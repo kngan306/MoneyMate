@@ -1,0 +1,36 @@
+name: flutter_moneymate_01
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.2.6
+  path_provider: ^2.0.14
+  path: ^1.8.2
+  firebase_core: ^2.27.2
+  cloud_firestore: ^4.15.5
+  firebase_auth: ^4.17.6
+  connectivity_plus: ^5.0.2
+  flutter_native_splash: ^2.4.4
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/files/
+    - assets/images/
+flutter_native_splash:
+  color: "#ECDFCC"
+  image: assets/images/logo.png
+  android: true
+  ios: true
