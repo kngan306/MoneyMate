@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.2
+
   sqflite: ^2.2.6
   path_provider: ^2.0.14
   path: ^1.8.2
@@ -16,7 +18,12 @@ dependencies:
   cloud_firestore: ^4.15.5
   firebase_auth: ^4.17.6
   connectivity_plus: ^5.0.2
-  flutter_native_splash: ^2.4.4
+  flutter_native_splash: ^2.4.4  
+  fl_chart: ^0.70.2
+  dropdown_button2: ^2.3.9
+  table_calendar: ^3.2.0
+  intl: ^0.20.2
+  flutter_screenutil: ^5.9.3
 
 
 dev_dependencies:
@@ -27,8 +34,23 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/files/
     - assets/images/
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Montserrat-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Montserrat-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Montserrat-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Montserrat-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Montserrat-ExtraBold.ttf
+          weight: 800
+          
 flutter_native_splash:
   color: "#ECDFCC"
   image: assets/images/logo.png

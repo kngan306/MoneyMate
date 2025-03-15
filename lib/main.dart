@@ -1,7 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/mainpage.dart';
-import 'package:flutter_moneymate_01/page/welcome_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../page/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,9 +15,15 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Mainpage(),
-    );
+    return ScreenUtilInit(
+        designSize: Size(360, 754), // Kích thước thiết kế gốc
+        minTextAdapt: true,
+        builder: (context, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            // home: Mainpage(),
+            home: SplashScreen(),
+          );
+        });
   }
 }
