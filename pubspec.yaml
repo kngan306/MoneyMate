@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-
+  syncfusion_flutter_calendar: ^28.2.11
   sqflite: ^2.2.6
   path_provider: ^2.0.14
   path: ^1.8.2
@@ -24,6 +24,7 @@ dependencies:
   table_calendar: ^3.2.0
   intl: ^0.20.2
   flutter_screenutil: ^5.9.3
+  convex_bottom_bar: ^3.2.0
 
 
 dev_dependencies:
