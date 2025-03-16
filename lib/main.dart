@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/mainpage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../page/splash_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/themkhoanchi_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,8 +22,9 @@ class MainApp extends StatelessWidget {
         builder: (context, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            // home: Mainpage(),
-            home: SplashScreen(),
+            home: Mainpage(),
+            // home: SplashScreen(),
+            // home: ThemKhoanChi(),
           );
         });
   }
