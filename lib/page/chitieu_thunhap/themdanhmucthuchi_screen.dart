@@ -28,33 +28,21 @@ class _ThemDanhMucThuChiState extends State<ThemDanhMucThuChi> {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E201E),
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: const Icon(
-                Icons.arrow_back,
-                size: 26,
-                color: Colors.white,
-              ),
-            ),
-            const Text(
-              "Tạo mới",
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                fontSize: 20,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(width: 26),
-          ],
+        title: const Text(
+          'Danh mục thu chi',
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            fontSize: 20,
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
         elevation: 0,
-        toolbarHeight: 60,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -166,8 +154,7 @@ class _ThemDanhMucThuChiState extends State<ThemDanhMucThuChi> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 20.0, bottom: 30),
                       child: ElevatedButton(
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),
                           shape: RoundedRectangleBorder(
