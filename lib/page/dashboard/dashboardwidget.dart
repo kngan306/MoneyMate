@@ -59,7 +59,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   children: [
                     Text("Tổng số dư",
                         style: TextStyle(
-                            fontSize: 18.sp,
+                            fontSize: 17,
                             fontFamily: 'Montserrat',
                             fontWeight: FontWeight.bold)),
                     Row(
@@ -69,7 +69,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                             _isBalanceVisible ? "7,500,000 đ" : "******",
                             style: TextStyle(
                                 fontFamily: 'Montserrat',
-                                fontSize: 20.sp,
+                                fontSize: 17,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF697565)),
                           ),
@@ -79,7 +79,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                               _isBalanceVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              size: 28.sp),
+                              size: 22),
                           onPressed: () {
                             setState(() {
                               _isBalanceVisible = !_isBalanceVisible;
@@ -98,7 +98,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   Text(
                     "Tình hình thu chi",
                     style: TextStyle(
-                        fontSize: 18.sp,
+                        fontSize: 17,
                         fontFamily: 'Montserrat',
                         fontWeight: FontWeight.bold),
                   ),
@@ -109,7 +109,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         'Chọn tháng',
                         style: TextStyle(
                           fontFamily: 'Montserrat',
-                          fontSize: 12.sp,
+                          fontSize: 13,
                           color: Theme.of(context).hintColor,
                         ),
                       ),
@@ -120,7 +120,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                               child: Text(
                                 item,
                                 style: TextStyle(
-                                  fontSize: 12.sp,
+                                  fontSize: 13,
                                   color: selectedValue == item
                                       ? Colors.blueAccent
                                       : Colors
@@ -208,14 +208,14 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           children: [
                             Text("Thu nhập",
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 15,
                                   fontFamily: 'Montserrat',
                                 )),
                             SizedBox(height: 5.h),
                             Text("10,000,000 đ",
                                 style: TextStyle(
                                   color: Colors.green,
-                                  fontSize: 14.sp,
+                                  fontSize: 15,
                                   fontFamily: 'Montserrat',
                                 )),
                           ],
@@ -224,14 +224,14 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           children: [
                             Text("Chi Tiêu",
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 15,
                                   fontFamily: 'Montserrat',
                                 )),
                             SizedBox(height: 5.h),
                             Text("2,500,000 đ",
                                 style: TextStyle(
                                   color: Colors.red,
-                                  fontSize: 14.sp,
+                                  fontSize: 15,
                                   fontFamily: 'Montserrat',
                                 )),
                           ],
@@ -240,13 +240,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           children: [
                             Text("Tổng",
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 15,
                                   fontFamily: 'Montserrat',
                                 )),
                             SizedBox(height: 5.h),
                             Text("+7,500,000 đ",
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 15,
                                   fontFamily: 'Montserrat',
                                 )),
                           ],
@@ -261,7 +261,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         Text(
                           "Lịch sử ghi chép",
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 13,
                             fontFamily: 'Montserrat',
                           ),
                         ),
@@ -277,7 +277,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               // Danh mục thu chi
               Text("Danh mục thu chi",
                   style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 17,
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.bold)),
               SizedBox(height: 10.h),
@@ -359,14 +359,14 @@ class ExpenseItem extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: TextStyle(fontSize: 16.sp, fontFamily: 'Montserrat',), // Kích thước chữ theo tỷ lệ
+              style: TextStyle(fontSize: 15, fontFamily: 'Montserrat',), // Kích thước chữ theo tỷ lệ
             ),
           ),
 
           Text(
             amount,
             style: TextStyle(
-                fontSize: 16.sp, fontFamily: 'Montserrat', color: Colors.red), // Điều chỉnh fontSize
+                fontSize: 15, fontFamily: 'Montserrat', color: Colors.red), // Điều chỉnh fontSize
           ),
         ],
       ),

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/mainpage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../page/splash_screen.dart';
-import 'package:flutter_moneymate_01/page/chitieu_thunhap/themkhoanchi_screen.dart';
+import 'package:flutter_moneymate_01/page/baoCao/timkiembaocao_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //await Firebase.initializeApp();
+  // await Firebase.initializeApp();
   runApp(const MainApp());
 }
 
@@ -17,15 +17,19 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-        designSize: Size(360, 754), // Kích thước thiết kế gốc
-        minTextAdapt: true,
-        builder: (context, child) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Mainpage(),
-            // home: SplashScreen(),
-            // home: ThemKhoanChi(),
-          );
-        });
+      designSize: const Size(360, 754), // Kích thước thiết kế gốc
+      minTextAdapt: true,
+      builder: (context, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            fontFamily: 'Montserrat', // Áp dụng font Montserrat cho toàn bộ app
+          ),
+          home: const Mainpage(),
+          // home: SplashScreen(),
+          // home: TimKiemBaoCaoThuChi(),
+        );
+      },
+    );
   }
 }
