@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/widgets/settings_item.dart';
+import '../../widgets/custom_app_bar.dart';
+
 
 class CaiDat extends StatelessWidget {
   const CaiDat({Key? key}) : super(key: key);
@@ -7,6 +9,14 @@ class CaiDat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        title: "Cài đặt",
+        showToggleButtons: false,
+        showMenuButton: true, // Hiển thị nút menu (Drawer)
+        onMenuPressed: () {
+          Scaffold.of(context).openDrawer(); // Mở drawer từ MainPage
+        },
+      ),
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
         child: Stack(

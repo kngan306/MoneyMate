@@ -8,6 +8,7 @@ import 'package:flutter_moneymate_01/page/Calendar/calendarwidget.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter_moneymate_01/page/thongbao_screen.dart';
 import 'package:flutter_moneymate_01/page/vitien_screen.dart';
+import 'authentication/dangnhap_screen.dart';
 
 class Mainpage extends StatefulWidget {
   const Mainpage({Key? key}) : super(key: key);
@@ -17,9 +18,12 @@ class Mainpage extends StatefulWidget {
 }
 
 class _MainpageState extends State<Mainpage> {
-  int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  static final List<Widget> _widgetOptions = <Widget>[
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static List<Widget> _widgetOptions = <Widget>[
     DashboardWidget(),
     CalendarWidget(),
     ThemKhoanThuChi(),
@@ -29,49 +33,49 @@ class _MainpageState extends State<Mainpage> {
     ViTien(), //6
     CaiDat(), //7
   ];
-
-  // Danh sách tiêu đề ứng với từng màn hình
-  static final List<String> _titles = [
-    "Trang chủ",
-    "Lịch",
-    "Thêm khoản thu chi",
-    "Báo cáo",
-    "Tài khoản",
-    "Thông báo", //5
-    "Ví của tôi", //6
-    "Cài đặt", //7
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
+  // // Danh sách tiêu đề ứng với từng màn hình
+  // static final List<String> _titles = [
+  //   "Trang chủ",
+  //   "Lịch",
+  //   "Thêm khoản thu chi",
+  //   "Báo cáo",
+  //   "Tài khoản",
+  //   "Thông báo", //5
+  //   "Ví của tôi", //6
+  //   "Cài đặt", //7
+  // ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E201E),
-        title: Text(
-          _titles[_selectedIndex], // Tiêu đề động theo từng màn hình
-          style: const TextStyle(
-            color: Colors.white,
-            fontFamily: 'Montserrat', // Đặt font chữ
-            fontSize: 20, // Kích thước chữ
-            fontWeight: FontWeight.bold, // Làm đậm chữ nếu cần
-          ),
-        ),
-        centerTitle: true, // Căn giữa tiêu đề
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: const Color(0xFF1E201E),
+      //   title: Text(
+      //     _titles[_selectedIndex], // Tiêu đề động theo từng màn hình
+      //     style: const TextStyle(
+      //       color: Colors.white,
+      //       fontFamily: 'Montserrat', // Đặt font chữ
+      //       fontSize: 20, // Kích thước chữ
+      //       fontWeight: FontWeight.bold, // Làm đậm chữ nếu cần
+      //     ),
+      //   ),
+      //   centerTitle: true, // Căn giữa tiêu đề
+      //   leading: Builder(
+      //     builder: (context) => IconButton(
+      //       icon: const Icon(Icons.menu, color: Colors.white),
+      //       onPressed: () {
+      //         Scaffold.of(context).openDrawer();
+      //       },
+      //     ),
+      //   ),
+      // ),
+      key: _scaffoldKey, // Key để mở Drawer từ trang con
+
       body: Center(
         child: _widgetOptions[_selectedIndex],
       ),
@@ -130,10 +134,12 @@ class _MainpageState extends State<Mainpage> {
               leading: const Icon(Icons.exit_to_app),
               title: const Text('Đăng xuất'),
               onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 0;
-                });
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DangNhap(),
+                  ),
+                );
               },
             ),
           ],

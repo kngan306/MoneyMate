@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../widgets/custom_app_bar.dart';
+
 
 class UserWidget extends StatelessWidget {
   const UserWidget({super.key});
@@ -6,6 +8,14 @@ class UserWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       appBar: CustomAppBar(
+        title: "Tài khoản",
+        showToggleButtons: false,
+        showMenuButton: true, // Hiển thị nút menu (Drawer)
+        onMenuPressed: () {
+          Scaffold.of(context).openDrawer(); // Mở drawer từ MainPage
+        },
+      ),
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
           child: Center(
