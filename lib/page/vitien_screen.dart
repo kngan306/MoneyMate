@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/widgets/wallet_item.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class ViTien extends StatelessWidget {
   const ViTien({Key? key}) : super(key: key);
@@ -7,6 +8,14 @@ class ViTien extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        title: "Ví của tôi",
+        showToggleButtons: false,
+        showMenuButton: true, // Hiển thị nút menu (Drawer)
+        onMenuPressed: () {
+          Scaffold.of(context).openDrawer(); // Mở drawer từ MainPage
+        },
+      ),
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
         child: Column(

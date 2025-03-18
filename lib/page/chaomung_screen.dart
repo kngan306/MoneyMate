@@ -90,7 +90,7 @@ class ChaoMung extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: () {
                           // Navigator.pushNamed(context, AppRoutes.login);
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const DangNhap(),
@@ -128,7 +128,7 @@ class ChaoMung extends StatelessWidget {
                         onPressed: () {
                           // Handle register action
                           // Navigator.pushNamed(context, AppRoutes.register);
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const DangKy(),

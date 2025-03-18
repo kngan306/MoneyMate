@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'quenmatkhau_screen.dart';
 import 'dangky_screen.dart';
 import '../dashboard/dashboardwidget.dart';
+import '../mainpage.dart';
 
 class DangNhap extends StatefulWidget {
   const DangNhap({Key? key}) : super(key: key);
@@ -244,10 +245,10 @@ class _DangNhapState extends State<DangNhap> {
                       child: GestureDetector(
                         onTap: () {
                           // Navigator.pushNamed(context, '/dashboard');
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const DashboardWidget(),
+                              builder: (context) => Mainpage(),
                             ),
                           );
                         },
@@ -371,8 +372,8 @@ class _DangNhapState extends State<DangNhap> {
                           ),
                           Icon(
                             Icons.arrow_forward,
-                            size: 26, 
-                            color: Colors.black, 
+                            size: 26,
+                            color: Colors.black,
                           ),
                         ],
                       ),
@@ -415,8 +416,8 @@ class _DangNhapState extends State<DangNhap> {
                           ),
                           Icon(
                             Icons.arrow_forward,
-                            size: 26, 
-                            color: Colors.black, 
+                            size: 26,
+                            color: Colors.black,
                           ),
                         ],
                       ),

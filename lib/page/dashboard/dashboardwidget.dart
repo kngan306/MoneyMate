@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../widgets/custom_app_bar.dart';
+import 'package:flutter_moneymate_01/page/dashboard/lichsughichep_screen.dart';
+import 'package:flutter_moneymate_01/page/dashboard/lichsutheodanhmuc_screen.dart';
 
 class DashboardWidget extends StatefulWidget {
   const DashboardWidget({super.key});
@@ -41,6 +44,14 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        title: "Trang chủ",
+        showToggleButtons: false,
+        showMenuButton: true, // Hiển thị nút menu (Drawer)
+        onMenuPressed: () {
+          Scaffold.of(context).openDrawer(); // Mở drawer từ MainPage
+        },
+      ),
       backgroundColor: const Color(0xFFF5F5F5),
       body: SingleChildScrollView(
         child: Padding(
@@ -254,22 +265,31 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       ],
                     ),
                     SizedBox(height: 10.h),
-                    Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.end, // Căn cả hàng về bên phải
-                      children: [
-                        Text(
-                          "Lịch sử ghi chép",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontFamily: 'Montserrat',
+                    // Clickable text to navigate to LichSuGhiChep
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LichSuGhiChep()),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Lịch sử ghi chép",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontFamily: 'Montserrat',
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                            width: 5.w), // Giảm khoảng cách giữa chữ và icon
-                        Icon(Icons.chevron_right, color: Colors.black),
-                      ],
-                    )
+                          const SizedBox(
+                              width: 5), // Giảm khoảng cách giữa chữ và icon
+                          const Icon(Icons.chevron_right, color: Colors.black),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -282,32 +302,47 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       fontWeight: FontWeight.bold)),
               SizedBox(height: 10.h),
 
-              // Không dùng Expanded để tránh lỗi cuộn
               ListView(
                 shrinkWrap: true, // Đảm bảo list không chiếm toàn bộ chiều cao
                 physics:
                     const NeverScrollableScrollPhysics(), // Tắt cuộn riêng lẻ
-                children: const [
+                children: [
                   ExpenseItem(
-                      iconPath: "assets/images/food.png",
-                      title: "Ăn uống",
-                      amount: "-1,000,000 đ"),
+                    iconPath: "assets/images/food.png",
+                    title: "Ăn uống",
+                    amount: "-1,000,000 đ",
+                    onTap: () {}, // Không có hành động nào cho mục này
+                  ),
                   ExpenseItem(
-                      iconPath: "assets/images/quanao.png",
-                      title: "Quần áo",
-                      amount: "-500,000 đ"),
+                    iconPath: "assets/images/quanao.png",
+                    title: "Quần áo",
+                    amount: "-500,000 đ",
+                    onTap: () {}, // Không có hành động nào cho mục này
+                  ),
                   ExpenseItem(
-                      iconPath: "assets/images/mypham.png",
-                      title: "Mỹ phẩm",
-                      amount: "-400,000 đ"),
+                    iconPath: "assets/images/mypham.png",
+                    title: "Mỹ phẩm",
+                    amount: "-400,000 đ",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LichSuTheoDanhMuc()),
+                      );
+                    },
+                  ),
                   ExpenseItem(
-                      iconPath: "assets/images/yte.png",
-                      title: "Y tế",
-                      amount: "-100,000 đ"),
+                    iconPath: "assets/images/yte.png",
+                    title: "Y tế",
+                    amount: "-100,000 đ",
+                    onTap: () {}, // Không có hành động nào cho mục này
+                  ),
                   ExpenseItem(
-                      iconPath: "assets/images/xemay.png",
-                      title: "Đi lại",
-                      amount: "-500,000 đ"),
+                    iconPath: "assets/images/xemay.png",
+                    title: "Đi lại",
+                    amount: "-500,000 đ",
+                    onTap: () {}, // Không có hành động nào cho mục này
+                  ),
                 ],
               ),
             ],
@@ -318,57 +353,66 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   }
 }
 
-// Cập nhật ExpenseItem để hỗ trợ cả ảnh và icon
 class ExpenseItem extends StatelessWidget {
   final IconData? icon; // Icon từ Flutter
   final String title;
   final String amount;
   final String? iconPath; // Đường dẫn ảnh từ assets
+  final VoidCallback onTap; // Thêm một callback cho sự kiện click
 
   const ExpenseItem({
-    super.key,
+    Key? key,
     this.icon,
     required this.title,
     required this.amount,
     this.iconPath,
-  });
+    required this.onTap, // Nhận callback
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-          vertical: 5.h), // Điều chỉnh khoảng cách theo tỷ lệ
-      padding: EdgeInsets.all(16.r), // Điều chỉnh padding theo tỷ lệ
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r), // Bo góc theo tỷ lệ
-      ),
-      child: Row(
-        children: [
-          // Nếu có iconPath -> dùng ảnh từ assets, nếu không -> dùng icon mặc định
-          if (iconPath != null)
-            Image.asset(iconPath!,
-                width: 30.w, height: 30.h) // Kích thước ảnh theo tỷ lệ
-          else if (icon != null)
-            Icon(icon,
-                size: 30.sp,
-                color: Colors.redAccent), // Kích thước icon theo tỷ lệ
+    return GestureDetector(
+      onTap: onTap, // Gọi callback khi nhấn
+      child: Container(
+        margin: EdgeInsets.symmetric(
+            vertical: 5.h), // Điều chỉnh khoảng cách theo tỷ lệ
+        padding: EdgeInsets.all(16.r), // Điều chỉnh padding theo tỷ lệ
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.r), // Bo góc theo tỷ lệ
+        ),
+        child: Row(
+          children: [
+            // Nếu có iconPath -> dùng ảnh từ assets, nếu không -> dùng icon mặc định
+            if (iconPath != null)
+              Image.asset(iconPath!,
+                  width: 30.w, height: 30.h) // Kích thước ảnh theo tỷ lệ
+            else if (icon != null)
+              Icon(icon,
+                  size: 30.sp,
+                  color: Colors.redAccent), // Kích thước icon theo tỷ lệ
 
-          SizedBox(width: 10.w), // Điều chỉnh khoảng cách giữa các phần tử
+            SizedBox(width: 10.w), // Điều chỉnh khoảng cách giữa các phần tử
 
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(fontSize: 15, fontFamily: 'Montserrat',), // Kích thước chữ theo tỷ lệ
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Montserrat',
+                ), // Kích thước chữ theo tỷ lệ
+              ),
             ),
-          ),
 
-          Text(
-            amount,
-            style: TextStyle(
-                fontSize: 15, fontFamily: 'Montserrat', color: Colors.red), // Điều chỉnh fontSize
-          ),
-        ],
+            Text(
+              amount,
+              style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Montserrat',
+                  color: Colors.red), // Điều chỉnh fontSize
+            ),
+          ],
+        ),
       ),
     );
   }
