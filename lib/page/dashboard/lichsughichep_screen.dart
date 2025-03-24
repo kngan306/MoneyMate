@@ -1,7 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class LichSuGhiChep extends StatelessWidget {
+class LichSuGhiChep extends StatefulWidget {
   const LichSuGhiChep({Key? key}) : super(key: key);
+
+  @override
+  _LichSuGhiChepState createState() => _LichSuGhiChepState();
+}
+
+class _LichSuGhiChepState extends State<LichSuGhiChep> {
+  late DateTime _focusedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusedDay = DateTime.now(); // Initialize to the current date
+  }
+
+  void _changeMonth(int step) {
+    setState(() {
+      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +49,45 @@ class LichSuGhiChep extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Thanh chọn tháng
+            Padding(
+              // padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.fromLTRB(16.0, 19.0, 16.0, 0.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.chevron_left, size: 30),
+                    onPressed: () => _changeMonth(-1),
+                  ),
+                  Container(
+                    width: 250,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black, width: 1),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                    ),
+                    child: Center(
+                      // Căn giữa nội dung
+                      child: Text(
+                        DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.chevron_right, size: 30),
+                    onPressed: () => _changeMonth(1),
+                  ),
+                ],
+              ),
+            ),
             // Transactions list
             Expanded(
               child: Container(
-                margin: const EdgeInsets.only(top: 30), // Thêm margin ở đây
+                margin: const EdgeInsets.only(top: 19), // Thêm margin ở đây
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [

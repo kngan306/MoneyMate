@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'dangnhap_screen.dart';
 import 'xacthucotp_screen.dart';
-import '../../widgets/phone_input.dart';
-import '../../widgets/email_input.dart';
-import '../../widgets/registration_tab.dart';
+import '../../widgets/input/phone_input.dart';
+import '../../widgets/input/email_input.dart';
+import '../../widgets/tab/registration_tab.dart';
 
 class DangKy extends StatefulWidget {
   const DangKy({Key? key}) : super(key: key);
@@ -86,7 +86,8 @@ class _DangKyState extends State<DangKy> {
                 // margin: const EdgeInsets.only(top: 30.0),
                 margin: const EdgeInsets.only(top: 20.0),
                 // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 178.0),
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 160.0),
+                // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 160.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 222.0),
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Colors.white,

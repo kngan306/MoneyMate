@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_moneymate_01/page/caidat_screen.dart';
+import 'package:flutter_moneymate_01/page/menu/caidat_screen.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/themkhoanthuchi_screen.dart';
 import 'package:flutter_moneymate_01/page/baoCao/reportwidget.dart';
 import 'package:flutter_moneymate_01/page/dashboard/dashboardwidget.dart';
 import 'package:flutter_moneymate_01/page/User/userwidget.dart';
 import 'package:flutter_moneymate_01/page/Calendar/calendarwidget.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:flutter_moneymate_01/page/thongbao_screen.dart';
-import 'package:flutter_moneymate_01/page/vitien_screen.dart';
+import 'package:flutter_moneymate_01/page/menu/thongbao_screen.dart';
+import 'package:flutter_moneymate_01/page/menu/vitien_screen.dart';
 import 'authentication/dangnhap_screen.dart';
 
 class Mainpage extends StatefulWidget {

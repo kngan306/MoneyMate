@@ -2,8 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/mainpage.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../page/splash_screen.dart';
-import 'package:flutter_moneymate_01/page/baoCao/timkiembaocao_screen.dart';
+import 'page/splash/splash_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -33,7 +32,6 @@ class MainApp extends StatelessWidget {
           ),
           //home: const Mainpage(),
           home: SplashScreen(),
-          // home: TimKiemBaoCaoThuChi(),
         );
       },
     );

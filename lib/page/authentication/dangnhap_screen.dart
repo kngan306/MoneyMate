@@ -85,8 +85,8 @@ class _DangNhapState extends State<DangNhap> {
               Container(
                 // margin: const EdgeInsets.only(top: 30.0),
                 margin: const EdgeInsets.only(top: 20.0),
-                // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 44.0),
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 25.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 88.0),
+                // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 25.0),
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Colors.white,

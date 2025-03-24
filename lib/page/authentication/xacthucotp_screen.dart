@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dangkyfinal_screen.dart';
-import '../../widgets/otp_input.dart';
+import '../../widgets/input/otp_input.dart';
 
 class XacThucOTP extends StatefulWidget {
   const XacThucOTP({Key? key}) : super(key: key);
@@ -109,7 +109,8 @@ class _XacThucOTPState extends State<XacThucOTP> {
                 // margin: const EdgeInsets.only(top: 30.0),
                 margin: const EdgeInsets.only(top: 20.0),
                 // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 160.0),
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 140.0),
+                // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 140.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 205.0),
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Colors.white,
