@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../widgets/otp_input.dart';
+import '../../widgets/input/otp_input.dart';
 import 'resetpass_screen.dart';
 
 class XacThucQuenMatKhau extends StatefulWidget {
@@ -109,7 +109,8 @@ class _XacThucQuenMatKhauState extends State<XacThucQuenMatKhau> {
                 // margin: const EdgeInsets.only(top: 30.0),
                 margin: const EdgeInsets.only(top: 20.0),
                 // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 160.0),
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 140.0),
+                // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 140.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 200.0),
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   color: Colors.white,

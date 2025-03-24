@@ -228,6 +228,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                   color: Colors.green,
                                   fontSize: 15,
                                   fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w600,
                                 )),
                           ],
                         ),
@@ -244,6 +245,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                   color: Colors.red,
                                   fontSize: 15,
                                   fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w600,
                                 )),
                           ],
                         ),
@@ -259,6 +261,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w600,
                                 )),
                           ],
                         ),

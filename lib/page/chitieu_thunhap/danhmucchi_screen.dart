@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../widgets/category2_item.dart';
+import '../../widgets/cateitem/category2_item.dart';
 import 'themdanhmucthuchi_screen.dart';
 
 class DanhMucChi extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import '../../widgets/email_input.dart';
+import '../../widgets/input/email_input.dart';
 import 'xacthuc_quenmk_screen.dart';
 
 class QuenMatKhau extends StatefulWidget {
@@ -92,7 +92,8 @@ class _QuenMatKhauState extends State<QuenMatKhau> {
                 // margin: const EdgeInsets.only(top: 30.0),
                 margin: const EdgeInsets.only(top: 20.0),
                 // padding: const EdgeInsets.fromLTRB(16, 16, 16, 180),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
+                // padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 230),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(

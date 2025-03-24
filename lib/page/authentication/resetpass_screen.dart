@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../widgets/password_new_input.dart';
+import '../../widgets/input/password_new_input.dart';
 import 'dangnhap_screen.dart';
 
 class ResetPassword extends StatefulWidget {
@@ -94,7 +94,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                   // margin: const EdgeInsets.only(top: 30.0),
                   margin: const EdgeInsets.only(top: 20.0),
                   // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 90.0),
-                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 78.0),
+                  // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 78.0),
+                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 140.0),
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Colors.white,

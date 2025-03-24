@@ -264,7 +264,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                             '-240,000 đ',
                             style: TextStyle(
                               //fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
+                              // fontWeight: FontWeight.bold,
                               fontSize: 15,
                               color: Color(0xFFFE0000),
                             ),
@@ -321,7 +321,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                             '+1,000,000 đ',
                             style: TextStyle(
                               //fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
+                              // fontWeight: FontWeight.bold,
                               fontSize: 15,
                               color: Color(0xFF4ABD57),
                             ),
@@ -376,7 +376,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                           const Text(
                             '-500,000 đ',
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                              // fontWeight: FontWeight.bold,
                               //fontFamily: 'Montserrat',
                               fontSize: 15,
                               color: Color(0xFFFE0000),
@@ -401,7 +401,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         Text(label, style: TextStyle(fontSize: 16, color: Colors.black)),
         Text(amount,
             style: TextStyle(
-                color: color, fontSize: 16, fontWeight: FontWeight.bold)),
+                color: color, fontSize: 16, fontWeight: FontWeight.w600)),
       ],
     );
   }

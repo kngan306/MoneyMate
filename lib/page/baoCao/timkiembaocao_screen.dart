@@ -95,6 +95,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                           Text(
                             '1,168,000 đ',
                             style: TextStyle(
+                              fontWeight: FontWeight.w600,
                               fontFamily: 'Montserrat',
                               fontSize: 15,
                               color: const Color(0xFFFE0000),
@@ -129,6 +130,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                           Text(
                             '1,000,000 đ',
                             style: TextStyle(
+                              fontWeight: FontWeight.w600,
                               fontFamily: 'Montserrat',
                               fontSize: 15,
                               color: const Color(0xFF4ABD57),
@@ -143,9 +145,8 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 13),
                       child: Container(
                         width: 1,
-                        height: 26,
+                        height: 30,
                         color: const Color(0xFFD9D9D9),
-                        margin: const EdgeInsets.only(top: 11),
                       ),
                     ),
 
@@ -165,9 +166,10 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                           Text(
                             '-168,000 đ',
                             style: TextStyle(
+                              fontWeight: FontWeight.w600,
                               fontFamily: 'Montserrat',
                               fontSize: 15,
-                              color: const Color(0xFFFE0000),
+                              color: const Color.fromARGB(255, 0, 0, 0),
                             ),
                           ),
                         ],

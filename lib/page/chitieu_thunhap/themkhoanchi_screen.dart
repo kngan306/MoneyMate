@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../widgets/category_item.dart';
+import '../../widgets/cateitem/category_item.dart';
 import 'danhmucchi_screen.dart';
 import 'themkhoanthu_screen.dart';
 
