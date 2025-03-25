@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/cateitem/category_item.dart';
 import 'danhmucchi_screen.dart';
 import 'themkhoanthu_screen.dart';
+import '../mainpage.dart';
 
 class ThemKhoanChi extends StatefulWidget {
   const ThemKhoanChi({Key? key}) : super(key: key);
@@ -394,12 +395,13 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                         Expanded(
                                           child: GestureDetector(
                                             onTap: () {
-                                              // Chuyển đến trang DanhMucChi
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DanhMucChi()),
+                                                  builder: (context) =>
+                                                      Mainpage(
+                                                          selectedIndex: 10),
+                                                ),
                                               );
                                             },
                                             child: Container(

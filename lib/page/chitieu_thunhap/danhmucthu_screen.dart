@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/cateitem/category2_item.dart';
 import 'themdanhmucthuchi_screen.dart';
+import '../mainpage.dart';
 
 class DanhMucThu extends StatefulWidget {
   const DanhMucThu({Key? key}) : super(key: key);
@@ -15,8 +16,8 @@ class _DanhMucThuState extends State<DanhMucThu> {
   bool isPhuCapChecked = false;
   bool isThuNhapPhuChecked = false;
   bool isTienThuongChecked = false;
-  bool isDauTuChecked = true; 
-  bool isDiLaiChecked = false; 
+  bool isDauTuChecked = true;
+  bool isDiLaiChecked = false;
   bool isTienNhaChecked = false;
   bool isXaStressChecked = false;
   bool isCapWifiChecked = false;
@@ -93,11 +94,11 @@ class _DanhMucThuState extends State<DanhMucThu> {
                   padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
                   child: GestureDetector(
                     onTap: () {
-                      // Chuyển sang màn hình ThemDanhMuc
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ThemDanhMucThuChi()),
+                          builder: (context) => Mainpage(selectedIndex: 12),
+                        ),
                       );
                     },
                     child: Container(
@@ -229,83 +230,90 @@ class _DanhMucThuState extends State<DanhMucThu> {
                         width: 1,
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        // Tiền lương
-                        CategoryItem(
-                          categoryKey: 'tienLuong',
-                          title: 'Tiền lương',
-                          iconUrl: 'assets/images/cate29.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isTienLuongChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isTienLuongChecked = value;
-                            });
-                          },
-                        ),
+                    child: SizedBox(
+                      height:
+                          400, // Điều chỉnh chiều cao để phù hợp với giao diện
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            // Danh sách CategoryItem
+                            // Tiền lương
+                            CategoryItem(
+                              categoryKey: 'tienLuong',
+                              title: 'Tiền lương',
+                              iconUrl: 'assets/images/cate29.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isTienLuongChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isTienLuongChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Phụ cấp
-                        CategoryItem(
-                          categoryKey: 'phuCap',
-                          title: 'Phụ cấp',
-                          iconUrl: 'assets/images/cate33.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isPhuCapChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isPhuCapChecked = value;
-                            });
-                          },
-                        ),
+                            // Phụ cấp
+                            CategoryItem(
+                              categoryKey: 'phuCap',
+                              title: 'Phụ cấp',
+                              iconUrl: 'assets/images/cate33.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isPhuCapChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isPhuCapChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Thu nhập phụ
-                        CategoryItem(
-                          categoryKey: 'thuNhapPhu',
-                          title: 'Thu nhập phụ',
-                          iconUrl: 'assets/images/cate31.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isThuNhapPhuChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isThuNhapPhuChecked = value;
-                            });
-                          },
-                        ),
+                            // Thu nhập phụ
+                            CategoryItem(
+                              categoryKey: 'thuNhapPhu',
+                              title: 'Thu nhập phụ',
+                              iconUrl: 'assets/images/cate31.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isThuNhapPhuChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isThuNhapPhuChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Tiền thưởng
-                        CategoryItem(
-                          categoryKey: 'tienThuong',
-                          title: 'Tiền thưởng',
-                          iconUrl: 'assets/images/cate32.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isTienThuongChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isTienThuongChecked = value;
-                            });
-                          },
-                        ),
+                            // Tiền thưởng
+                            CategoryItem(
+                              categoryKey: 'tienThuong',
+                              title: 'Tiền thưởng',
+                              iconUrl: 'assets/images/cate32.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isTienThuongChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isTienThuongChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Đầu tư
-                        CategoryItem(
-                          categoryKey: 'dauTu',
-                          title: 'Đầu tư',
-                          iconUrl: 'assets/images/cate30.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isDauTuChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isDauTuChecked = value;
-                            });
-                          },
+                            // Đầu tư
+                            CategoryItem(
+                              categoryKey: 'dauTu',
+                              title: 'Đầu tư',
+                              iconUrl: 'assets/images/cate30.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isDauTuChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isDauTuChecked = value;
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

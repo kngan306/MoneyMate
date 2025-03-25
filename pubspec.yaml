@@ -18,13 +18,14 @@ dependencies:
   cloud_firestore: ^4.15.5
   firebase_auth: ^4.17.6
   connectivity_plus: ^5.0.2
-  flutter_native_splash: ^2.4.4  
+  # flutter_native_splash: ^2.4.4  
   fl_chart: ^0.70.2
   dropdown_button2: ^2.3.9
   table_calendar: ^3.2.0
   intl: ^0.20.2
   flutter_screenutil: ^5.9.3
   convex_bottom_bar: ^3.2.0
+  keyboard_avoider: ^0.2.0
 
 
 dev_dependencies:

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/cateitem/category_item.dart';
 import 'danhmucthu_screen.dart';
 import 'themkhoanchi_screen.dart';
+import '../mainpage.dart';
 
 class ThemKhoanThu extends StatefulWidget {
   const ThemKhoanThu({Key? key}) : super(key: key);
@@ -266,7 +267,7 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                             child: Container(
                               padding: const EdgeInsets.only(top: 10.0),
                               height:
-                                  300, // Chiều cao cố định để giới hạn số dòng hiển thị
+                                  285, // Chiều cao cố định để giới hạn số dòng hiển thị
                               child: ListView(
                                 children: [
                                   // First row of categories
@@ -359,12 +360,13 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                         Expanded(
                                           child: GestureDetector(
                                             onTap: () {
-                                              // Chuyển đến trang DanhMucChi
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DanhMucThu()),
+                                                  builder: (context) =>
+                                                      Mainpage(
+                                                          selectedIndex: 11),
+                                                ),
                                               );
                                             },
                                             child: Container(

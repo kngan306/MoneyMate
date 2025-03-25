@@ -85,7 +85,7 @@ class _DangNhapState extends State<DangNhap> {
               Container(
                 // margin: const EdgeInsets.only(top: 30.0),
                 margin: const EdgeInsets.only(top: 20.0),
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 88.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 88.0),
                 // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 25.0),
                 width: double.infinity,
                 decoration: const BoxDecoration(
@@ -336,7 +336,7 @@ class _DangNhapState extends State<DangNhap> {
                     ),
 
                     // Google login button
-                    const SizedBox(height: 21),
+                    const SizedBox(height: 30),
                     Container(
                       constraints: const BoxConstraints(maxWidth: 300),
                       padding: const EdgeInsets.fromLTRB(17, 10, 17, 10),
