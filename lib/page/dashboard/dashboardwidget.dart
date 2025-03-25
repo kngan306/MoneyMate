@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../widgets/custom_app_bar.dart';
 import 'package:flutter_moneymate_01/page/dashboard/lichsughichep_screen.dart';
 import 'package:flutter_moneymate_01/page/dashboard/lichsutheodanhmuc_screen.dart';
+import '../mainpage.dart';
 
 class DashboardWidget extends StatefulWidget {
   const DashboardWidget({super.key});
@@ -16,7 +17,7 @@ class DashboardWidget extends StatefulWidget {
 typedef MenuEntry = DropdownMenuEntry<String>;
 
 class _DashboardWidgetState extends State<DashboardWidget> {
-  bool _isBalanceVisible = true;
+  bool _isBalanceVisible = false;
 
   final List<String> items = [
     'Tháng 1',
@@ -274,7 +275,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const LichSuGhiChep()),
+                            builder: (context) => Mainpage(selectedIndex: 8),
+                          ),
                         );
                       },
                       child: Row(
@@ -326,13 +328,14 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     iconPath: "assets/images/mypham.png",
                     title: "Mỹ phẩm",
                     amount: "-400,000 đ",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LichSuTheoDanhMuc()),
-                      );
-                    },
+                     onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Mainpage(selectedIndex: 9),
+                          ),
+                        );
+                      },
                   ),
                   ExpenseItem(
                     iconPath: "assets/images/yte.png",

@@ -74,7 +74,8 @@ class ChaoMung extends StatelessWidget {
               Container(
                 width: double.infinity,
                 // padding: const EdgeInsets.fromLTRB(50, 40, 50, 36),
-                padding: const EdgeInsets.fromLTRB(50, 40, 50, 94),
+                // padding: const EdgeInsets.fromLTRB(50, 40, 50, 94),
+                padding: const EdgeInsets.fromLTRB(50, 65, 50, 94),
                 decoration: const BoxDecoration(
                   color: Color(0xFFECDFCC), // Cream
                   borderRadius: BorderRadius.only(
@@ -90,7 +91,7 @@ class ChaoMung extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: () {
                           // Navigator.pushNamed(context, AppRoutes.login);
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const DangNhap(),
@@ -128,7 +129,7 @@ class ChaoMung extends StatelessWidget {
                         onPressed: () {
                           // Handle register action
                           // Navigator.pushNamed(context, AppRoutes.register);
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const DangKy(),

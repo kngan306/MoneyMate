@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/menu/caidat_screen.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/themkhoanthuchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/danhmucchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/danhmucthu_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/themdanhmucthuchi_screen.dart';
 import 'package:flutter_moneymate_01/page/baoCao/reportwidget.dart';
 import 'package:flutter_moneymate_01/page/dashboard/dashboardwidget.dart';
+import 'package:flutter_moneymate_01/page/dashboard/lichsughichep_screen.dart';
+import 'package:flutter_moneymate_01/page/dashboard/lichsutheodanhmuc_screen.dart';
 import 'package:flutter_moneymate_01/page/User/userwidget.dart';
 import 'package:flutter_moneymate_01/page/Calendar/calendarwidget.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
@@ -11,7 +16,9 @@ import 'package:flutter_moneymate_01/page/menu/vitien_screen.dart';
 import 'authentication/dangnhap_screen.dart';
 
 class Mainpage extends StatefulWidget {
-  const Mainpage({Key? key}) : super(key: key);
+  //const Mainpage({Key? key}) : super(key: key);
+  final int selectedIndex;
+  const Mainpage({Key? key, this.selectedIndex = 0}) : super(key: key);
 
   @override
   State<Mainpage> createState() => _MainpageState();
@@ -21,6 +28,13 @@ class _MainpageState extends State<Mainpage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex;
+  }
+
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
@@ -32,6 +46,11 @@ class _MainpageState extends State<Mainpage> {
     ThongBao(), //5
     ViTien(), //6
     CaiDat(), //7
+    LichSuGhiChep(), //8
+    LichSuTheoDanhMuc(), //9
+    DanhMucChi(), //10
+    DanhMucThu(), //11
+    ThemDanhMucThuChi(), //12
   ];
   void _onItemTapped(int index) {
     setState(() {
@@ -84,18 +103,23 @@ class _MainpageState extends State<Mainpage> {
           padding: EdgeInsets.zero,
           children: [
             const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
+              decoration: BoxDecoration(color: Color(0xFF1E201E)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: NetworkImage(
-                        'https://googleflutter.com/sample_image.jpg'),
+                    backgroundImage: AssetImage('assets/images/avt.jpg'),
                   ),
                   SizedBox(height: 8),
-                  Text('Duy Kha'),
-                  Text('22dh111480@st.huflit.edu.vn'),
+                  Text(
+                    'Duy Kha',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    '22dh111480@st.huflit.edu.vn',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ],
               ),
             ),
@@ -150,9 +174,9 @@ class _MainpageState extends State<Mainpage> {
         activeColor: Colors.white,
         color: Colors.white70,
         style: TabStyle.fixedCircle,
-        height: 60,
+        height: 55,
         curveSize: 80,
-        top: -15,
+        top: -20,
         items: [
           TabItem(icon: Icons.home, title: 'Trang chủ'),
           TabItem(icon: Icons.calendar_month_outlined, title: 'Lịch'),

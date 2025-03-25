@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/cateitem/category2_item.dart';
 import 'themdanhmucthuchi_screen.dart';
+import '../mainpage.dart';
 
 class DanhMucChi extends StatefulWidget {
   const DanhMucChi({Key? key}) : super(key: key);
@@ -92,11 +93,11 @@ class _DanhMucChiState extends State<DanhMucChi> {
                   padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
                   child: GestureDetector(
                     onTap: () {
-                      // Chuyển sang màn hình ThemDanhMucChi
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ThemDanhMucThuChi()),
+                          builder: (context) => Mainpage(selectedIndex: 12),
+                        ),
                       );
                     },
                     child: Container(
@@ -225,129 +226,136 @@ class _DanhMucChiState extends State<DanhMucChi> {
                         width: 1,
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        // Ăn uống
-                        CategoryItem(
-                          categoryKey: 'anUong',
-                          title: 'Ăn uống',
-                          iconUrl: 'assets/images/food.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isAnUongChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isAnUongChecked = value;
-                            });
-                          },
-                        ),
+                    child: SizedBox(
+                      height:
+                          400, // Điều chỉnh chiều cao để phù hợp với giao diện
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            // Danh sách CategoryItem
+                            // Ăn uống
+                            CategoryItem(
+                              categoryKey: 'anUong',
+                              title: 'Ăn uống',
+                              iconUrl: 'assets/images/food.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isAnUongChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isAnUongChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Quần áo
-                        CategoryItem(
-                          categoryKey: 'quanAo',
-                          title: 'Quần áo',
-                          iconUrl: 'assets/images/quanao.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isQuanAoChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isQuanAoChecked = value;
-                            });
-                          },
-                        ),
+                            // Quần áo
+                            CategoryItem(
+                              categoryKey: 'quanAo',
+                              title: 'Quần áo',
+                              iconUrl: 'assets/images/quanao.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isQuanAoChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isQuanAoChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Mỹ phẩm
-                        CategoryItem(
-                          categoryKey: 'myPham',
-                          title: 'Mỹ phẩm',
-                          iconUrl: 'assets/images/mypham.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isMyPhamChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isMyPhamChecked = value;
-                            });
-                          },
-                        ),
+                            // Mỹ phẩm
+                            CategoryItem(
+                              categoryKey: 'myPham',
+                              title: 'Mỹ phẩm',
+                              iconUrl: 'assets/images/mypham.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isMyPhamChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isMyPhamChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Y tế
-                        CategoryItem(
-                          categoryKey: 'yTe',
-                          title: 'Y tế',
-                          iconUrl: 'assets/images/yte.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isYTeChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isYTeChecked = value;
-                            });
-                          },
-                          hasCheckmark: true,
-                        ),
+                            // Y tế
+                            CategoryItem(
+                              categoryKey: 'yTe',
+                              title: 'Y tế',
+                              iconUrl: 'assets/images/yte.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isYTeChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isYTeChecked = value;
+                                });
+                              },
+                              hasCheckmark: true,
+                            ),
 
-                        // Đi lại
-                        CategoryItem(
-                          categoryKey: 'diLai',
-                          title: 'Đi lại',
-                          iconUrl: 'assets/images/xemay.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isDiLaiChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isDiLaiChecked = value;
-                            });
-                          },
-                        ),
+                            // Đi lại
+                            CategoryItem(
+                              categoryKey: 'diLai',
+                              title: 'Đi lại',
+                              iconUrl: 'assets/images/xemay.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isDiLaiChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isDiLaiChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Tiền nhà
-                        CategoryItem(
-                          categoryKey: 'tienNha',
-                          title: 'Tiền nhà',
-                          iconUrl: 'assets/images/nha.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isTienNhaChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isTienNhaChecked = value;
-                            });
-                          },
-                        ),
+                            // Tiền nhà
+                            CategoryItem(
+                              categoryKey: 'tienNha',
+                              title: 'Tiền nhà',
+                              iconUrl: 'assets/images/nha.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isTienNhaChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isTienNhaChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Xã stress
-                        CategoryItem(
-                          categoryKey: 'xaStress',
-                          title: 'Xã stress',
-                          iconUrl: 'assets/images/bia.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: false,
-                          isChecked: isXaStressChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isXaStressChecked = value;
-                            });
-                          },
-                        ),
+                            // Xã stress
+                            CategoryItem(
+                              categoryKey: 'xaStress',
+                              title: 'Xã stress',
+                              iconUrl: 'assets/images/bia.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: false,
+                              isChecked: isXaStressChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isXaStressChecked = value;
+                                });
+                              },
+                            ),
 
-                        // Cáp & wifi
-                        CategoryItem(
-                          categoryKey: 'capWifi',
-                          title: 'Cáp & wifi',
-                          iconUrl: 'assets/images/wifi.png',
-                          arrowUrl: 'assets/images/arrow2_icon.png',
-                          isLastItem: true,
-                          isChecked: isCapWifiChecked,
-                          onCheckboxChanged: (value) {
-                            setState(() {
-                              isCapWifiChecked = value;
-                            });
-                          },
+                            // Cáp & wifi
+                            CategoryItem(
+                              categoryKey: 'capWifi',
+                              title: 'Cáp & wifi',
+                              iconUrl: 'assets/images/wifi.png',
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isLastItem: true,
+                              isChecked: isCapWifiChecked,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  isCapWifiChecked = value;
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

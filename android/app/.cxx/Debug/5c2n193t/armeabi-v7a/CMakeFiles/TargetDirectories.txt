@@ -1,0 +1,2 @@
+D:/DoAn_Mobile_25_3/Flutter_MoneyMate/android/app/.cxx/Debug/5c2n193t/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/DoAn_Mobile_25_3/Flutter_MoneyMate/android/app/.cxx/Debug/5c2n193t/armeabi-v7a/CMakeFiles/rebuild_cache.dir

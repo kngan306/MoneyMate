@@ -1,14 +1,166 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_app_bar.dart';
 
-
-class UserWidget extends StatelessWidget {
+class UserWidget extends StatefulWidget {
   const UserWidget({super.key});
+  @override
+  _UserWidgetState createState() => _UserWidgetState();
+}
+
+class _UserWidgetState extends State<UserWidget> {
+  bool _isObscured = true;
+  final TextEditingController _controller = TextEditingController(text: '123');
+
+  String get displayText {
+    if (_isObscured) {
+      return '*' * _controller.text.length; // Hiển thị dấu * theo độ dài chuỗi
+    }
+    return _controller.text; // Hiển thị nội dung thật
+  }
+
+  void showChangePasswordDialog() {
+    bool _isCurrentObscured = true;
+    bool _isNewObscured = true;
+    bool _isConfirmObscured = true;
+
+    TextEditingController _currentPasswordController = TextEditingController();
+    TextEditingController _newPasswordController = TextEditingController();
+    TextEditingController _confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.transparent, // Xóa nền mặc định
+              content: Container(
+                width: 400, // Điều chỉnh chiều rộng
+                padding: const EdgeInsets.all(16), // Khoảng cách bên trong
+                decoration: BoxDecoration(
+                  color: Colors.white, // Màu nền
+                  borderRadius: BorderRadius.circular(15), // Bo góc
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      "Đổi mật khẩu",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildPasswordField(
+                      "Mật khẩu hiện tại",
+                      _currentPasswordController,
+                      _isCurrentObscured,
+                      () {
+                        setState(() {
+                          _isCurrentObscured = !_isCurrentObscured;
+                        });
+                      },
+                    ),
+                    _buildPasswordField(
+                      "Mật khẩu mới",
+                      _newPasswordController,
+                      _isNewObscured,
+                      () {
+                        setState(() {
+                          _isNewObscured = !_isNewObscured;
+                        });
+                      },
+                    ),
+                    _buildPasswordField(
+                      "Xác nhận mật khẩu mới",
+                      _confirmPasswordController,
+                      _isConfirmObscured,
+                      () {
+                        setState(() {
+                          _isConfirmObscured = !_isConfirmObscured;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: () {
+                        // TODO: Xử lý quên mật khẩu
+                      },
+                      child: const Text(
+                        "Quên mật khẩu?",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 14,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Hủy"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            // TODO: Xử lý đổi mật khẩu
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text("Xác nhận"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildPasswordField(
+    String label,
+    TextEditingController controller,
+    bool isObscured,
+    VoidCallback toggleVisibility,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        obscureText: isObscured,
+        decoration: InputDecoration(
+          labelText: label,
+          suffixIcon: IconButton(
+            icon: Icon(isObscured ? Icons.visibility_off : Icons.visibility),
+            onPressed: toggleVisibility,
+          ),
+          border: const OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: CustomAppBar(
+      appBar: CustomAppBar(
         title: "Tài khoản",
         showToggleButtons: false,
         showMenuButton: true, // Hiển thị nút menu (Drawer)
@@ -186,7 +338,8 @@ class UserWidget extends StatelessWidget {
                               Expanded(
                                 child: TextField(
                                   controller: TextEditingController(
-                                      text: 'duyuyen041104@gmail.com'), // Giá trị ban đầu
+                                      text:
+                                          'duyuyen041104@gmail.com'), // Giá trị ban đầu
                                   style: const TextStyle(fontSize: 17),
                                   decoration: const InputDecoration(
                                     border:
@@ -233,7 +386,7 @@ class UserWidget extends StatelessWidget {
                             ),
                           ],
                         ),
-                       const SizedBox(height: 7),
+                        const SizedBox(height: 7),
                         Container(
                           height: 55,
                           decoration: BoxDecoration(
@@ -323,8 +476,8 @@ class UserWidget extends StatelessWidget {
                               // Edit text field
                               Expanded(
                                 child: TextField(
-                                  controller: TextEditingController(
-                                      text: '********'), // Giá trị ban đầu
+                                  controller:
+                                      TextEditingController(text: displayText),
                                   style: const TextStyle(fontSize: 17),
                                   readOnly: true,
                                   decoration: const InputDecoration(
@@ -333,12 +486,20 @@ class UserWidget extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Image.asset(
-                                  'assets/images/eye.png',
-                                  width: 25,
-                                  height: 25,
-                                  fit: BoxFit.contain,
+                              IconButton(
+                                icon: Icon(
+                                  _isObscured
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.black,
                                 ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isObscured =
+                                        !_isObscured; // Đảo trạng thái hiển thị
+                                  });
+                                },
+                              ),
                             ],
                           ),
                         ),
@@ -348,11 +509,15 @@ class UserWidget extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            const Text(
-                              'Đổi mật khẩu ',
-                              style: TextStyle(
-                                fontSize: 15,
-                                //fontFamily: 'Montserrat',
+                            GestureDetector(
+                              onTap:
+                                  showChangePasswordDialog, // Mở dialog đổi mật khẩu
+                              child: const Text(
+                                'Đổi mật khẩu ',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                             Image.asset(
