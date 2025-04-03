@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_moneymate_01/page/chitieu_thunhap/themkhoanchi_screen.dart';
-import 'package:flutter_moneymate_01/page/chitieu_thunhap/themkhoanthu_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/themkhoanchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/themkhoanthu_screen.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/tab/thuchi_tab.dart';
 

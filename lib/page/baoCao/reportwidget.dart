@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/tab/baocao_tab.dart';
-import '../../widgets/chart/barchart_chitieu.dart';
-import '../../widgets/chart/donutchart_chitieu.dart';
-import '../../widgets/chart/barchart_thunhap.dart';
-import '../../widgets/chart/donutchart_thunhap.dart';
+import '../../widgets/chart/chitieu/barchart_chitieu.dart';
+import '../../widgets/chart/chitieu/donutchart_chitieu.dart';
+import '../../widgets/chart/thunhap/barchart_thunhap.dart';
+import '../../widgets/chart/thunhap/donutchart_thunhap.dart';
 import 'timkiembaocao_screen.dart';
 
 class ReportWidget extends StatefulWidget {
@@ -745,7 +744,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                           child: Row(
                                             children: [
                                               const Text(
-                                                'Chi tiết chi tiêu',
+                                                'Chi tiết thu nhập',
                                                 style: TextStyle(
                                                   fontFamily: 'Montserrat',
                                                   fontSize: 15,
@@ -855,15 +854,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                     ),
                                                   ),
                                                 ],
-                                              ),
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    top: 5),
-                                                height: 0.5,
-                                                color: const Color(0xFFD9D9D9),
-                                              ),
-                                              const SizedBox(height: 9),
-                                              
+                                              ),                                             
                                             ],
                                           ),
                                         ),
@@ -889,20 +880,12 @@ class _ReportWidgetState extends State<ReportWidget> {
         return const BarChart_ChiTieu();
       case "Tròn":
         return const DonutChart_ChiTieu();
-      // case "Cột":
-      //   return const BarChart_ThuNhap();
-      // case "Tròn":
-      //   return const DonutChart_ThuNhap();
       default:
         return const SizedBox();
     }
   }
     Widget getSelectedChartThuNhap() {
     switch (selectedChartThuNhap) {
-      // case "Bar Chart":
-      //   return const BarChart_ChiTieu();
-      // case "Donut Chart":
-      //   return const DonutChart_ChiTieu();
       case "Cột":
         return const BarChart_ThuNhap();
       case "Tròn":

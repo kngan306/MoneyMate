@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_moneymate_01/page/authentication/dangnhap_screen.dart';
-import 'package:flutter_moneymate_01/page/authentication/dangky_screen.dart';
+import 'package:flutter_moneymate_01/page/authentication/login/dangnhap_screen.dart';
+import 'package:flutter_moneymate_01/page/authentication/register/dangky_screen.dart';
 
 class ChaoMung extends StatelessWidget {
   const ChaoMung({Key? key}) : super(key: key);

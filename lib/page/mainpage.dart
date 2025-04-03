@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/menu/caidat_screen.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/themkhoanthuchi_screen.dart';
-import 'package:flutter_moneymate_01/page/chitieu_thunhap/danhmucchi_screen.dart';
-import 'package:flutter_moneymate_01/page/chitieu_thunhap/danhmucthu_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/danhmucchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/danhmucthu_screen.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/themdanhmucthuchi_screen.dart';
 import 'package:flutter_moneymate_01/page/baoCao/reportwidget.dart';
 import 'package:flutter_moneymate_01/page/dashboard/dashboardwidget.dart';
@@ -13,7 +13,7 @@ import 'package:flutter_moneymate_01/page/Calendar/calendarwidget.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter_moneymate_01/page/menu/thongbao_screen.dart';
 import 'package:flutter_moneymate_01/page/menu/vitien_screen.dart';
-import 'authentication/dangnhap_screen.dart';
+import 'authentication/login/dangnhap_screen.dart';
 
 class Mainpage extends StatefulWidget {
   //const Mainpage({Key? key}) : super(key: key);

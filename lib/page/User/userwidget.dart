@@ -55,7 +55,7 @@ class _UserWidgetState extends State<UserWidget> {
                     const Text(
                       "Đổi mật khẩu",
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -270,7 +270,7 @@ class _UserWidgetState extends State<UserWidget> {
                                 child: TextField(
                                   controller: TextEditingController(
                                       text: 'Duy Uyen'), // Giá trị ban đầu
-                                  style: const TextStyle(fontSize: 17),
+                                  style: const TextStyle(fontSize: 15),
                                   decoration: const InputDecoration(
                                     border:
                                         InputBorder.none, // Ẩn border mặc định
@@ -340,7 +340,7 @@ class _UserWidgetState extends State<UserWidget> {
                                   controller: TextEditingController(
                                       text:
                                           'duyuyen041104@gmail.com'), // Giá trị ban đầu
-                                  style: const TextStyle(fontSize: 17),
+                                  style: const TextStyle(fontSize: 15),
                                   decoration: const InputDecoration(
                                     border:
                                         InputBorder.none, // Ẩn border mặc định
@@ -409,7 +409,7 @@ class _UserWidgetState extends State<UserWidget> {
                                 child: TextField(
                                   controller: TextEditingController(
                                       text: '0919041104'), // Giá trị ban đầu
-                                  style: const TextStyle(fontSize: 17),
+                                  style: const TextStyle(fontSize: 15),
                                   decoration: const InputDecoration(
                                     border:
                                         InputBorder.none, // Ẩn border mặc định
@@ -478,7 +478,7 @@ class _UserWidgetState extends State<UserWidget> {
                                 child: TextField(
                                   controller:
                                       TextEditingController(text: displayText),
-                                  style: const TextStyle(fontSize: 17),
+                                  style: const TextStyle(fontSize: 15),
                                   readOnly: true,
                                   decoration: const InputDecoration(
                                     border:
