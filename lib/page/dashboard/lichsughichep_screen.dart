@@ -11,6 +11,69 @@ class LichSuGhiChep extends StatefulWidget {
 class _LichSuGhiChepState extends State<LichSuGhiChep> {
   late DateTime _focusedDay;
 
+  // This map stores transactions by date to check if there are any transactions left for that day
+  Map<String, List<Map<String, dynamic>>> transactions = {
+    '03/03/2025 (Thứ 2)': [
+      {  
+        'title': 'Tiền lương',
+        'amount': '+5,000,000 đ',
+        'isIncome': true,
+        'iconUrl': 'assets/images/cate29.png',
+        'index': 0
+      },
+    ],
+    '05/03/2025 (Thứ 7)': [
+      {
+        'title': 'Tiền điện',
+        'amount': '-630,000 đ',
+        'isIncome': false,
+        'iconUrl': 'assets/images/cate25.png',
+        'index': 1
+      },
+      {
+        'title': 'Tiền nước',
+        'amount': '-318,000 đ',
+        'isIncome': false,
+        'iconUrl': 'assets/images/cate26.png',
+        'index': 2
+      },
+    ],
+    '08/03/2025 (Thứ 7)': [
+      {
+        'title': 'Mỹ phẩm',
+        'amount': '-500,000 đ',
+        'isIncome': false,
+        'iconUrl': 'assets/images/mypham.png',
+        'index': 3
+      },
+    ],
+    '09/03/2025 (Chủ nhật)': [
+      {
+        'title': 'Mỹ phẩm',
+        'amount': '-500,000 đ',
+        'isIncome': false,
+        'iconUrl': 'assets/images/mypham.png',
+        'index': 4
+      },
+      {
+        'title': 'Ăn uống',
+        'amount': '-240,000 đ',
+        'isIncome': false,
+        'iconUrl': 'assets/images/food.png',
+        'index': 5
+      },
+    ],
+    '11/03/2025 (Thứ 3)': [
+      {
+        'title': 'Tiền wifi',
+        'amount': '-220,000 đ',
+        'isIncome': false,
+        'iconUrl': 'assets/images/cate23.png',
+        'index': 6
+      },
+    ],
+  };
+
   @override
   void initState() {
     super.initState();
@@ -20,6 +83,22 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
   void _changeMonth(int step) {
     setState(() {
       _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+    });
+  }
+
+  void _deleteTransaction(String date, int index) {
+    // Handle the delete action, for now just print the index
+    print("Deleted transaction at index $index on date $date");
+
+    // Remove the transaction from the list
+    setState(() {
+      transactions[date]
+          ?.removeWhere((transaction) => transaction['index'] == index);
+
+      // If there are no more transactions for that date, remove the date header too
+      if (transactions[date]?.isEmpty ?? true) {
+        transactions.remove(date);
+      }
     });
   }
 
@@ -51,7 +130,6 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
           children: [
             // Thanh chọn tháng
             Padding(
-              // padding: const EdgeInsets.symmetric(vertical: 8.0),
               padding: const EdgeInsets.fromLTRB(16.0, 19.0, 16.0, 0.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -69,7 +147,6 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
                       color: Colors.white,
                     ),
                     child: Center(
-                      // Căn giữa nội dung
                       child: Text(
                         DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
                         style: TextStyle(
@@ -87,66 +164,32 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
             // Transactions list
             Expanded(
               child: Container(
-                margin: const EdgeInsets.only(top: 19), // Thêm margin ở đây
+                margin: const EdgeInsets.only(top: 19),
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
-                    // First date group
-                    _buildDateHeader('03/03/2025 (Thứ 2)'),
-                    _buildTransactionItem(
-                      iconUrl: 'assets/images/cate29.png',
-                      title: 'Tiền lương',
-                      amount: '+5,000,000 đ',
-                      isIncome: true,
-                    ),
+                    // Iterate through the date groups and display them
+                    ...transactions.entries.map((entry) {
+                      String date = entry.key;
+                      List<Map<String, dynamic>> transactionList = entry.value;
 
-                    // Second date group
-                    _buildDateHeader('05/03/2025 (Thứ 7)'),
-                    _buildTransactionItem(
-                      iconUrl: 'assets/images/cate25.png',
-                      title: 'Tiền điện',
-                      amount: '-630,000 đ',
-                      isIncome: false,
-                    ),
-                    _buildTransactionItem(
-                      iconUrl: 'assets/images/cate26.png',
-                      title: 'Tiền nước',
-                      amount: '-318,000 đ',
-                      isIncome: false,
-                    ),
-
-                    // Third date group
-                    _buildDateHeader('08/03/2025 (Thứ 3)'),
-                    _buildTransactionItem(
-                      iconUrl: 'assets/images/mypham.png',
-                      title: 'Mỹ phẩm',
-                      amount: '-500,000 đ',
-                      isIncome: false,
-                    ),
-
-                    // Four date group
-                    _buildDateHeader('09/03/2025 (Chủ nhật)'),
-                    _buildTransactionItem(
-                      iconUrl: 'assets/images/mypham.png',
-                      title: 'Mỹ phẩm',
-                      amount: '-500,000 đ',
-                      isIncome: false,
-                    ),
-                    _buildTransactionItem(
-                      iconUrl: 'assets/images/food.png',
-                      title: 'Ăn uống',
-                      amount: '-240,000 đ',
-                      isIncome: false,
-                    ),
-
-                    // Five date group
-                    _buildDateHeader('11/03/2025 (Thứ 3)'),
-                    _buildTransactionItem(
-                      iconUrl: 'assets/images/cate23.png',
-                      title: 'Tiền wifi',
-                      amount: '-220,000 đ',
-                      isIncome: false,
-                    ),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildDateHeader(date),
+                          ...transactionList.map((transaction) {
+                            return _buildTransactionItem(
+                              iconUrl: transaction['iconUrl'],
+                              title: transaction['title'],
+                              amount: transaction['amount'],
+                              isIncome: transaction['isIncome'],
+                              index: transaction['index'],
+                              date: date,
+                            );
+                          }).toList(),
+                        ],
+                      );
+                    }).toList(),
                   ],
                 ),
               ),
@@ -178,42 +221,59 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
     required String title,
     required String amount,
     required bool isIncome,
+    required int index,
+    required String date,
   }) {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Image.asset(
-                iconUrl,
-                width: 35,
-                height: 35,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                title,
-                style: TextStyle(
-                  fontFamily: 'Montserrat',
-                  fontSize: 15,
-                  color: Colors.black,
+    return Dismissible(
+      key: Key(index.toString()),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        // Handle the delete action when swiped
+        _deleteTransaction(date, index);
+      },
+      background: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      child: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Image.asset(
+                  iconUrl,
+                  width: 35,
+                  height: 35,
+                  fit: BoxFit.contain,
                 ),
-              ),
-            ],
-          ),
-          Text(
-            amount,
-            style: TextStyle(
-              fontFamily: 'Montserrat',
-              fontSize: 15,
-              color:
-                  isIncome ? const Color(0xFF4ABD57) : const Color(0xFFFE0000),
+                const SizedBox(width: 4),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontFamily: 'Montserrat',
+                    fontSize: 15,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+            Text(
+              amount,
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontSize: 15,
+                color: isIncome
+                    ? const Color(0xFF4ABD57)
+                    : const Color(0xFFFE0000),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

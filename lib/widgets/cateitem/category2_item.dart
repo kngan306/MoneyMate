@@ -5,6 +5,7 @@ class CategoryItem extends StatelessWidget {
   final String title;
   final String iconUrl;
   final String arrowUrl;
+  final bool isFirstItem;
   final bool isLastItem;
   final bool isChecked; // Thay đổi ở đây
   final Function(bool) onCheckboxChanged;
@@ -16,6 +17,7 @@ class CategoryItem extends StatelessWidget {
     required this.title,
     required this.iconUrl,
     required this.arrowUrl,
+    required this.isFirstItem,
     required this.isLastItem,
     required this.isChecked, // Thay đổi ở đây
     required this.onCheckboxChanged,
@@ -35,12 +37,12 @@ class CategoryItem extends StatelessWidget {
                 ),
               )
             : null,
-        borderRadius: isLastItem
-            ? const BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              )
-            : null,
+        borderRadius: BorderRadius.only(
+          topLeft: isFirstItem ? const Radius.circular(10) : Radius.zero,
+          topRight: isFirstItem ? const Radius.circular(10) : Radius.zero,
+          bottomLeft: isLastItem ? const Radius.circular(10) : Radius.zero,
+          bottomRight: isLastItem ? const Radius.circular(10) : Radius.zero,
+        ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Row(
