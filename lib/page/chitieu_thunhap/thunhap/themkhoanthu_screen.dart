@@ -16,6 +16,7 @@ class ThemKhoanThu extends StatefulWidget {
 
 class _ThemKhoanThuState extends State<ThemKhoanThu> {
   int selectedCategoryIndex = 0; // Chỉ số của mục được chọn
+  String _selectedWallet = 'Chọn ví tiền của bạn'; // Giá trị mặc định
 
   DateTime? selectedDate; // Biến lưu ngày đã chọn
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy'); // Định dạng ngày
@@ -484,8 +485,8 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                   width:
                                       30), // Khoảng cách giữa Text và đường gạch
                               Container(
-                                width: 1, // Độ rộng của đường gạch
-                                height: 40, // Chiều cao của đường gạch
+                                width: 1,
+                                height: 40,
                                 color: const Color(0x331E201E),
                               ),
                               const SizedBox(
@@ -494,22 +495,116 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                             ],
                           ),
                           Expanded(
-                            child: TextField(
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                fontFamily:
-                                    'Montserrat', // Font cho văn bản nhập vào
-                                color: Colors.black, // Màu chữ khi nhập
-                              ),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: 'Chọn ví tiền của bạn',
-                                hintStyle: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w400,
-                                  fontFamily: 'Montserrat', // Font cho hintText
-                                  color: Color(0x331E201E),
+                            child: GestureDetector(
+                              onTap: () async {
+                                String? selectedWallet =
+                                    await showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Dialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            20), // Bo góc mềm mại hơn
+                                      ),
+                                      backgroundColor:
+                                          Colors.white, // Màu nền của Dialog
+                                      child: Container(
+                                        padding: const EdgeInsets.all(20),
+                                        width:
+                                            320, // Điều chỉnh chiều rộng của Dialog
+                                        height:
+                                            200, // Điều chỉnh chiều cao của Dialog
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(
+                                              20), // Tạo bo góc mềm mại cho Container
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Color(
+                                                  0x10000000), // Màu bóng của Dialog
+                                              blurRadius: 10, // Độ mờ của bóng
+                                              spreadRadius:
+                                                  5, // Độ lan tỏa của bóng
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Center(
+                                              child: const Text(
+                                                "Chọn ví tiền",
+                                                style: TextStyle(
+                                                  fontSize:
+                                                      20, // Cỡ chữ tiêu đề lớn hơn
+                                                  fontWeight: FontWeight
+                                                      .bold, // Chữ đậm
+                                                  color: Color(
+                                                      0xFF3E4A59), // Màu chữ tối cho tiêu đề
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 15),
+                                            ListTile(
+                                              leading: Image.asset(
+                                                'assets/images/cate30.png', // Icon cho ví chính
+                                                width: 30,
+                                                height: 30,
+                                              ),
+                                              title: const Text("Tiền mặt"),
+                                              trailing:
+                                                  _selectedWallet == "Tiền mặt"
+                                                      ? const Icon(Icons.check,
+                                                          color: Colors.green)
+                                                      : null,
+                                              onTap: () => Navigator.pop(
+                                                  context, "Tiền mặt"),
+                                            ),
+                                            ListTile(
+                                              leading: Image.asset(
+                                                'assets/images/cate29.png', // Icon cho ví chính
+                                                width: 30,
+                                                height: 30,
+                                              ),
+                                              title: const Text("Chuyển khoản"),
+                                              trailing: _selectedWallet ==
+                                                      "Chuyển khoản"
+                                                  ? const Icon(Icons.check,
+                                                      color: Colors.green)
+                                                  : null,
+                                              onTap: () => Navigator.pop(
+                                                  context, "Chuyển khoản"),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+
+                                if (selectedWallet != null) {
+                                  setState(() {
+                                    _selectedWallet = selectedWallet;
+                                  });
+                                }
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: Text(
+                                  _selectedWallet.isEmpty
+                                      ? "Chọn ví tiền của bạn"
+                                      : _selectedWallet,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'Montserrat',
+                                    color: _selectedWallet.isEmpty
+                                        ? Color(0x331E201E)
+                                        : Colors.black,
+                                  ),
                                 ),
                               ),
                             ),

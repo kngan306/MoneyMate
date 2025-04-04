@@ -7,6 +7,7 @@ import '../../widgets/chart/chitieu/donutchart_chitieu.dart';
 import '../../widgets/chart/thunhap/barchart_thunhap.dart';
 import '../../widgets/chart/thunhap/donutchart_thunhap.dart';
 import 'timkiembaocao_screen.dart';
+import '../mainpage.dart';
 
 class ReportWidget extends StatefulWidget {
   const ReportWidget({super.key});
@@ -47,8 +48,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         onSearchPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => const TimKiemBaoCaoThuChi()),
+            MaterialPageRoute(builder: (context) => Mainpage(selectedIndex: 13)),
           );
         },
       ),
@@ -93,7 +93,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                   ],
                 ),
               ),
-
+              
               // Summary card
               Padding(
                 padding: const EdgeInsets.only(top: 19, left: 16, right: 16),
@@ -300,7 +300,8 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                   onChanged: (value) {
                                                     if (value != null) {
                                                       setState(() {
-                                                        selectedChartChiTieu = value;
+                                                        selectedChartChiTieu =
+                                                            value;
                                                       });
                                                     }
                                                   },
@@ -696,7 +697,8 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                   onChanged: (value) {
                                                     if (value != null) {
                                                       setState(() {
-                                                        selectedChartThuNhap = value;
+                                                        selectedChartThuNhap =
+                                                            value;
                                                       });
                                                     }
                                                   },
@@ -854,7 +856,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                     ),
                                                   ),
                                                 ],
-                                              ),                                             
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -884,7 +886,8 @@ class _ReportWidgetState extends State<ReportWidget> {
         return const SizedBox();
     }
   }
-    Widget getSelectedChartThuNhap() {
+
+  Widget getSelectedChartThuNhap() {
     switch (selectedChartThuNhap) {
       case "Cột":
         return const BarChart_ThuNhap();
