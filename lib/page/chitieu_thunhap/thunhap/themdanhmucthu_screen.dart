@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../widgets/cateitem/category3_item.dart'; // Đảm bảo rằng bạn đã import đúng widget CategoryItem
+import '../../../widgets/cateitem/category3_item.dart'; // Đảm bảo rằng bạn đã import đúng widget CategoryItem
 
-class ThemDanhMucThuChi extends StatefulWidget {
-  const ThemDanhMucThuChi({Key? key}) : super(key: key);
+class ThemDanhMucThu extends StatefulWidget {
+  const ThemDanhMucThu({Key? key}) : super(key: key);
 
   @override
-  State<ThemDanhMucThuChi> createState() => _ThemDanhMucThuChiState();
+  State<ThemDanhMucThu> createState() => _ThemDanhMucThuState();
 }
 
-class _ThemDanhMucThuChiState extends State<ThemDanhMucThuChi> {
+class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
   final TextEditingController _categoryNameController = TextEditingController();
   int? _selectedIconIndex;
 
@@ -29,7 +29,7 @@ class _ThemDanhMucThuChiState extends State<ThemDanhMucThuChi> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E201E),
         title: const Text(
-          'Danh mục thu chi',
+          'Danh mục thu nhập',
           style: TextStyle(
             fontFamily: 'Montserrat',
             fontSize: 20,

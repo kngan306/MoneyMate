@@ -22,7 +22,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(360, 754), // Kích thước thiết kế gốc
+      designSize: const Size(432, 816), // Thiết lập kích thước gốc pixel 3a xl
       minTextAdapt: true,
       builder: (context, child) {
         return MaterialApp(

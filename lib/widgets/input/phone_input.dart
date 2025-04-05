@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class PhoneInput extends StatefulWidget {
-  final TextEditingController controller; // Thêm controller làm tham số
-
-  const PhoneInput({Key? key, required this.controller}) : super(key: key);
+  const PhoneInput({Key? key}) : super(key: key);
 
   @override
   _PhoneInputState createState() => _PhoneInputState();
 }
 
 class _PhoneInputState extends State<PhoneInput> {
+  final TextEditingController _phoneController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -74,7 +74,7 @@ class _PhoneInputState extends State<PhoneInput> {
           ),
           Expanded(
             child: TextField(
-              controller: widget.controller, // Sử dụng controller từ widget
+              controller: _phoneController,
               keyboardType: TextInputType.phone,
               style: const TextStyle(
                 fontSize: 15,
@@ -101,7 +101,7 @@ class _PhoneInputState extends State<PhoneInput> {
               size: 22,
             ),
             onPressed: () {
-              widget.controller.clear(); // Sử dụng controller từ widget
+              _phoneController.clear();
             },
           ),
         ],

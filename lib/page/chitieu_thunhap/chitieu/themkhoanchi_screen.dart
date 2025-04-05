@@ -295,9 +295,9 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                               ),
                             ],
                           ),
+                          // Container chứa danh sách các mục với Transform
                           Transform.translate(
-                            offset:
-                                const Offset(0, 0), // Dịch chuyển lên 10 pixel
+                            offset: const Offset(0, 0), // Dịch chuyển lên 10 pixel
                             child: Container(
                               padding: const EdgeInsets.only(top: 10.0),
                               height: 285,

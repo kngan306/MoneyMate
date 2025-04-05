@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/menu/caidat_screen.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/themkhoanthuchi_screen.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/danhmucchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/themdanhmucchi_screen.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/danhmucthu_screen.dart';
-import 'package:flutter_moneymate_01/page/chitieu_thunhap/themdanhmucthuchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/themdanhmucthu_screen.dart';
 import 'package:flutter_moneymate_01/page/baoCao/reportwidget.dart';
 import 'package:flutter_moneymate_01/page/dashboard/dashboardwidget.dart';
 import 'package:flutter_moneymate_01/page/dashboard/lichsughichep_screen.dart';
@@ -51,8 +52,9 @@ class _MainpageState extends State<Mainpage> {
     LichSuTheoDanhMuc(), //9
     DanhMucChi(), //10
     DanhMucThu(), //11
-    ThemDanhMucThuChi(), //12
+    ThemDanhMucChi(), //12
     TimKiemBaoCaoThuChi(), //13
+    ThemDanhMucThu(), //14
   ];
   void _onItemTapped(int index) {
     setState(() {
