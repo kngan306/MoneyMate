@@ -14,6 +14,7 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter_moneymate_01/page/menu/thongbao_screen.dart';
 import 'package:flutter_moneymate_01/page/menu/vitien_screen.dart';
 import 'authentication/login/dangnhap_screen.dart';
+import 'baoCao/timkiembaocao_screen.dart';
 
 class Mainpage extends StatefulWidget {
   //const Mainpage({Key? key}) : super(key: key);
@@ -51,6 +52,7 @@ class _MainpageState extends State<Mainpage> {
     DanhMucChi(), //10
     DanhMucThu(), //11
     ThemDanhMucThuChi(), //12
+    TimKiemBaoCaoThuChi(), //13
   ];
   void _onItemTapped(int index) {
     setState(() {

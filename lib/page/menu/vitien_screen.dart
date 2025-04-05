@@ -56,8 +56,8 @@ class ViTien extends StatelessWidget {
                         iconPath: 'assets/images/cate30.png',
                         title: 'Tiền mặt',
                         amount: '+10,000,000 đ',
-                        showAction: true,
-                        actionText: 'Chỉnh sửa',
+                        // showAction: true,
+                        // actionText: 'Chỉnh sửa',
                       ),
 
                       const SizedBox(height: 11),
@@ -65,10 +65,10 @@ class ViTien extends StatelessWidget {
                       // E-wallet Card
                       WalletItem(
                         iconPath: 'assets/images/cate29.png',
-                        title: 'Ví điện tử',
+                        title: 'Chuyển khoản',
                         amount: '0 đ',
-                        showAction: true,
-                        actionText: 'Thêm ví',
+                        // showAction: true,
+                        // actionText: 'Thêm ví',
                       ),
                     ],
                   ),
