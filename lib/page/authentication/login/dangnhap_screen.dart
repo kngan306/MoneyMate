@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import '../forgotpass/quenmatkhau_screen.dart';
 import '../register/dangky_screen.dart';
 import '../../dashboard/dashboardwidget.dart';
 import '../../mainpage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DangNhap extends StatefulWidget {
   const DangNhap({Key? key}) : super(key: key);
@@ -13,10 +15,61 @@ class DangNhap extends StatefulWidget {
 }
 
 class _DangNhapState extends State<DangNhap> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  String? _errorMessage;
 
+  // Hàm đăng nhập với Firebase Authentication
+  Future<void> _login() async {
+    try {
+      // Đăng nhập với Firebase Authentication
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // Lấy thông tin người dùng từ Firestore
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        var userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: user.email)
+            .get();
+
+        if (userDoc.docs.isNotEmpty) {
+          // In thông tin người dùng ra terminal
+          var data = userDoc.docs.first.data();
+          print('Đăng nhập thành công! Thông tin người dùng từ Firestore:');
+          print('ID: ${userDoc.docs.first.id}');
+          print('SĐT: ${data['sdt']}');
+          print('Email: ${data['email']}');
+          print('Username: ${data['username']}');
+          print('Password: ${data['password']}');
+          print('Image: ${data['image']}');
+        } else {
+          print('Không tìm thấy thông tin người dùng trong Firestore.');
+        }
+      } else {
+        print('Không lấy được thông tin user từ Firebase Auth.');
+      }
+
+      // Đăng nhập thành công, chuyển đến Mainpage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Mainpage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+          _errorMessage = 'Email hoặc mật khẩu không đúng.';
+        } else {
+          _errorMessage = 'Đã xảy ra lỗi: ${e.message}';
+        }
+      });
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +162,7 @@ class _DangNhapState extends State<DangNhap> {
                         ),
                         const SizedBox(width: 2),
                         const Text(
-                          'Tên đăng nhập',
+                          'Email',
                           style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
@@ -120,7 +173,7 @@ class _DangNhapState extends State<DangNhap> {
                     ),
                     const SizedBox(height: 7),
                     TextField(
-                      controller: _usernameController,
+                      controller: _emailController,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 14,
@@ -213,6 +266,20 @@ class _DangNhapState extends State<DangNhap> {
                       ),
                     ),
 
+                    // Hiển thị lỗi (nếu có)
+                    if (_errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          _errorMessage!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                            fontFamily: 'Montserrat',
+                          ),
+                        ),
+                      ),
+
                     // Forgot password
                     Align(
                       alignment: Alignment.centerRight,
@@ -243,15 +310,16 @@ class _DangNhapState extends State<DangNhap> {
                     const SizedBox(height: 21),
                     Center(
                       child: GestureDetector(
-                        onTap: () {
-                          // Navigator.pushNamed(context, '/dashboard');
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Mainpage(),
-                            ),
-                          );
-                        },
+                        onTap: _login, // Gọi hàm đăng nhập
+                        // onTap: () {
+                        //   // Navigator.pushNamed(context, '/dashboard');
+                        //   Navigator.pushReplacement(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) => Mainpage(),
+                        //     ),
+                        //   );
+                        // },
                         child: Container(
                           width: 200,
                           padding: const EdgeInsets.symmetric(vertical: 12),
