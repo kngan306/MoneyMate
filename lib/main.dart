@@ -8,8 +8,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
+  await Firebase.initializeApp();// Khởi tạo Firebase
   await initializeDateFormatting('vi_VN', null); // 🇻🇳 Khởi tạo ngôn ngữ tiếng Việt
   Intl.defaultLocale = 'vi_VN'; // Đặt mặc định là tiếng Việt
 
@@ -33,7 +32,7 @@ class MainApp extends StatelessWidget {
           supportedLocales: const [
             Locale('vi', 'VN'), // 🇻🇳 Thêm hỗ trợ tiếng Việt
           ],
-          localizationsDelegates: const [
+          localizationsDelegates: const [ 
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
