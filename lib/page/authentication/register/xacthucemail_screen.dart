@@ -174,12 +174,12 @@ class _XacThucEmailState extends State<XacThucEmail> {
                       child: ElevatedButton(
                         onPressed: () {
                           // Navigator.pushNamed(context, AppRoutes.registerFinal);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => const DangKyFinal(),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DangKyFinal(),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),

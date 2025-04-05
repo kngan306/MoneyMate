@@ -5,13 +5,7 @@ import '../../../widgets/input/otp_input.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class XacThucOTP extends StatefulWidget {
-  final String verificationId;
-  final String phoneNumber; // Thêm tham số phoneNumber
-  const XacThucOTP({
-    Key? key,
-    required this.verificationId,
-    required this.phoneNumber,
-  }) : super(key: key);
+  const XacThucOTP({Key? key}) : super(key: key);
 
   @override
   State<XacThucOTP> createState() => _XacThucOTPState();
@@ -21,32 +15,9 @@ class _XacThucOTPState extends State<XacThucOTP> {
   final List<TextEditingController> _otpControllers = List.generate(
     4,
     (index) => TextEditingController(
-        //text: ['3', '0', '0', '6'][index],
-        ),
+      text: ['3', '0', '0', '6'][index],
+    ),
   );
-
-  Future<void> verifyOtp() async {
-    String otp = _otpControllers.map((c) => c.text).join();
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: widget.verificationId,
-      smsCode: otp,
-    );
-    try {
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DangKyFinal(
-            phoneNumber: widget.phoneNumber, // Truyền số điện thoại chính xác
-          ),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('OTP không hợp lệ')),
-      );
-    }
-  }
 
   final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
 
@@ -168,10 +139,10 @@ class _XacThucOTPState extends State<XacThucOTP> {
                         ),
                       ),
                     ),
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.only(top: 14.0),
                       child: Text(
-                        'Vui lòng nhập mã OTP bao gồm 4 số vừa được gửi về số điện thoại ${widget.phoneNumber}',
+                        'Vui lòng nhập mã OTP bao gồm 4 số vừa được gửi về số điện thoại +84',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
@@ -202,16 +173,15 @@ class _XacThucOTPState extends State<XacThucOTP> {
                       padding: const EdgeInsets.only(
                           top: 30.0), // Giữ khoảng cách trên
                       child: ElevatedButton(
-                        onPressed: verifyOtp,
-                        // onPressed: () {
-                        //   // Navigator.pushNamed(context, AppRoutes.registerFinal);
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => const DangKyFinal(),
-                        //     ),
-                        //   );
-                        // },
+                        onPressed: () {
+                          // Navigator.pushNamed(context, AppRoutes.registerFinal);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DangKyFinal(),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),
                           shape: RoundedRectangleBorder(

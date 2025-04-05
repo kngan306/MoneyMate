@@ -5,8 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DangKyFinal extends StatefulWidget {
-  final String phoneNumber; // Nhận số điện thoại từ XacThucOTP
-  const DangKyFinal({Key? key, required this.phoneNumber}) : super(key: key);
+  const DangKyFinal({Key? key}) : super(key: key);
 
   @override
   State<DangKyFinal> createState() => _DangKyFinalState();
@@ -16,27 +15,15 @@ class _DangKyFinalState extends State<DangKyFinal> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  // final TextEditingController _phoneController =
-  //     TextEditingController(text: '0123456789');
-  // final TextEditingController _emailController =
-  //     TextEditingController(text: 'kimngan@gmail.com');
-  // final TextEditingController _usernameController =
-  //     TextEditingController(text: 'kngan306');
-  // final TextEditingController _passwordController = TextEditingController();
-  // final TextEditingController _confirmPasswordController =
-  //     TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _phoneController =
+      TextEditingController(text: '0123456789');
+  final TextEditingController _emailController =
+      TextEditingController(text: 'kimngan@gmail.com');
+  final TextEditingController _usernameController =
+      TextEditingController(text: 'kngan306');
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _phoneController.text = widget.phoneNumber; // Gán số điện thoại đã xác thực
-  }
 
   @override
   void dispose() {
@@ -46,69 +33,6 @@ class _DangKyFinalState extends State<DangKyFinal> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _completeRegistration() async {
-    if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mật khẩu không khớp')),
-      );
-      return;
-    }
-
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // Cập nhật thông tin người dùng
-        await user.updateEmail(_emailController.text);
-        await user.updatePassword(_passwordController.text);
-
-        // Lưu thông tin bổ sung vào Firestore
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'phone': _phoneController.text,
-          'email': _emailController.text,
-          'username': _usernameController.text,
-          'created_at': DateTime.now().millisecondsSinceEpoch,
-        }, SetOptions(merge: true));
-
-        // Điều hướng đến màn hình đăng nhập sau khi đăng ký thành công
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const DangNhap()),
-        );
-      } else {
-        // Nếu không có user (trường hợp lỗi), tạo tài khoản mới
-        UserCredential userCredential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
-
-        await userCredential.user!.linkWithPhoneNumber(widget.phoneNumber);
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set({
-          'phone': _phoneController.text,
-          'email': _emailController.text,
-          'username': _usernameController.text,
-          'created_at': DateTime.now().millisecondsSinceEpoch,
-        });
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const DangNhap()),
-        );
-      }
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Đăng ký thất bại')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Có lỗi xảy ra, vui lòng thử lại')),
-      );
-    }
   }
 
   @override
@@ -219,8 +143,6 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       TextFormField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
-                        enabled:
-                            false, // Không cho chỉnh sửa số điện thoại đã xác thực
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 14),
@@ -418,8 +340,10 @@ class _DangKyFinalState extends State<DangKyFinal> {
                               horizontal: 17, vertical: 12),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
-                            borderSide:
-                                const BorderSide(color: Colors.black, width: 1),
+                            borderSide: const BorderSide(
+                              color: Colors.black,
+                              width: 1,
+                            ),
                           ),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -448,16 +372,15 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       const SizedBox(height: 21),
                       Center(
                         child: ElevatedButton(
-                          onPressed: _completeRegistration,
-                          // onPressed: () {
-                          //   // Navigator.pushNamed(context, AppRoutes.login);
-                          //   Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) => const DangNhap(),
-                          //     ),
-                          //   );
-                          // },
+                          onPressed: () {
+                            // Navigator.pushNamed(context, AppRoutes.login);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const DangNhap(),
+                              ),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1E201E),
                             foregroundColor: Colors.white,

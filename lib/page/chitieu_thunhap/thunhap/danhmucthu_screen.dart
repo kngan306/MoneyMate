@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../widgets/cateitem/category2_item.dart';
-import '../themdanhmucthuchi_screen.dart';
+import 'themdanhmucthu_screen.dart';
 import '../../mainpage.dart';
 
 class DanhMucThu extends StatefulWidget {
@@ -97,7 +97,7 @@ class _DanhMucThuState extends State<DanhMucThu> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Mainpage(selectedIndex: 12),
+                          builder: (context) => Mainpage(selectedIndex: 14),
                         ),
                       );
                     },

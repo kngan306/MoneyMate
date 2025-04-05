@@ -17,77 +17,6 @@ class DangKy extends StatefulWidget {
 
 class _DangKyState extends State<DangKy> {
   bool isPhoneSelected = true; // Mặc định chọn Số điện thoại
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  Future<void> sendOtp() async {
-    if (isPhoneSelected) {
-      String input = _phoneController.text;
-      print('Số điện thoại nhập: $input');
-      if (input.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Vui lòng nhập số điện thoại')),
-        );
-        return;
-      }
-      if (!input.startsWith('0') || input.length < 10) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Số điện thoại không hợp lệ')),
-        );
-        return;
-      }
-      String phoneNumber = '+84${input.substring(1)}';
-      print('Số điện thoại gửi đến Firebase: $phoneNumber');
-      try {
-        await FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: phoneNumber,
-          verificationCompleted: (PhoneAuthCredential credential) async {
-            print('Verification completed: $credential');
-            await FirebaseAuth.instance.signInWithCredential(credential);
-          },
-          verificationFailed: (FirebaseAuthException e) {
-            print('Verification failed: ${e.message}');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(e.message ?? 'Lỗi xác thực')),
-            );
-          },
-          codeSent: (String verificationId, int? resendToken) {
-            print(
-                'Code sent: verificationId=$verificationId, resendToken=$resendToken');
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => XacThucOTP(
-                  verificationId: verificationId,
-                  phoneNumber: phoneNumber,
-                ),
-              ),
-            );
-          },
-          codeAutoRetrievalTimeout: (String verificationId) {
-            print(
-                'Code auto-retrieval timeout: verificationId=$verificationId');
-          },
-        );
-      } catch (e) {
-        print('Error in sendOtp: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đã xảy ra lỗi: $e')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Email OTP chưa được hỗ trợ')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,9 +157,7 @@ class _DangKyState extends State<DangKy> {
                         ),
                       ),
                       const SizedBox(height: 30),
-                      PhoneInput(
-                          controller:
-                              _phoneController), // Truyền _phoneController vào
+                      const PhoneInput(),
                       const SizedBox(height: 27),
                     ],
                     if (!isPhoneSelected) ...[
@@ -259,19 +186,23 @@ class _DangKyState extends State<DangKy> {
                       const SizedBox(height: 27),
                     ],
                     ElevatedButton(
-                      onPressed: sendOtp,
-                      // onPressed: () {
-                      //   if (isPhoneSelected) {
-                      //     sendOtp();
-                      //   } else {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => const XacThucEmail(),
-                      //       ),
-                      //     );
-                      //   }
-                      // },
+                      onPressed: () {
+                        if (isPhoneSelected) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const XacThucOTP(),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const XacThucEmail(),
+                            ),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF333333),
                         foregroundColor: Colors.white,
