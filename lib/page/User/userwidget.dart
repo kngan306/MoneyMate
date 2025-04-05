@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_app_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserWidget extends StatefulWidget {
   const UserWidget({super.key});
@@ -8,20 +10,65 @@ class UserWidget extends StatefulWidget {
 }
 
 class _UserWidgetState extends State<UserWidget> {
-  bool _isObscured = true;
-  final TextEditingController _controller = TextEditingController(text: '123');
+  bool _isObscured = true; // Biến kiểm soát hiển thị/ẩn mật khẩu
+  late TextEditingController _usernameController; // Controller cho tên đăng nhập
+  late TextEditingController _emailController; // Controller cho email
+  late TextEditingController _phoneController; // Controller cho số điện thoại
+  late TextEditingController _passwordController; // Controller cho mật khẩu
 
-  String get displayText {
-    if (_isObscured) {
-      return '*' * _controller.text.length; // Hiển thị dấu * theo độ dài chuỗi
-    }
-    return _controller.text; // Hiển thị nội dung thật
+  @override
+  void initState() {
+    super.initState();
+    // Khởi tạo các TextEditingController
+    _usernameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneController = TextEditingController();
+    _passwordController = TextEditingController();
+    // Gọi hàm load dữ liệu từ Firestore khi widget được khởi tạo
+    _loadUserData();
   }
 
+  // Hàm load dữ liệu người dùng từ Firestore
+  Future<void> _loadUserData() async {
+    User? user = FirebaseAuth.instance.currentUser; // Lấy thông tin user hiện tại từ Firebase Auth
+    if (user != null) {
+      try {
+        var userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: user.email)
+            .get(); // Truy vấn document trong collection 'users' với email khớp
+
+        if (userDoc.docs.isNotEmpty) {
+          var data = userDoc.docs.first.data(); // Lấy dữ liệu từ document đầu tiên
+          setState(() {
+            // Cập nhật giá trị cho các controller từ Firestore
+            _usernameController.text = data['username'] ?? '';
+            _emailController.text = data['email'] ?? '';
+            _phoneController.text = data['sdt'] ?? '';
+            _passwordController.text = data['password'] ?? '';
+          });
+        } else {
+          print('Không tìm thấy thông tin người dùng trong Firestore.');
+        }
+      } catch (e) {
+        print('Lỗi khi load dữ liệu từ Firestore: $e');
+      }
+    }
+  }
+
+  // Getter để hiển thị mật khẩu dạng dấu * hoặc text thật
+  String get displayText {
+    if (_isObscured) {
+      return '*' * _passwordController.text.length; // Hiển thị dấu * theo độ dài mật khẩu
+    }
+    return _passwordController.text; // Hiển thị mật khẩu thật
+  }
+
+  // Hàm hiển thị dialog đổi mật khẩu
   void showChangePasswordDialog() {
-    bool _isCurrentObscured = true;
-    bool _isNewObscured = true;
-    bool _isConfirmObscured = true;
+    bool _isCurrentObscured = true; // Ẩn mật khẩu hiện tại
+    bool _isNewObscured = true; // Ẩn mật khẩu mới
+    bool _isConfirmObscured = true; // Ẩn xác nhận mật khẩu
 
     TextEditingController _currentPasswordController = TextEditingController();
     TextEditingController _newPasswordController = TextEditingController();
@@ -33,13 +80,13 @@ class _UserWidgetState extends State<UserWidget> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: Colors.transparent, // Xóa nền mặc định
+              backgroundColor: Colors.transparent,
               content: Container(
-                width: 400, // Điều chỉnh chiều rộng
-                padding: const EdgeInsets.all(16), // Khoảng cách bên trong
+                width: 400,
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white, // Màu nền
-                  borderRadius: BorderRadius.circular(15), // Bo góc
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -134,6 +181,7 @@ class _UserWidgetState extends State<UserWidget> {
     );
   }
 
+  // Hàm tạo TextField cho dialog đổi mật khẩu
   Widget _buildPasswordField(
     String label,
     TextEditingController controller,
@@ -170,436 +218,395 @@ class _UserWidgetState extends State<UserWidget> {
       ),
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
-          child: Center(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Main content container
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Logo
-                        Center(
-                          child: Stack(
+        child: Center(
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 30.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Phần hiển thị thông tin chính
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Avatar người dùng
+                          Center(
+                            child: Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 76.5,
+                                  backgroundImage:
+                                      AssetImage('assets/images/avt.jpg'),
+                                ),
+                                Positioned(
+                                  bottom: 5,
+                                  right: 5,
+                                  child: Container(
+                                    width: 35,
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.2),
+                                          blurRadius: 4,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.black54,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // Phần tên đăng nhập
+                          Row(
                             children: [
-                              // Avatar hình tròn
-                              CircleAvatar(
-                                radius: 76.5, // 153 / 2
-                                backgroundImage:
-                                    AssetImage('assets/images/avt.jpg'),
+                              Image.asset(
+                                'assets/images/user_icon.png',
+                                width: 27,
+                                height: 27,
+                                fit: BoxFit.contain,
                               ),
-
-                              // Icon camera nằm ở góc dưới phải
-                              Positioned(
-                                bottom: 5, // Khoảng cách từ dưới lên
-                                right: 5, // Khoảng cách từ phải sang
-                                child: Container(
-                                  width: 35, // Kích thước icon camera
-                                  height: 35,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors
-                                        .white, // Nền trắng cho icon camera
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        blurRadius: 4,
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.black54,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Phone number section
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/user_icon.png',
-                              width: 27,
-                              height: 27,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(width: 3),
-                            const Text(
-                              'Tên đăng nhập',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                //fontFamily: 'Montserrat',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 7),
-                        Container(
-                          height: 55,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                              color: const Color(0xFF1E201E),
-                              width: 2,
-                            ),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical:
-                                2, // Giảm padding để cân đối với TextField
-                          ),
-                          child: Row(
-                            children: [
-                              // Edit text field
-                              Expanded(
-                                child: TextField(
-                                  controller: TextEditingController(
-                                      text: 'Duy Uyen'), // Giá trị ban đầu
-                                  style: const TextStyle(fontSize: 15),
-                                  decoration: const InputDecoration(
-                                    border:
-                                        InputBorder.none, // Ẩn border mặc định
-                                    hintText:
-                                        'Nhập tên...', // Gợi ý khi chưa nhập gì
-                                  ),
-                                ),
-                              ),
-                              // Edit icon
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     // TODO: Xử lý logic khi bấm vào icon chỉnh sửa
-                              //   },
-                              //   child: Image.asset(
-                              //     'assets/images/edit.png',
-                              //     width: 25,
-                              //     height: 25,
-                              //     fit: BoxFit.contain,
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                        ),
-
-                        // Email section
-                        const SizedBox(height: 21),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/image.png',
-                              width: 27,
-                              height: 27,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(width: 2),
-                            const Text(
-                              'Email',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                //fontFamily: 'Montserrat',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 7),
-                        Container(
-                          height: 55,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                              color: const Color(0xFF1E201E),
-                              width: 2,
-                            ),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical:
-                                2, // Giảm padding để cân đối với TextField
-                          ),
-                          child: Row(
-                            children: [
-                              // Edit text field
-                              Expanded(
-                                child: TextField(
-                                  controller: TextEditingController(
-                                      text:
-                                          'duyuyen041104@gmail.com'), // Giá trị ban đầu
-                                  style: const TextStyle(fontSize: 15),
-                                  decoration: const InputDecoration(
-                                    border:
-                                        InputBorder.none, // Ẩn border mặc định
-                                    hintText:
-                                        'Nhập email...', // Gợi ý khi chưa nhập gì
-                                  ),
-                                ),
-                              ),
-                              // Edit icon
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     // TODO: Xử lý logic khi bấm vào icon chỉnh sửa
-                              //   },
-                              //   child: Image.asset(
-                              //     'assets/images/edit.png',
-                              //     width: 25,
-                              //     height: 25,
-                              //     fit: BoxFit.contain,
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                        ),
-
-                        // Username section
-                        const SizedBox(height: 21),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/phone_icon.png',
-                              width: 27,
-                              height: 27,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(width: 2),
-                            const Text(
-                              'Số điện thoại',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                //fontFamily: 'Montserrat',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 7),
-                        Container(
-                          height: 55,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                              color: const Color(0xFF1E201E),
-                              width: 2,
-                            ),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical:
-                                2, // Giảm padding để cân đối với TextField
-                          ),
-                          child: Row(
-                            children: [
-                              // Edit text field
-                              Expanded(
-                                child: TextField(
-                                  controller: TextEditingController(
-                                      text: '0919041104'), // Giá trị ban đầu
-                                  style: const TextStyle(fontSize: 15),
-                                  decoration: const InputDecoration(
-                                    border:
-                                        InputBorder.none, // Ẩn border mặc định
-                                    hintText:
-                                        'Nhập số điện thoại...', // Gợi ý khi chưa nhập gì
-                                  ),
-                                ),
-                              ),
-                              // Edit icon
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     // TODO: Xử lý logic khi bấm vào icon chỉnh sửa
-                              //   },
-                              //   child: Image.asset(
-                              //     'assets/images/edit.png',
-                              //     width: 25,
-                              //     height: 25,
-                              //     fit: BoxFit.contain,
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                        ),
-
-                        // Password section
-                        const SizedBox(height: 21),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/password_icon.png',
-                              width: 27,
-                              height: 27,
-                              fit: BoxFit.contain,
-                            ),
-                            const SizedBox(width: 2),
-                            const Text(
-                              'Mật khẩu',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                //fontFamily: 'Montserrat',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 7),
-                        Container(
-                          height: 55,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(
-                              color: const Color(0xFF1E201E),
-                              width: 2,
-                            ),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical:
-                                2, // Giảm padding để cân đối với TextField
-                          ),
-                          child: Row(
-                            children: [
-                              // Edit text field
-                              Expanded(
-                                child: TextField(
-                                  controller:
-                                      TextEditingController(text: displayText),
-                                  style: const TextStyle(fontSize: 15),
-                                  readOnly: true,
-                                  decoration: const InputDecoration(
-                                    border:
-                                        InputBorder.none, // Ẩn border mặc định
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  _isObscured
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                  color: Colors.black,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _isObscured =
-                                        !_isObscured; // Đảo trạng thái hiển thị
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Change password link
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap:
-                                  showChangePasswordDialog, // Mở dialog đổi mật khẩu
-                              child: const Text(
-                                'Đổi mật khẩu ',
+                              const SizedBox(width: 3),
+                              const Text(
+                                'Tên đăng nhập',
                                 style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: 7),
+                          Container(
+                            height: 55,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: const Color(0xFF1E201E),
+                                width: 2,
+                              ),
                             ),
-                            Image.asset(
-                              'assets/images/arrow2_icon.png',
-                              width: 15,
-                              height: 15,
-                              fit: BoxFit.contain,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 2,
                             ),
-                          ],
-                        ),
-                      ],
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _usernameController, // Sử dụng controller từ Firestore
+                                    style: const TextStyle(fontSize: 15),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Nhập tên...',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Phần email
+                          const SizedBox(height: 21),
+                          Row(
+                            children: [
+                              Image.asset(
+                                'assets/images/image.png',
+                                width: 27,
+                                height: 27,
+                                fit: BoxFit.contain,
+                              ),
+                              const SizedBox(width: 2),
+                              const Text(
+                                'Email',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 7),
+                          Container(
+                            height: 55,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: const Color(0xFF1E201E),
+                                width: 2,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 2,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _emailController, // Sử dụng controller từ Firestore
+                                    style: const TextStyle(fontSize: 15),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Nhập email...',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Phần số điện thoại
+                          const SizedBox(height: 21),
+                          Row(
+                            children: [
+                              Image.asset(
+                                'assets/images/phone_icon.png',
+                                width: 27,
+                                height: 27,
+                                fit: BoxFit.contain,
+                              ),
+                              const SizedBox(width: 2),
+                              const Text(
+                                'Số điện thoại',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 7),
+                          Container(
+                            height: 55,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: const Color(0xFF1E201E),
+                                width: 2,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 2,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _phoneController, // Sử dụng controller từ Firestore
+                                    style: const TextStyle(fontSize: 15),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Nhập số điện thoại...',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Phần mật khẩu
+                          const SizedBox(height: 21),
+                          Row(
+                            children: [
+                              Image.asset(
+                                'assets/images/password_icon.png',
+                                width: 27,
+                                height: 27,
+                                fit: BoxFit.contain,
+                              ),
+                              const SizedBox(width: 2),
+                              const Text(
+                                'Mật khẩu',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 7),
+                          Container(
+                            height: 55,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: const Color(0xFF1E201E),
+                                width: 2,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 2,
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: TextEditingController(text: displayText),
+                                    style: const TextStyle(fontSize: 15),
+                                    readOnly: true,
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    _isObscured ? Icons.visibility_off : Icons.visibility,
+                                    color: Colors.black,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isObscured = !_isObscured; // Đổi trạng thái hiển thị mật khẩu
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Link đổi mật khẩu
+                          const SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: showChangePasswordDialog,
+                                child: const Text(
+                                  'Đổi mật khẩu ',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              Image.asset(
+                                'assets/images/arrow2_icon.png',
+                                width: 15,
+                                height: 15,
+                                fit: BoxFit.contain,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-
-                  // Buttons section
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        // Save button
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // TODO: Xử lý lưu thay đổi
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: const BorderSide(
-                                  color: Color(0xFF4ABD57), // Viền xanh lá
-                                  width: 1,
+                    // Phần nút "Lưu thay đổi" và "Hủy"
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        children: [
+                          // Nút lưu thay đổi
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                // Lưu thay đổi lên Firestore
+                                User? user = FirebaseAuth.instance.currentUser;
+                                if (user != null) {
+                                  var userDoc = await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .where('email', isEqualTo: user.email)
+                                      .get();
+                                  if (userDoc.docs.isNotEmpty) {
+                                    await FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(userDoc.docs.first.id)
+                                        .update({
+                                      'username': _usernameController.text,
+                                      'email': _emailController.text,
+                                      'sdt': _phoneController.text,
+                                      // Không cập nhật mật khẩu ở đây, xử lý riêng trong dialog
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Đã lưu thay đổi')),
+                                    );
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: const BorderSide(
+                                    color: Color(0xFF4ABD57),
+                                    width: 1,
+                                  ),
                                 ),
                               ),
-                            ),
-                            child: const Text(
-                              'Lưu thay đổi',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF4ABD57), // Chữ xanh lá
+                              child: const Text(
+                                'Lưu thay đổi',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF4ABD57),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Cancel button
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // TODO: Xử lý hủy thay đổi
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: const BorderSide(
-                                  color: Color(0xFFFE0000), // Viền đỏ
-                                  width: 1,
+                          const SizedBox(width: 16),
+                          // Nút hủy
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Khôi phục dữ liệu ban đầu từ Firestore
+                                _loadUserData();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: const BorderSide(
+                                    color: Color(0xFFFE0000),
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                              child: const Text(
+                                'Hủy',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFFFE0000),
                                 ),
                               ),
                             ),
-                            child: const Text(
-                              'Hủy',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFFFE0000), // Chữ đỏ
-                              ),
-                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      )),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    // Giải phóng các controller để tránh rò rỉ bộ nhớ
+    _usernameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

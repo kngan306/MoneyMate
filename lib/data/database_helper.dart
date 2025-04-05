@@ -1,122 +1,210 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DatabaseHelper {
-  // Singleton pattern
+  // Singleton pattern để đảm bảo chỉ có một instance của DatabaseHelper
   static final DatabaseHelper instance = DatabaseHelper._init();
   DatabaseHelper._init();
 
   // Tham chiếu đến Firestore instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Hàm thêm người dùng (users)
+  // Hàm lấy UID của người dùng hiện tại từ Firebase Authentication
+  String? _getCurrentUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    return user?.uid;
+  }
+
+  // Hàm thêm người dùng (users) vào Firestore
   Future<void> addUser(Map<String, dynamic> userData) async {
-    await _firestore.collection('users').add({
+    await _firestore.collection('users').doc(userData['email']).set({
       'sdt': userData['sdt'],
       'email': userData['email'],
       'username': userData['username'],
       'password': userData['password'],
-      'image': userData['image'] ?? 'assets/images/default_user.png',
+      'image': userData['image'], // Không đặt giá trị mặc định, để null nếu không có
     });
   }
 
-  // Hàm lấy danh sách người dùng
-  Future<List<Map<String, dynamic>>> getUsers() async {
-    QuerySnapshot snapshot = await _firestore.collection('users').get();
-    return snapshot.docs.map((doc) => {
+  // Hàm lấy thông tin người dùng hiện tại
+  Future<Map<String, dynamic>?> getCurrentUser() async {
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
+      if (doc.exists) {
+        return {
           'id': doc.id,
           ...doc.data() as Map<String, dynamic>,
-        }).toList();
+        };
+      }
+    }
+    return null;
   }
 
-  // Hàm thêm ví tiền (vi_tien)
+  // Hàm thêm ví tiền (vi_tien) cho người dùng hiện tại
   Future<void> addViTien(Map<String, dynamic> viTienData) async {
-    await _firestore.collection('vi_tien').add({
-      'ten_vi': viTienData['ten_vi'],
-    });
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('vi_tien')
+          .add({
+        'ten_vi': viTienData['ten_vi'],
+      });
+    }
   }
 
-  // Hàm lấy danh sách ví tiền
+  // Hàm lấy danh sách ví tiền của người dùng hiện tại
   Future<List<Map<String, dynamic>>> getViTien() async {
-    QuerySnapshot snapshot = await _firestore.collection('vi_tien').get();
-    return snapshot.docs.map((doc) => {
-          'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
-        }).toList();
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('vi_tien')
+          .get();
+      return snapshot.docs.map((doc) => {
+            'id': doc.id,
+            ...doc.data() as Map<String, dynamic>,
+          }).toList();
+    }
+    return [];
   }
 
-  // Hàm thêm danh mục thu (danh_muc_thu)
+  // Hàm thêm danh mục thu (danh_muc_thu) cho người dùng hiện tại
   Future<void> addDanhMucThu(Map<String, dynamic> danhMucThuData) async {
-    await _firestore.collection('danh_muc_thu').add({
-      'ten_muc_thu': danhMucThuData['ten_muc_thu'],
-      'image': danhMucThuData['image'] ?? 'assets/images/default_income.png',
-    });
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('danh_muc_thu')
+          .add({
+        'ten_muc_thu': danhMucThuData['ten_muc_thu'],
+        'image': danhMucThuData['image'], // Không đặt giá trị mặc định, để null nếu không có
+      });
+    }
   }
 
-  // Hàm lấy danh sách danh mục thu
+  // Hàm lấy danh sách danh mục thu của người dùng hiện tại
   Future<List<Map<String, dynamic>>> getDanhMucThu() async {
-    QuerySnapshot snapshot = await _firestore.collection('danh_muc_thu').get();
-    return snapshot.docs.map((doc) => {
-          'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
-        }).toList();
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('danh_muc_thu')
+          .get();
+      return snapshot.docs.map((doc) => {
+            'id': doc.id,
+            ...doc.data() as Map<String, dynamic>,
+          }).toList();
+    }
+    return [];
   }
 
-  // Hàm thêm thu nhập (thu_nhap)
+  // Hàm thêm thu nhập (thu_nhap) cho người dùng hiện tại
   Future<void> addThuNhap(Map<String, dynamic> thuNhapData) async {
-    await _firestore.collection('thu_nhap').add({
-      'ngay': thuNhapData['ngay'], // Định dạng dd/MM/yy
-      'so_tien': thuNhapData['so_tien'],
-      'ghi_chu': thuNhapData['ghi_chu'],
-      'muc_thu_nhap': thuNhapData['muc_thu_nhap'], // ID tham chiếu đến danh_muc_thu
-      'loai_vi': thuNhapData['loai_vi'], // ID tham chiếu đến vi_tien
-    });
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('thu_nhap')
+          .add({
+        'ngay': thuNhapData['ngay'], // Định dạng dd/MM/yy
+        'so_tien': thuNhapData['so_tien'],
+        'ghi_chu': thuNhapData['ghi_chu'],
+        'muc_thu_nhap': thuNhapData['muc_thu_nhap'], // ID tham chiếu đến danh_muc_thu
+        'loai_vi': thuNhapData['loai_vi'], // ID tham chiếu đến vi_tien
+      });
+    }
   }
 
-  // Hàm lấy danh sách thu nhập
+  // Hàm lấy danh sách thu nhập của người dùng hiện tại
   Future<List<Map<String, dynamic>>> getThuNhap() async {
-    QuerySnapshot snapshot = await _firestore.collection('thu_nhap').get();
-    return snapshot.docs.map((doc) => {
-          'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
-        }).toList();
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('thu_nhap')
+          .get();
+      return snapshot.docs.map((doc) => {
+            'id': doc.id,
+            ...doc.data() as Map<String, dynamic>,
+          }).toList();
+    }
+    return [];
   }
 
-  // Hàm thêm danh mục chi (danh_muc_chi)
+  // Hàm thêm danh mục chi (danh_muc_chi) cho người dùng hiện tại
   Future<void> addDanhMucChi(Map<String, dynamic> danhMucChiData) async {
-    await _firestore.collection('danh_muc_chi').add({
-      'ten_muc_chi': danhMucChiData['ten_muc_chi'],
-      'image': danhMucChiData['image'] ?? 'assets/images/default_expense.png',
-    });
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('danh_muc_chi')
+          .add({
+        'ten_muc_chi': danhMucChiData['ten_muc_chi'],
+        'image': danhMucChiData['image'], // Không đặt giá trị mặc định, để null nếu không có
+      });
+    }
   }
 
-  // Hàm lấy danh sách danh mục chi
+  // Hàm lấy danh sách danh mục chi của người dùng hiện tại
   Future<List<Map<String, dynamic>>> getDanhMucChi() async {
-    QuerySnapshot snapshot = await _firestore.collection('danh_muc_chi').get();
-    return snapshot.docs.map((doc) => {
-          'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
-        }).toList();
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('danh_muc_chi')
+          .get();
+      return snapshot.docs.map((doc) => {
+            'id': doc.id,
+            ...doc.data() as Map<String, dynamic>,
+          }).toList();
+    }
+    return [];
   }
 
-  // Hàm thêm chi tiêu (chi_tieu)
+  // Hàm thêm chi tiêu (chi_tieu) cho người dùng hiện tại
   Future<void> addChiTieu(Map<String, dynamic> chiTieuData) async {
-    await _firestore.collection('chi_tieu').add({
-      'ngay': chiTieuData['ngay'], // Định dạng dd/MM/yy
-      'so_tien': chiTieuData['so_tien'],
-      'ghi_chu': chiTieuData['ghi_chu'],
-      'muc_chi_tieu': chiTieuData['muc_chi_tieu'], // ID tham chiếu đến danh_muc_chi
-      'loai_vi': chiTieuData['loai_vi'], // ID tham chiếu đến vi_tien
-    });
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('chi_tieu')
+          .add({
+        'ngay': chiTieuData['ngay'], // Định dạng dd/MM/yy
+        'so_tien': chiTieuData['so_tien'],
+        'ghi_chu': chiTieuData['ghi_chu'],
+        'muc_chi_tieu': chiTieuData['muc_chi_tieu'], // ID tham chiếu đến danh_muc_chi
+        'loai_vi': chiTieuData['loai_vi'], // ID tham chiếu đến vi_tien
+      });
+    }
   }
 
-  // Hàm lấy danh sách chi tiêu
+  // Hàm lấy danh sách chi tiêu của người dùng hiện tại
   Future<List<Map<String, dynamic>>> getChiTieu() async {
-    QuerySnapshot snapshot = await _firestore.collection('chi_tieu').get();
-    return snapshot.docs.map((doc) => {
-          'id': doc.id,
-          ...doc.data() as Map<String, dynamic>,
-        }).toList();
+    String? userId = _getCurrentUserId();
+    if (userId != null) {
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('chi_tieu')
+          .get();
+      return snapshot.docs.map((doc) => {
+            'id': doc.id,
+            ...doc.data() as Map<String, dynamic>,
+          }).toList();
+    }
+    return [];
   }
 
   // Hàm kiểm tra kết nối mạng và thực hiện đồng bộ (nếu cần)
