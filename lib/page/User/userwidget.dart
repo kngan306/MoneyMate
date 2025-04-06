@@ -16,6 +16,7 @@ class _UserWidgetState extends State<UserWidget> {
   late TextEditingController _emailController; // Controller cho email
   late TextEditingController _phoneController; // Controller cho số điện thoại
   late TextEditingController _passwordController; // Controller cho mật khẩu
+  String? _imageUrl; // Biến để lưu URL hoặc asset path của hình ảnh
 
   @override
   void initState() {
@@ -49,6 +50,7 @@ class _UserWidgetState extends State<UserWidget> {
             _emailController.text = data['email'] ?? '';
             _phoneController.text = data['sdt'] ?? '';
             _passwordController.text = data['password'] ?? '';
+            _imageUrl = data['image']; // Lấy URL hoặc asset path của hình ảnh
           });
         } else {
           print('Không tìm thấy thông tin người dùng trong Firestore.');
@@ -58,7 +60,6 @@ class _UserWidgetState extends State<UserWidget> {
       }
     }
   }
-
 
   // Getter để hiển thị mật khẩu dạng dấu * hoặc text thật
   String get displayText {
@@ -243,10 +244,20 @@ class _UserWidgetState extends State<UserWidget> {
                           Center(
                             child: Stack(
                               children: [
-                                CircleAvatar(   
+                                CircleAvatar(
                                   radius: 76.5,
+                                  backgroundColor: _imageUrl == null ||
+                                          _imageUrl!.isEmpty
+                                      ? Colors
+                                          .white // Hình tròn trắng nếu không có hình
+                                      : null,
                                   backgroundImage:
-                                      AssetImage('assets/images/avt.jpg'),
+                                      _imageUrl != null && _imageUrl!.isNotEmpty
+                                          ? (_imageUrl!.startsWith('assets/')
+                                                  ? AssetImage(_imageUrl!)
+                                                  : NetworkImage(_imageUrl!))
+                                              as ImageProvider
+                                          : null,
                                 ),
                                 Positioned(
                                   bottom: 5,
