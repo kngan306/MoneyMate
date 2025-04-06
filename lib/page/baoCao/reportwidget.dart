@@ -8,6 +8,8 @@ import '../../widgets/chart/thunhap/barchart_thunhap.dart';
 import '../../widgets/chart/thunhap/donutchart_thunhap.dart';
 import 'timkiembaocao_screen.dart';
 import '../mainpage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ReportWidget extends StatefulWidget {
   const ReportWidget({super.key});
@@ -23,15 +25,89 @@ class _ReportWidgetState extends State<ReportWidget> {
   late DateTime _focusedDay;
   bool isExpenseSelected = true; // Track if "Chi tiêu" is selected
 
+  String? userDocId; // Biến để lưu ID của document người dùng
+  double monthlyIncome = 0.0; // Tổng thu nhập của tháng được chọn
+  double monthlyExpense = 0.0; // Tổng chi tiêu của tháng được chọn
+  double monthlyTotal = 0.0; // Tổng (thu nhập - chi tiêu) của tháng được chọn
+
   @override
   void initState() {
     super.initState();
-    _focusedDay = DateTime.now(); // Initialize to the current date
+    _focusedDay = DateTime.now(); // Khởi tạo với ngày hiện tại
+    _loadData(); // Tải dữ liệu khi khởi tạo
+  }
+
+  // Hàm tải dữ liệu từ Firestore
+  Future<void> _loadData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Lấy document người dùng từ Firestore dựa trên email
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        userDocId = userDoc.docs.first.id; // Lấy ID của document người dùng
+        await _calculateMonthlyData(userDocId!, _focusedDay);
+        setState(() {});
+      } else {
+        print('Không tìm thấy thông tin người dùng trong Firestore.');
+      }
+    }
+  }
+
+  // Hàm tính dữ liệu thu nhập và chi tiêu theo tháng
+  Future<void> _calculateMonthlyData(
+      String userDocId, DateTime focusedDay) async {
+    String monthStr =
+        focusedDay.month.toString().padLeft(2, '0'); // Định dạng tháng (01-12)
+    String yearStr = focusedDay.year.toString(); // Năm hiện tại
+
+    // Xác định ngày bắt đầu và kết thúc của tháng
+    String startDate = '$yearStr-$monthStr-01'; // Ngày đầu tháng
+    String nextMonthStr =
+        ((focusedDay.month + 1) % 12).toString().padLeft(2, '0');
+    String nextYearStr =
+        (focusedDay.month == 12 ? focusedDay.year + 1 : focusedDay.year)
+            .toString();
+    if (focusedDay.month == 12)
+      nextMonthStr = '01'; // Tháng 12 thì sang tháng 1 năm sau
+    String endDate =
+        '$nextYearStr-$nextMonthStr-01'; // Ngày đầu tháng tiếp theo
+
+    // Truy vấn thu nhập trong tháng
+    QuerySnapshot incomeSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+    monthlyIncome = incomeSnapshot.docs.fold(0.0, (sum, doc) {
+      return sum + (doc['so_tien'] as num).toDouble();
+    });
+
+    // Truy vấn chi tiêu trong tháng
+    QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('chi_tieu')
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+    monthlyExpense = expenseSnapshot.docs.fold(0.0, (sum, doc) {
+      return sum + (doc['so_tien'] as num).toDouble();
+    });
+
+    // Tính tổng của tháng
+    monthlyTotal = monthlyIncome - monthlyExpense;
   }
 
   void _changeMonth(int step) {
     setState(() {
       _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+      _loadData(); // Tải lại dữ liệu khi thay đổi tháng
     });
   }
 
@@ -48,7 +124,8 @@ class _ReportWidgetState extends State<ReportWidget> {
         onSearchPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Mainpage(selectedIndex: 13)),
+            MaterialPageRoute(
+                builder: (context) => Mainpage(selectedIndex: 13)),
           );
         },
       ),
@@ -93,7 +170,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                   ],
                 ),
               ),
-              
+
               // Summary card
               Padding(
                 padding: const EdgeInsets.only(top: 19, left: 16, right: 16),
@@ -112,9 +189,11 @@ class _ReportWidgetState extends State<ReportWidget> {
                             child: Align(
                               alignment: Alignment.center,
                               child: Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    '-740,000 đ',
+                                    NumberFormat.currency(
+                                            locale: 'vi_VN', symbol: 'đ')
+                                        .format(-monthlyExpense),
                                     style: TextStyle(
                                       fontFamily: 'Montserrat',
                                       fontSize: 15,
@@ -135,9 +214,11 @@ class _ReportWidgetState extends State<ReportWidget> {
                             child: Align(
                               alignment: Alignment.center,
                               child: Column(
-                                children: const [
+                                children: [
                                   Text(
-                                    '+1,000,000 đ',
+                                    NumberFormat.currency(
+                                            locale: 'vi_VN', symbol: 'đ')
+                                        .format(monthlyIncome),
                                     style: TextStyle(
                                       fontFamily: 'Montserrat',
                                       fontSize: 15,
@@ -166,9 +247,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                           width: 159,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
+                            children: [
                               Text(
-                                'Thu chi',
+                                'Tổng',
                                 style: TextStyle(
                                   fontFamily: 'Montserrat',
                                   fontSize: 15,
@@ -177,7 +258,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                                 ),
                               ),
                               Text(
-                                '+360,000 đ',
+                                NumberFormat.currency(
+                                        locale: 'vi_VN', symbol: 'đ')
+                                    .format(monthlyTotal),
                                 style: TextStyle(
                                   fontFamily: 'Montserrat',
                                   fontSize: 17,
