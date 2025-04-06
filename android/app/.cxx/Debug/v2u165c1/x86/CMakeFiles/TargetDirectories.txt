@@ -1,0 +1,2 @@
+D:/DA_Mobile_6_4/Flutter_MoneyMate/android/app/.cxx/Debug/v2u165c1/x86/CMakeFiles/edit_cache.dir
+D:/DA_Mobile_6_4/Flutter_MoneyMate/android/app/.cxx/Debug/v2u165c1/x86/CMakeFiles/rebuild_cache.dir

@@ -6,6 +6,7 @@ import '../register/dangky_screen.dart';
 import '../../dashboard/dashboardwidget.dart';
 import '../../mainpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class DangNhap extends StatefulWidget {
   const DangNhap({Key? key}) : super(key: key);
@@ -19,6 +20,68 @@ class _DangNhapState extends State<DangNhap> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   String? _errorMessage;
+
+  Future<void> saveGoogleUserToFirestore(User user) async {
+    final userRef = FirebaseFirestore.instance.collection('users');
+
+    // Kiểm tra xem user đã tồn tại chưa (bằng email)
+    final existingUser =
+        await userRef.where('email', isEqualTo: user.email).get();
+
+    if (existingUser.docs.isEmpty) {
+      // Nếu chưa tồn tại -> thêm user mới
+      await userRef.add({
+        'username': user.displayName ?? '',
+        'email': user.email ?? '',
+        'image': user.photoURL ?? '',
+        'sdt': '', // Bạn có thể cập nhật sau trong phần hồ sơ
+        'password': '', // Để trống vì đăng nhập bằng Google
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      print('🔥 Thêm người dùng Google mới vào Firestore thành công!');
+    } else {
+      print('✅ Người dùng đã tồn tại trong Firestore.');
+    }
+  }
+
+  login() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        // Người dùng đã hủy đăng nhập, không làm gì cả
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Đăng nhập với Firebase
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      User? user = userCredential.user;
+
+      if (user != null) {
+        await saveGoogleUserToFirestore(user); // Thêm dòng này
+        // Đăng nhập thành công, chuyển hướng đến Trang chủ
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  Mainpage(selectedIndex: 0)), // nếu bạn hỗ trợ initialIndex
+        );
+      }
+    } catch (e) {
+      print("Lỗi đăng nhập Google: $e");
+      setState(() {
+        _errorMessage = 'Đăng nhập bằng Google không thành công';
+      });
+    }
+  }
 
   // Hàm đăng nhập với Firebase Authentication
   Future<void> _login() async {
@@ -69,7 +132,7 @@ class _DangNhapState extends State<DangNhap> {
       });
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -405,45 +468,50 @@ class _DangNhapState extends State<DangNhap> {
 
                     // Google login button
                     const SizedBox(height: 30),
-                    Container(
-                      constraints: const BoxConstraints(maxWidth: 300),
-                      padding: const EdgeInsets.fromLTRB(17, 10, 17, 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: const Color(0xFF1E201E),
-                          width: 1,
+                    GestureDetector(
+                      onTap: () {
+                        login();
+                      },
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 300),
+                        padding: const EdgeInsets.fromLTRB(17, 10, 17, 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: const Color(0xFF1E201E),
+                            width: 1,
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/google_icon.png',
-                                width: 30,
-                                height: 30,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                'Tiếp tục với Google',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Montserrat',
-                                  color: Colors.black,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Image.asset(
+                                  'assets/images/google_icon.png',
+                                  width: 30,
+                                  height: 30,
+                                  fit: BoxFit.contain,
                                 ),
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.arrow_forward,
-                            size: 26,
-                            color: Colors.black,
-                          ),
-                        ],
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Tiếp tục với Google',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Icon(
+                              Icons.arrow_forward,
+                              size: 26,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 

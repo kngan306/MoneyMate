@@ -11,7 +11,8 @@ class UserWidget extends StatefulWidget {
 
 class _UserWidgetState extends State<UserWidget> {
   bool _isObscured = true; // Biến kiểm soát hiển thị/ẩn mật khẩu
-  late TextEditingController _usernameController; // Controller cho tên đăng nhập
+  late TextEditingController
+      _usernameController; // Controller cho tên đăng nhập
   late TextEditingController _emailController; // Controller cho email
   late TextEditingController _phoneController; // Controller cho số điện thoại
   late TextEditingController _passwordController; // Controller cho mật khẩu
@@ -30,7 +31,8 @@ class _UserWidgetState extends State<UserWidget> {
 
   // Hàm load dữ liệu người dùng từ Firestore
   Future<void> _loadUserData() async {
-    User? user = FirebaseAuth.instance.currentUser; // Lấy thông tin user hiện tại từ Firebase Auth
+    User? user = FirebaseAuth
+        .instance.currentUser; // Lấy thông tin user hiện tại từ Firebase Auth
     if (user != null) {
       try {
         var userDoc = await FirebaseFirestore.instance
@@ -39,7 +41,8 @@ class _UserWidgetState extends State<UserWidget> {
             .get(); // Truy vấn document trong collection 'users' với email khớp
 
         if (userDoc.docs.isNotEmpty) {
-          var data = userDoc.docs.first.data(); // Lấy dữ liệu từ document đầu tiên
+          var data =
+              userDoc.docs.first.data(); // Lấy dữ liệu từ document đầu tiên
           setState(() {
             // Cập nhật giá trị cho các controller từ Firestore
             _usernameController.text = data['username'] ?? '';
@@ -56,10 +59,13 @@ class _UserWidgetState extends State<UserWidget> {
     }
   }
 
+
   // Getter để hiển thị mật khẩu dạng dấu * hoặc text thật
   String get displayText {
     if (_isObscured) {
-      return '*' * _passwordController.text.length; // Hiển thị dấu * theo độ dài mật khẩu
+      return '*' *
+          _passwordController
+              .text.length; // Hiển thị dấu * theo độ dài mật khẩu
     }
     return _passwordController.text; // Hiển thị mật khẩu thật
   }
@@ -237,7 +243,7 @@ class _UserWidgetState extends State<UserWidget> {
                           Center(
                             child: Stack(
                               children: [
-                                CircleAvatar(
+                                CircleAvatar(   
                                   radius: 76.5,
                                   backgroundImage:
                                       AssetImage('assets/images/avt.jpg'),
@@ -308,7 +314,8 @@ class _UserWidgetState extends State<UserWidget> {
                               children: [
                                 Expanded(
                                   child: TextField(
-                                    controller: _usernameController, // Sử dụng controller từ Firestore
+                                    controller:
+                                        _usernameController, // Sử dụng controller từ Firestore
                                     style: const TextStyle(fontSize: 15),
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
@@ -358,7 +365,8 @@ class _UserWidgetState extends State<UserWidget> {
                               children: [
                                 Expanded(
                                   child: TextField(
-                                    controller: _emailController, // Sử dụng controller từ Firestore
+                                    controller:
+                                        _emailController, // Sử dụng controller từ Firestore
                                     style: const TextStyle(fontSize: 15),
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
@@ -408,7 +416,8 @@ class _UserWidgetState extends State<UserWidget> {
                               children: [
                                 Expanded(
                                   child: TextField(
-                                    controller: _phoneController, // Sử dụng controller từ Firestore
+                                    controller:
+                                        _phoneController, // Sử dụng controller từ Firestore
                                     style: const TextStyle(fontSize: 15),
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
@@ -458,7 +467,8 @@ class _UserWidgetState extends State<UserWidget> {
                               children: [
                                 Expanded(
                                   child: TextField(
-                                    controller: TextEditingController(text: displayText),
+                                    controller: TextEditingController(
+                                        text: displayText),
                                     style: const TextStyle(fontSize: 15),
                                     readOnly: true,
                                     decoration: const InputDecoration(
@@ -468,12 +478,15 @@ class _UserWidgetState extends State<UserWidget> {
                                 ),
                                 IconButton(
                                   icon: Icon(
-                                    _isObscured ? Icons.visibility_off : Icons.visibility,
+                                    _isObscured
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
                                     color: Colors.black,
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _isObscured = !_isObscured; // Đổi trạng thái hiển thị mật khẩu
+                                      _isObscured =
+                                          !_isObscured; // Đổi trạng thái hiển thị mật khẩu
                                     });
                                   },
                                 ),
@@ -534,7 +547,8 @@ class _UserWidgetState extends State<UserWidget> {
                                       // Không cập nhật mật khẩu ở đây, xử lý riêng trong dialog
                                     });
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Đã lưu thay đổi')),
+                                      const SnackBar(
+                                          content: Text('Đã lưu thay đổi')),
                                     );
                                   }
                                 }
