@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import '../login/dangnhap_screen.dart';
 import 'xacthucotp_screen.dart';
-import 'xacthucemail_screen.dart';
+import 'dangkyfinal_screen.dart';
 import '../../../widgets/input/phone_input.dart';
 import '../../../widgets/input/email_input.dart';
 import '../../../widgets/tab/registration_tab.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+//import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DangKy extends StatefulWidget {
   const DangKy({Key? key}) : super(key: key);
@@ -18,6 +19,53 @@ class DangKy extends StatefulWidget {
 
 class _DangKyState extends State<DangKy> {
   bool isPhoneSelected = true; // Mặc định chọn Số điện thoại
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    // Gọi hàm xử lý Dynamic Link
+    _handleDynamicLinks();
+  }
+
+  void _handleDynamicLinks() async {
+    // Xử lý link khi ứng dụng được mở từ một link
+    try {
+      final PendingDynamicLinkData? data = await FirebaseDynamicLinks.instance.getInitialLink();
+      _navigateToDangKyFinal(data);
+    } catch (e) {
+      print('Error handling initial dynamic link: $e');
+    }
+
+    // Lắng nghe các Dynamic Link mới
+    FirebaseDynamicLinks.instance.onLink.listen((dynamicLink) {
+      _navigateToDangKyFinal(dynamicLink);
+    }).onError((error) {
+      print('Error listening to dynamic links: $error');
+    });
+  }
+
+  void _navigateToDangKyFinal(PendingDynamicLinkData? data) {
+    final Uri? deepLink = data?.link;
+
+    if (deepLink != null) {
+      String email = deepLink.queryParameters['email'] ?? '';
+      print('Dynamic link email: $email');
+      if (email.isNotEmpty) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DangKyFinal(
+              phoneNumber: '',
+              email: email,
+            ),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +128,8 @@ class _DangKyState extends State<DangKy> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 20.0.h),
-                padding: EdgeInsets.fromLTRB(16.0.w, 16.0.h, 16.0.w, 222.0.h),
+                margin: const EdgeInsets.only(top: 20.0),
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 222.0),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -148,9 +196,11 @@ class _DangKyState extends State<DangKy> {
                           fontFamily: 'Montserrat',
                         ),
                       ),
-                      SizedBox(height: 30.h),
-                      const PhoneInput(),
-                      SizedBox(height: 27.h),
+                      const SizedBox(height: 30),
+                      PhoneInput(
+                          controller:
+                              _phoneController), // Pass the controller here
+                      const SizedBox(height: 27),
                     ],
                     if (!isPhoneSelected) ...[
                       Text(
@@ -173,26 +223,115 @@ class _DangKyState extends State<DangKy> {
                           fontFamily: 'Montserrat',
                         ),
                       ),
-                      SizedBox(height: 30.h),
-                      const EmailInput(),
-                      SizedBox(height: 27.h),
+                      const SizedBox(height: 30),
+                      EmailInput(
+                          controller:
+                              _emailController), // Truyền controller vào đây
+                      const SizedBox(height: 27),
                     ],
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        // hàm xử lý khi ấn vào nút Số điện thoại
                         if (isPhoneSelected) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const XacThucOTP(),
-                            ),
-                          );
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const XacThucEmail(),
-                            ),
-                          );
+                          String phoneNumber = _phoneController.text.trim();
+                          if (phoneNumber.startsWith('0')) {
+                            phoneNumber =
+                                phoneNumber.substring(1); // Bỏ số 0 đầu
+                          }
+                          if (phoneNumber.isNotEmpty) {
+                            await _auth.verifyPhoneNumber(
+                              phoneNumber:
+                                  '+84$phoneNumber', // Assuming the user enters the number without the country code
+                              verificationCompleted:
+                                  (PhoneAuthCredential credential) async {
+                                await _auth.signInWithCredential(credential);
+                              },
+                              verificationFailed: (FirebaseAuthException e) {
+                                print('Lỗi xác thực: ${e.code} - ${e.message}');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Lỗi: ${e.code} - ${e.message}')),
+                                );
+                              },
+                              codeSent:
+                                  (String verificationId, int? resendToken) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => XacThucOTP(
+                                      verificationId: verificationId,
+                                      phoneNumber:
+                                          phoneNumber, // Truyền số điện thoại vào đây
+                                    ),
+                                  ),
+                                );
+                              },
+                              codeAutoRetrievalTimeout:
+                                  (String verificationId) {},
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Vui lòng nhập số điện thoại hợp lệ')),
+                            );
+                          }
+                        }
+
+                        // hàm xử lý khi ấn vào nút Email
+                        if (!isPhoneSelected) {
+                          String email = _emailController.text.trim();
+                          if (email.isNotEmpty) {
+                            try {
+                              // Tạo Dynamic Link với email
+                              String dynamicLink = 'https://moneymateapp.page.link/email-link-verify?email=$email';                           
+                              
+                              // Gửi mã xác thực đến email
+                              await _auth.sendSignInLinkToEmail(
+                                email: email,
+                                actionCodeSettings: ActionCodeSettings(
+                                  // url: 'https://moneymateapp.page.link/email-link-verify', // Sử dụng Dynamic Link đã tạo
+                                  url: dynamicLink, // Sử dụng Dynamic Link đã tạo
+                                  handleCodeInApp: true,
+                                  androidPackageName: 'com.example.flutter_moneymate_01',
+                                  androidInstallApp: true,
+                                  androidMinimumVersion: '29',
+                                ),
+                              );
+
+                              // Hiển thị thông báo thành công
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Mã xác thực đã được gửi đến $email. Vui lòng kiểm tra email của bạn.')),
+                              );
+
+                              // Gọi hàm xử lý Dynamic Link
+                              _handleDynamicLinks();
+                              
+                              // Chuyển đến màn hình đăng ký hoàn tất
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => DangKyFinal(
+                              //         phoneNumber: '',
+                              //         email: email), // Chuyển đến DangKyFinal
+                              //   ),
+                              // );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Lỗi gửi mã xác thực: ${e.toString()}')),
+                              );
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Vui lòng nhập email hợp lệ')),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(

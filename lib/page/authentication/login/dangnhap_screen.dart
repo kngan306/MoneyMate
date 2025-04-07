@@ -37,7 +37,7 @@ class _DangNhapState extends State<DangNhap> {
         'image': user.photoURL ?? '',
         'sdt': '', // Bạn có thể cập nhật sau trong phần hồ sơ
         'password': '', // Để trống vì đăng nhập bằng Google
-        'createdAt': FieldValue.serverTimestamp(),
+        // 'createdAt': FieldValue.serverTimestamp(),
       });
 
       print('🔥 Thêm người dùng Google mới vào Firestore thành công!');
@@ -86,9 +86,17 @@ class _DangNhapState extends State<DangNhap> {
 
   // Hàm đăng nhập với Firebase Authentication
   Future<void> _login() async {
+    // Kiểm tra xem người dùng có nhập email và mật khẩu không
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Vui lòng nhập email và mật khẩu.';
+      });
+      return;
+    }
+
     try {
-      // Đăng nhập với Firebase Authentication
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      // Đăng nhập với Firebase Authentication bằng email và mật khẩu
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
@@ -243,8 +251,8 @@ class _DangNhapState extends State<DangNhap> {
                             width: 1.w,
                           ),
                         ),
-                        hintText: 'Nhập tên đăng nhập',
-                        hintStyle: TextStyle(
+                        hintText: 'Nhập email',
+                        hintStyle: const TextStyle(
                           fontFamily:
                               'Montserrat', // Áp dụng font cho hint text
                           fontSize: 15.sp,

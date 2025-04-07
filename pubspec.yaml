@@ -31,13 +31,18 @@ dependencies:
   convex_bottom_bar: ^3.2.0
   keyboard_avoider: ^0.2.0
   google_sign_in: ^6.3.0
-
-
+  firebase_dynamic_links: ^5.5.7
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/images/logo.png"
 
 flutter:
   uses-material-design: true

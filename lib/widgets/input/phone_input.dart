@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 
-class PhoneInput extends StatefulWidget {
-  const PhoneInput({Key? key}) : super(key: key);
+class PhoneInput extends StatelessWidget {
+  final TextEditingController controller;
 
-  @override
-  _PhoneInputState createState() => _PhoneInputState();
-}
-
-class _PhoneInputState extends State<PhoneInput> {
-  final TextEditingController _phoneController = TextEditingController();
+  const PhoneInput({Key? key, required this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +69,7 @@ class _PhoneInputState extends State<PhoneInput> {
           ),
           Expanded(
             child: TextField(
-              controller: _phoneController,
+              controller: controller,
               keyboardType: TextInputType.phone,
               style: const TextStyle(
                 fontSize: 15,
@@ -83,7 +78,7 @@ class _PhoneInputState extends State<PhoneInput> {
                 color: Colors.black,
               ),
               decoration: const InputDecoration(
-                hintText: '0123 456 789',
+                hintText: '905 905 905',
                 hintStyle: TextStyle(
                   color: Colors.grey,
                   fontSize: 15,
@@ -101,7 +96,7 @@ class _PhoneInputState extends State<PhoneInput> {
               size: 22,
             ),
             onPressed: () {
-              _phoneController.clear();
+              controller.clear();
             },
           ),
         ],

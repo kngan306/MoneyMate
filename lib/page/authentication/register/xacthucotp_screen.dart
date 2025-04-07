@@ -6,21 +6,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class XacThucOTP extends StatefulWidget {
-  const XacThucOTP({Key? key}) : super(key: key);
+  final String verificationId;
+
+  final String phoneNumber; // Thêm biến để nhận số điện thoại
+
+  const XacThucOTP(
+      {Key? key, required this.verificationId, required this.phoneNumber})
+      : super(key: key);
 
   @override
   State<XacThucOTP> createState() => _XacThucOTPState();
 }
 
 class _XacThucOTPState extends State<XacThucOTP> {
-  final List<TextEditingController> _otpControllers = List.generate(
-    4,
-    (index) => TextEditingController(
-      text: ['3', '0', '0', '6'][index],
-    ),
-  );
-
-  final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
+  final List<TextEditingController> _otpControllers =
+      List.generate(6, (index) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
 
   @override
   void dispose() {
@@ -33,13 +34,33 @@ class _XacThucOTPState extends State<XacThucOTP> {
     super.dispose();
   }
 
-  void _verifyOtp() {
+  void _verifyOtp() async {
     final otp = _otpControllers.map((controller) => controller.text).join();
-    print('Verifying OTP: $otp');
-  }
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: widget.verificationId,
+        smsCode: otp,
+      );
 
-  void _resendOtp() {
-    print('Resending OTP code');
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Navigate to the final registration screen with the phone number
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DangKyFinal(
+            phoneNumber: widget.phoneNumber,
+            email: '',
+          ), // Truyền số điện thoại và email vào đây
+        ),
+      );
+    } catch (e) {
+      print('Failed to verify OTP: $e');
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid OTP')),
+      );
+    }
   }
 
   @override
@@ -140,10 +161,10 @@ class _XacThucOTPState extends State<XacThucOTP> {
                         ),
                       ),
                     ),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(top: 14.0),
                       child: Text(
-                        'Vui lòng nhập mã OTP bao gồm 4 số vừa được gửi về số điện thoại +84',
+                        'Vui lòng nhập mã OTP bao gồm 6 số vừa được gửi về số điện thoại ${widget.phoneNumber}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
@@ -157,13 +178,19 @@ class _XacThucOTPState extends State<XacThucOTP> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: List.generate(
-                          4,
+                          6, // Đảm bảo số lượng ô nhập là 6
                           (index) => OtpInputField(
                             controller: _otpControllers[index],
                             focusNode: _focusNodes[index],
                             onChanged: (value) {
-                              if (value.length == 1 && index < 3) {
-                                _focusNodes[index + 1].requestFocus();
+                              if (value.length == 1) {
+                                if (index < 5) {
+                                  // Chỉ số không vượt quá 5
+                                  _focusNodes[index + 1].requestFocus();
+                                }
+                              } else if (value.isEmpty && index > 0) {
+                                _focusNodes[index - 1]
+                                    .requestFocus(); // Quay lại ô trước nếu xóa ký tự
                               }
                             },
                           ),
@@ -174,15 +201,16 @@ class _XacThucOTPState extends State<XacThucOTP> {
                       padding: const EdgeInsets.only(
                           top: 30.0), // Giữ khoảng cách trên
                       child: ElevatedButton(
-                        onPressed: () {
-                          // Navigator.pushNamed(context, AppRoutes.registerFinal);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const DangKyFinal(),
-                            ),
-                          );
-                        },
+                        // onPressed: () {
+                        //   // Navigator.pushNamed(context, AppRoutes.registerFinal);
+                        //   Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) => const DangKyFinal(),
+                        //     ),
+                        //   );
+                        // },
+                        onPressed: _verifyOtp,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),
                           shape: RoundedRectangleBorder(
@@ -216,7 +244,7 @@ class _XacThucOTPState extends State<XacThucOTP> {
                             const TextSpan(text: 'Chưa nhận được mã? '),
                             WidgetSpan(
                               child: GestureDetector(
-                                onTap: _resendOtp,
+                                // onTap: _resendOtp,
                                 child: const Text(
                                   'Gửi lại',
                                   style: TextStyle(
