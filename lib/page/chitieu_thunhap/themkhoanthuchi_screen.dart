@@ -22,7 +22,14 @@ class _ThemKhoanThuChiState extends State<ThemKhoanThuChi> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Thêm khoản thu chi",
+         title: Text(
+          "Thêm khoản thu chi",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         showToggleButtons: true,
         showMenuButton: true, // Hiển thị nút menu (Drawer)
         onMenuPressed: () {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../widgets/custom_app_bar.dart';
 
 class LichSuGhiChep extends StatefulWidget {
   const LichSuGhiChep({Key? key}) : super(key: key);
@@ -182,23 +184,15 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E201E),
-        title: const Text(
-          'Lịch sử ghi chép',
+      appBar: CustomAppBar(
+        title: Text(
+          "Lịch sử ghi chép",
           style: TextStyle(
-            fontFamily: 'Montserrat',
-            fontSize: 20,
+            fontSize: 17.sp,
             color: Colors.white,
-            fontWeight: FontWeight.w600,
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        centerTitle: true,
-        elevation: 0,
+        showBackButton: true,
       ),
       body: Container(
         color: const Color(0xFFF5F5F5),
@@ -207,31 +201,31 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
           children: [
             // Thanh chọn tháng
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 19.0, 16.0, 0.0),
+              padding: EdgeInsets.fromLTRB(16.0.w, 19.0.h, 16.0.w, 0.0.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.chevron_left, size: 30),
+                    icon: Icon(Icons.chevron_left, size: 30.sp),
                     onPressed: () => _changeMonth(-1),
                   ),
                   Container(
-                    width: 250,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    width: 250.w,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black, width: 1),
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.black, width: 1.w),
+                      borderRadius: BorderRadius.circular(8.r),
                       color: Colors.white,
                     ),
                     child: Center(
                       child: Text(
                         DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right, size: 30),
+                    icon: Icon(Icons.chevron_right, size: 30.sp),
                     onPressed: () => _changeMonth(1),
                   ),
                 ],
@@ -240,14 +234,14 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
             // Transactions list
             Expanded(
               child: Container(
-                margin: const EdgeInsets.only(top: 19),
+                margin: EdgeInsets.only(top: 19.h),
                 child: transactions.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'Không có giao dịch trong tháng này',
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: 15,
+                            fontSize: 15.sp,
                             color: Colors.black54,
                           ),
                         ),
@@ -290,12 +284,12 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
     return Container(
       width: double.infinity,
       color: const Color(0xFF697565),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
       child: Text(
         date,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Montserrat',
-          fontSize: 14,
+          fontSize: 14.sp,
           color: Colors.white,
         ),
       ),
@@ -319,12 +313,12 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
       background: Container(
         color: Colors.red,
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: EdgeInsets.symmetric(horizontal: 20.0.w),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       child: Container(
         color: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -332,16 +326,16 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
               children: [
                 Image.asset(
                   iconUrl,
-                  width: 35,
-                  height: 35,
+                  width: 35.w,
+                  height: 35.h,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: 4.w),
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Montserrat',
-                    fontSize: 15,
+                    fontSize: 15.sp,
                     color: Colors.black,
                   ),
                 ),
@@ -351,7 +345,7 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
               amount,
               style: TextStyle(
                 fontFamily: 'Montserrat',
-                fontSize: 15,
+                fontSize: 15.sp,
                 color: isIncome
                     ? const Color(0xFF4ABD57)
                     : const Color(0xFFFE0000),

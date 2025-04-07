@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../widgets/custom_app_bar.dart';
+
 
 class LichSuTheoDanhMuc extends StatefulWidget {
   final String categoryId; // ID của danh mục
@@ -129,56 +132,48 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1E201E),
-        title: const Text(
-          'Lịch sử theo danh mục',
+      appBar: CustomAppBar(
+        title: Text(
+          "Lịch sử theo danh mục",
           style: TextStyle(
-            fontFamily: 'Montserrat',
+            fontSize: 17.sp,
             color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        centerTitle: true,
-        elevation: 0,
+        showBackButton: true,
       ),
       body: SafeArea(
         child: Column(
           children: [
             // Thanh chọn tháng
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 19.0, 16.0, 0.0),
+              padding: EdgeInsets.fromLTRB(16.0.w, 19.0.h, 16.0.w, 0.0.h),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.chevron_left, size: 30),
+                    icon: Icon(Icons.chevron_left, size: 30.sp),
                     onPressed: () => _changeMonth(-1),
                   ),
                   Container(
-                    width: 250,
+                    width: 250.w,
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black, width: 1),
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.black, width: 1.w),
+                      borderRadius: BorderRadius.circular(8.r),
                       color: Colors.white,
                     ),
                     child: Center(
                       child: Text(
                         DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right, size: 30),
+                    icon: Icon(Icons.chevron_right, size: 30.sp),
                     onPressed: () => _changeMonth(1),
                   ),
                 ],
@@ -187,28 +182,28 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
 
             // Category section
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+              padding: EdgeInsets.fromLTRB(16.0.w, 16.0.h, 16.0.w, 0.0.h),
               child: Row(
                 children: [
                   if (categoryImage.isNotEmpty) // Chỉ hiển thị nếu có hình ảnh
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 40.w,
+                      height: 40.h,
                       child: Image.asset(
                         categoryImage,
-                        width: 40,
-                        height: 40,
+                        width: 40.w,
+                        height: 40.h,
                         fit: BoxFit.cover,
                       ),
                     ),
                   if (categoryImage.isNotEmpty)
-                    const SizedBox(width: 5), // Khoảng cách chỉ khi có hình
+                    SizedBox(width: 5.w), // Khoảng cách chỉ khi có hình
                   Text(
                     categoryName.isNotEmpty ? categoryName : 'Đang tải...',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Montserrat',
                       color: Colors.black,
-                      fontSize: 17,
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -216,22 +211,22 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             // Transaction list
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                padding: EdgeInsets.fromLTRB(0.0.w, 0.0.h, 0.0.w, 0.0.h),
                 child: Container(
                   width: double.infinity,
                   color: Colors.white,
                   child: transactions.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             'Không có giao dịch trong tháng này',
                             style: TextStyle(
                               fontFamily: 'Montserrat',
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               color: Colors.black54,
                             ),
                           ),
@@ -252,7 +247,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
 
                             return Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                                  EdgeInsets.symmetric(horizontal: 16.0.w),
                               child: _buildTransactionItem(
                                 date: formattedDate,
                                 amount: formattedAmount,
@@ -284,22 +279,22 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
       background: Container(
         color: Colors.red,
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: EdgeInsets.symmetric(horizontal: 20.0.w),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       child: Container(
-        height: 60,
-        margin: const EdgeInsets.only(top: 1),
+        height: 60.h,
+        margin: EdgeInsets.only(top: 1.h),
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               date,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Montserrat',
                 color: Colors.black,
-                fontSize: 15,
+                fontSize: 15.sp,
               ),
             ),
             Text(

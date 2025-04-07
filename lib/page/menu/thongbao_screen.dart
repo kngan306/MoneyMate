@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/widgets/menuitem/notification_item.dart';
 import '../../../widgets/custom_app_bar.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThongBao extends StatelessWidget {
   const ThongBao({Key? key}) : super(key: key);
@@ -10,7 +10,13 @@ class ThongBao extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: CustomAppBar(
-        title: "Thông báo",
+         title: Text(
+          "Thông báo",
+          style: TextStyle(
+            fontSize: 17.sp,
+            color: Colors.white,
+          ),
+        ),
         showToggleButtons: false,
         showMenuButton: true, // Hiển thị nút menu (Drawer)
         onMenuPressed: () {

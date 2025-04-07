@@ -223,7 +223,13 @@ class _ReportWidgetState extends State<ReportWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Báo cáo",
+         title: Text(
+          "Báo cáo",
+          style: TextStyle(
+            fontSize: 17.sp,
+            color: Colors.white,
+          ),
+        ),
         showMenuButton: true,
         onMenuPressed: () => Scaffold.of(context).openDrawer(),
         showSearchIcon: true,

@@ -73,26 +73,25 @@ class _XacThucOTPState extends State<XacThucOTP> {
             children: [
               Padding(
                 padding:
-                    // const EdgeInsets.only(left: 16.0, right: 16.0, top: 25.0),
-                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                  EdgeInsets.only(left: 16.0.w, right: 16.0.w, top: 16.0.h),
                 child: Row(
                   children: [
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back,
-                        size: 26,
+                        size: 26.sp,
                         color: Colors.black,
                       ),
                     ),
                     Expanded(
                       child: Center(
-                        child: const Text(
+                        child: Text(
                           'Đăng ký',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                            letterSpacing: 1.0.sp,
                             color: Colors.black,
                             fontFamily: 'Montserrat',
                           ),
@@ -103,24 +102,21 @@ class _XacThucOTPState extends State<XacThucOTP> {
                 ),
               ),
               Padding(
-                // padding: const EdgeInsets.only(top: 30),
-                padding: const EdgeInsets.only(top: 20),
+                padding: EdgeInsets.only(top: 20.h),
                 child: Column(
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      // width: 70,
-                      // height: 70,
-                      width: 60,
-                      height: 60,
+                      width: 60.w,
+                      height: 60.h,
                     ),
-                    const Text(
+                    Text(
                       'MoneyMate',
                       style: TextStyle(
                         // fontSize: 25,
-                        fontSize: 21,
+                        fontSize: 21.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 2.52,
+                        letterSpacing: 2.52.sp,
                         color: Color(0xFF1E201E),
                         fontFamily: 'Montserrat',
                       ),
@@ -129,32 +125,29 @@ class _XacThucOTPState extends State<XacThucOTP> {
                 ),
               ),
               Container(
-                // margin: const EdgeInsets.only(top: 30.0),
-                margin: const EdgeInsets.only(top: 20.0),
-                // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 160.0),
-                // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 140.0),
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 205.0),
+                margin: EdgeInsets.only(top: 20.0.h),
+                padding: EdgeInsets.fromLTRB(16.0.w, 16.0.h, 16.0.w, 205.0.h),
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40.0),
-                    topRight: Radius.circular(40.0),
+                    topLeft: Radius.circular(40.0.r),
+                    topRight: Radius.circular(40.0.r),
                   ),
                 ),
                 child: Column(
                   children: [
                     Image.asset(
                       'assets/images/lock.png',
-                      width: 82,
-                      height: 82,
+                      width: 82.w,
+                      height: 82.h,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 14.0),
+                    Padding(
+                      padding: EdgeInsets.only(top: 14.0.r),
                       child: Text(
                         'Nhập mã OTP',
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
                           fontFamily: 'Montserrat',
@@ -162,19 +155,19 @@ class _XacThucOTPState extends State<XacThucOTP> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 14.0),
+                      padding: EdgeInsets.only(top: 14.0.h),
                       child: Text(
                         'Vui lòng nhập mã OTP bao gồm 6 số vừa được gửi về số điện thoại ${widget.phoneNumber}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           color: Colors.black,
                           fontFamily: 'Montserrat',
                         ),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 30.0),
+                      padding: EdgeInsets.only(top: 30.0.h),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: List.generate(
@@ -198,8 +191,8 @@ class _XacThucOTPState extends State<XacThucOTP> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          top: 30.0), // Giữ khoảng cách trên
+                      padding: EdgeInsets.only(
+                          top: 30.0.h), // Giữ khoảng cách trên
                       child: ElevatedButton(
                         // onPressed: () {
                         //   // Navigator.pushNamed(context, AppRoutes.registerFinal);
@@ -214,16 +207,16 @@ class _XacThucOTPState extends State<XacThucOTP> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50.0),
+                            borderRadius: BorderRadius.circular(50.0.r),
                           ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 62.0),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 12.0.h, horizontal: 62.0.w),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Xác thực',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w500,
                             color: Colors.white,
                             fontFamily: 'Montserrat',
@@ -232,11 +225,11 @@ class _XacThucOTPState extends State<XacThucOTP> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
+                      padding: EdgeInsets.only(top: 16.0.h),
                       child: RichText(
                         text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 14,
+                          style: TextStyle(
+                            fontSize: 14.sp,
                             color: Colors.black,
                             fontFamily: 'Montserrat',
                           ),

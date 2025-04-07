@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TimKiemBaoCaoThuChi extends StatelessWidget {
   const TimKiemBaoCaoThuChi({Key? key}) : super(key: key);
@@ -8,11 +9,11 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E201E),
-        title: const Text(
+        title: Text(
           'Tìm kiếm (Toàn thời gian)',
           style: TextStyle(
             fontFamily: 'Montserrat',
-            fontSize: 20,
+            fontSize: 20.sp,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
@@ -31,33 +32,33 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
           children: [
             // Search input field
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
+              padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 0.0.h),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                   border: Border.all(
                     color: const Color(0x80000000),
-                    width: 1,
+                    width: 1.w,
                   ),
                 ),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+                    EdgeInsets.symmetric(horizontal: 22.w, vertical: 11.h),
                 child: Row(
                   children: [
                     Image.asset(
                       'assets/images/search_icon.png',
-                      width: 28,
-                      height: 28,
+                      width: 28.w,
+                      height: 28.h,
                       fit: BoxFit.contain,
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16.w),
                     Expanded(
                       child: Text(
                         'tiền',
                         style: TextStyle(
                           fontFamily: 'Montserrat',
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           color: Colors.black,
                         ),
                       ),
@@ -69,14 +70,14 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
 
             // Summary section
             Padding(
-              padding: const EdgeInsets.only(top: 30, left: 16, right: 16),
+              padding: EdgeInsets.only(top: 30.h, left: 16.w, right: 16.w),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
+                    EdgeInsets.symmetric(horizontal: 15.w, vertical: 17.h),
                 child: Row(
                   children: [
                     // Expenses column
@@ -87,7 +88,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                             'Chi tiêu',
                             style: TextStyle(
                               fontFamily: 'Montserrat',
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               color: Colors.black,
                             ),
                             textAlign: TextAlign.center,
@@ -97,7 +98,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Montserrat',
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               color: const Color(0xFFFE0000),
                             ),
                           ),
@@ -107,10 +108,10 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
 
                     // Divider
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      padding: EdgeInsets.symmetric(horizontal: 13.w),
                       child: Container(
-                        width: 1,
-                        height: 30,
+                        width: 1.w,
+                        height: 30.h,
                         color: const Color(0xFFD9D9D9),
                       ),
                     ),
@@ -123,7 +124,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                             'Thu nhập',
                             style: TextStyle(
                               fontFamily: 'Montserrat',
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               color: Colors.black,
                             ),
                           ),
@@ -132,7 +133,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Montserrat',
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               color: const Color(0xFF4ABD57),
                             ),
                           ),
@@ -142,10 +143,10 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
 
                     // Divider
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 13),
+                      padding: EdgeInsets.symmetric(horizontal: 13.w),
                       child: Container(
-                        width: 1,
-                        height: 30,
+                        width: 1.w,
+                        height: 30.h,
                         color: const Color(0xFFD9D9D9),
                       ),
                     ),
@@ -158,7 +159,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                             'Tổng',
                             style: TextStyle(
                               fontFamily: 'Montserrat',
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               color: Colors.black,
                             ),
                             textAlign: TextAlign.center,
@@ -168,7 +169,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Montserrat',
-                              fontSize: 15,
+                              fontSize: 15.sp,
                               color: const Color.fromARGB(255, 0, 0, 0),
                             ),
                           ),
@@ -183,7 +184,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
             // Transactions list
             Expanded(
               child: Container(
-                margin: const EdgeInsets.only(top: 30), // Thêm margin ở đây
+                margin: EdgeInsets.only(top: 30.sp), // Thêm margin ở đây
                 child: ListView(
                   padding: EdgeInsets.zero,
                   children: [
@@ -233,12 +234,12 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: const Color(0xFF697565),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
       child: Text(
         date,
         style: TextStyle(
           fontFamily: 'Montserrat',
-          fontSize: 14,
+          fontSize: 14.sp,
           color: Colors.white,
         ),
       ),
@@ -253,7 +254,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
   }) {
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -261,16 +262,16 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
             children: [
               Image.asset(
                 iconUrl,
-                width: 35,
-                height: 35,
+                width: 35.w,
+                height: 35.h,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: 4.w),
               Text(
                 title,
                 style: TextStyle(
                   fontFamily: 'Montserrat',
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   color: Colors.black,
                 ),
               ),
@@ -280,7 +281,7 @@ class TimKiemBaoCaoThuChi extends StatelessWidget {
             amount,
             style: TextStyle(
               fontFamily: 'Montserrat',
-              fontSize: 15,
+              fontSize: 15.sp,
               color:
                   isIncome ? const Color(0xFF4ABD57) : const Color(0xFFFE0000),
             ),
