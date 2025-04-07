@@ -304,7 +304,13 @@ class _UserWidgetState extends State<UserWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Tài khoản",
+         title: Text(
+          "Tài khoản",
+          style: TextStyle(
+            fontSize: 17.sp,
+            color: Colors.white,
+          ),
+        ),
         showToggleButtons: false,
         showMenuButton: true, // Hiển thị nút menu (Drawer)
         onMenuPressed: () {

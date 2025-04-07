@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/themkhoanchi_screen.dart';
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/themkhoanthu_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
+  final Widget title;
   final bool showBackButton;
   final bool showMenuButton;
   final bool showToggleButtons;
@@ -43,7 +44,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               : null,
       title: showToggleButtons
           ? _buildToggleButtons(context)
-          : Text(title, style: const TextStyle(color: Colors.white)),
+          : title,
       centerTitle: true,
       actions: [
         if (showSearchIcon)
@@ -57,13 +58,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _buildToggleButtons(BuildContext context) {
     return ToggleButtons(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(20.r),
       borderColor: Colors.white,
       selectedBorderColor: Colors.white,
       fillColor: Colors.white,
       color: Colors.white70,
       selectedColor: const Color(0xFF1E201E),
-      constraints: const BoxConstraints(maxHeight: 40),
+      constraints: BoxConstraints(maxHeight: 40.h),
       isSelected: [selectedIndex == 0, selectedIndex == 1],
       onPressed: (index) {
         if (onToggle != null) {
@@ -79,11 +80,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _buildToggleButton(String text) {
     return SizedBox(
-      width: 95,
+      width: 95.w,
       child: Center(
         child: Text(
           text,
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 14.sp),
           textAlign: TextAlign.center,
         ),
       ),

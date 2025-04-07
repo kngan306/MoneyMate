@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../widgets/custom_app_bar.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 
 class CalendarWidget extends StatefulWidget {
   const CalendarWidget({Key? key}) : super(key: key);
@@ -185,7 +187,13 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Lịch",
+         title: Text(
+          "Lịch",
+          style: TextStyle(
+            fontSize: 17.sp,
+            color: Colors.white,
+          ),
+        ),
         showToggleButtons: false,
         showMenuButton: true,
         onMenuPressed: () {
@@ -199,31 +207,31 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             children: [
               // Thanh chọn tháng
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                padding: EdgeInsets.symmetric(vertical: 8.0.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chevron_left, size: 30),
+                      icon: Icon(Icons.chevron_left, size: 30.sp),
                       onPressed: () => _changeMonth(-1),
                     ),
                     Container(
-                      width: 250,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      width: 250.w,
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 1),
-                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.black, width: 1.w),
+                        borderRadius: BorderRadius.circular(8.r),
                         color: Colors.white,
                       ),
                       child: Center(
                         child: Text(
                           DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.chevron_right, size: 30),
+                      icon: Icon(Icons.chevron_right, size: 30.sp),
                       onPressed: () => _changeMonth(1),
                     ),
                   ],
@@ -252,12 +260,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     _loadTransactions();
                   });
                 },
-                daysOfWeekHeight: 30,
-                rowHeight: 60,
-                calendarStyle: const CalendarStyle(
+                daysOfWeekHeight: 30.h,
+                rowHeight: 60.h,
+                calendarStyle: CalendarStyle(
                   todayDecoration: BoxDecoration(),
                   todayTextStyle: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -273,7 +281,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                         Text(
                           '${date.day}',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: isSameDay(date, DateTime.now())
                                 ? FontWeight.bold
                                 : FontWeight.normal,
@@ -285,9 +293,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                             children: [
                               if (dayExpenses.any((t) => t.startsWith('+')))
                                 Container(
-                                  margin: const EdgeInsets.only(top: 3, right: 2),
-                                  width: 6,
-                                  height: 6,
+                                  margin: EdgeInsets.only(top: 3.h, right: 2.w),
+                                  width: 6.w,
+                                  height: 6.h,
                                   decoration: const BoxDecoration(
                                     color: Colors.green,
                                     shape: BoxShape.circle,
@@ -296,8 +304,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                               if (dayExpenses.any((t) => t.startsWith('-')))
                                 Container(
                                   margin: const EdgeInsets.only(top: 3, left: 2),
-                                  width: 6,
-                                  height: 6,
+                                  width: 6.w,
+                                  height: 6.h,
                                   decoration: const BoxDecoration(
                                     color: Colors.red,
                                     shape: BoxShape.circle,
@@ -313,7 +321,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
               // Thanh tổng thu nhập, chi tiêu
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -335,7 +343,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
               // Danh sách giao dịch
               Padding(
-                padding: const EdgeInsets.only(top: 14.0, bottom: 28.0),
+                padding: EdgeInsets.only(top: 14.0.h, bottom: 28.0.h),
                 child: _buildTransactionList(),
               ),
             ],
@@ -348,12 +356,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   Widget _buildSummaryColumn(String label, String amount, Color color) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 16, color: Colors.black)),
+        Text(label, style: TextStyle(fontSize: 16.sp, color: Colors.black)),
         Text(
           amount,
           style: TextStyle(
             color: color,
-            fontSize: 16,
+            fontSize: 16.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -378,12 +386,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     displayTransactions.sort((a, b) => a['date'].compareTo(b['date']));
 
     if (displayTransactions.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Không có giao dịch trong ngày này',
           style: TextStyle(
             fontFamily: 'Montserrat',
-            fontSize: 15,
+            fontSize: 15.sp,
             color: Colors.black54,
           ),
         ),
@@ -412,11 +420,11 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             Container(
               width: double.infinity,
               color: const Color(0xFF697565),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
               child: Text(
                 date,
-                style: const TextStyle(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: 14.sp,
                   color: Colors.white,
                 ),
               ),
@@ -424,7 +432,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ...transactionList.map((transaction) {
               return Container(
                 color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -432,16 +440,16 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                       children: [
                         Image.asset(
                           transaction['icon'],
-                          width: 35,
-                          height: 35,
+                          width: 35.w,
+                          height: 35.w,
                           fit: BoxFit.contain,
                         ),
-                        const SizedBox(width: 4),
+                        SizedBox(width: 4.w),
                         Text(
                           transaction['name'],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: 15,
+                            fontSize: 15.sp,
                             color: Colors.black,
                           ),
                         ),

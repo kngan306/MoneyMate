@@ -253,7 +253,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Trang chủ",
+        title: Text(
+          "Trang chủ",
+          style: TextStyle(
+            fontSize: 17.sp,
+            color: Colors.white,
+          ),
+        ),
         showToggleButtons: false,
         showMenuButton: true,
         onMenuPressed: () {

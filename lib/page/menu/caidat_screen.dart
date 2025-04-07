@@ -10,7 +10,14 @@ class CaiDat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Cài đặt",
+         title: Text(
+          "Cài đặt",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         showToggleButtons: false,
         showMenuButton: true, // Hiển thị nút menu (Drawer)
         onMenuPressed: () {

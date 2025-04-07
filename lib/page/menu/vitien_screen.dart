@@ -158,7 +158,13 @@ class _ViTienState extends State<ViTien> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Ví của tôi",
+         title: Text(
+          "Ví của tôi",
+          style: TextStyle(
+            fontSize: 17,
+            color: Colors.white,
+          ),
+        ),
         showToggleButtons: false,
         showMenuButton: true,
         onMenuPressed: () {
