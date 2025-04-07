@@ -18,8 +18,7 @@ import 'authentication/login/dangnhap_screen.dart';
 import 'baoCao/timkiembaocao_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:io';
-//import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Mainpage extends StatefulWidget {
   //const Mainpage({Key? key}) : super(key: key);
@@ -144,82 +143,92 @@ class _MainpageState extends State<Mainpage> {
       );
     }
     return Scaffold(
-      key: _scaffoldKey, // Key để mở Drawer từ trang con
-      body: Center(
-        child: _widgetOptions[_selectedIndex],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            // DrawerHeader với dữ liệu từ Firestore
-            FutureBuilder<Map<String, dynamic>?>(
-              future: _fetchUserData(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Hiển thị loading khi đang tải dữ liệu
-                  return DrawerHeader(
-                    decoration: BoxDecoration(color: Color(0xFF1E201E)),
-                    child: Center(
-                        child: CircularProgressIndicator(color: Colors.white)),
-                  );
-                } else if (snapshot.hasError || !snapshot.hasData) {
-                  // Hiển thị mặc định nếu có lỗi hoặc không có dữ liệu
-                  return DrawerHeader(
-                    decoration: BoxDecoration(color: Color(0xFF1E201E)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor:
-                              Colors.white, // Hình tròn trắng nếu lỗi
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Không xác định',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          'Không có email',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  // Dữ liệu từ Firestore
-                  var userData = snapshot.data!;
-                  String image = userData['image'] ?? '';
-                  String username = userData['username'] ?? 'Không xác định';
-                  String email = userData['email'] ?? 'Không có email';
+        key: _scaffoldKey, // Key để mở Drawer từ trang con
+        body: Center(
+          child: _widgetOptions[_selectedIndex],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.all(0
+                .w), // Tất cả padding = 0 và sẽ responsive theo chiều rộng màn hình
+            children: [
+              // DrawerHeader với dữ liệu từ Firestore
+              FutureBuilder<Map<String, dynamic>?>(
+                future: _fetchUserData(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Hiển thị loading khi đang tải dữ liệu
+                    return DrawerHeader(
+                      decoration: BoxDecoration(color: Color(0xFF1E201E)),
+                      child: Center(
+                          child:
+                              CircularProgressIndicator(color: Colors.white)),
+                    );
+                  } else if (snapshot.hasError || !snapshot.hasData) {
+                    // Hiển thị mặc định nếu có lỗi hoặc không có dữ liệu
+                    return DrawerHeader(
+                      decoration: BoxDecoration(color: Color(0xFF1E201E)),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 40.r,
+                            backgroundColor:
+                                Colors.white, // Hình tròn trắng nếu lỗi
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'Không xác định',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 16.sp),
+                          ),
+                          Text(
+                            'Không có email',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 16.sp),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    // Dữ liệu từ Firestore
+                    var userData = snapshot.data!;
+                    String image = userData['image'] ?? '';
+                    String username = userData['username'] ?? 'Không xác định';
+                    String email = userData['email'] ?? 'Không có email';
 
-                  return DrawerHeader(
-                    decoration: BoxDecoration(color: Color(0xFF1E201E)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: image.isEmpty
-                              ? Colors.white
-                              : null, // Hình tròn trắng nếu image null
-                          backgroundImage: image.isNotEmpty
-                              ? (image.startsWith('assets/')
-                                  ? AssetImage(image) // For local asset images
-                                  : (image.startsWith('http') // Check if the image is a network image
-                                      ? NetworkImage(image) // For network images
-                                      : FileImage(File(image)))) // For file images
-                              : null, // For null image     
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          username,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Text(
-                          email,
-                          style: TextStyle(color: Colors.white),
+                    return Container(
+                      height: 250.h, // Điều chỉnh chiều cao ở đây
+                      child: DrawerHeader(
+                        decoration: BoxDecoration(color: Color(0xFF1E201E)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 50
+                                  .r, // Tăng giá trị radius để hình tròn lớn hơn
+                              backgroundColor:
+                                  image.isEmpty ? Colors.white : null,
+                              backgroundImage: image.isNotEmpty
+                                  ? (image.startsWith('assets/')
+                                      ? AssetImage(image)
+                                      : NetworkImage(image)) as ImageProvider
+                                  : null,
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              username,
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 16.sp),
+                            ),
+                            Text(
+                              email,
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 16.sp),
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
                         ),
                       ),
                     );

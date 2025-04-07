@@ -252,7 +252,7 @@ class _DangNhapState extends State<DangNhap> {
                           ),
                         ),
                         hintText: 'Nhập email',
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontFamily:
                               'Montserrat', // Áp dụng font cho hint text
                           fontSize: 15.sp,

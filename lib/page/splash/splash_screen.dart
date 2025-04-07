@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'chaomung_screen.dart';
 import '../dashboard/dashboardwidget.dart';
 import '../mainpage.dart';
-//import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
