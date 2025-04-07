@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LichSuTheoDanhMuc extends StatefulWidget {
-  const LichSuTheoDanhMuc({Key? key}) : super(key: key);
+  final String categoryId; // ID của danh mục
+  final bool isIncome; // Xác định là thu nhập hay chi tiêu
+  final String selectedMonth; // Tháng được chọn từ Dashboard
+
+  const LichSuTheoDanhMuc({
+    Key? key,
+    required this.categoryId,
+    required this.isIncome,
+    required this.selectedMonth,
+  }) : super(key: key);
 
   @override
   _LichSuTheoDanhMucState createState() => _LichSuTheoDanhMucState();
@@ -10,22 +21,108 @@ class LichSuTheoDanhMuc extends StatefulWidget {
 
 class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
   late DateTime _focusedDay;
+  String? userDocId;
+  String categoryName = '';
+  String categoryImage = '';
+  List<Map<String, dynamic>> transactions = []; // Danh sách giao dịch
 
   @override
   void initState() {
     super.initState();
-    _focusedDay = DateTime.now(); // Initialize to the current date
+    int monthIndex = int.parse(widget.selectedMonth.split(' ')[1]);
+    _focusedDay = DateTime(DateTime.now().year, monthIndex, 1);
+    _loadUserData();
   }
 
-  void _changeMonth(int step) {
+  // Tải thông tin người dùng và dữ liệu giao dịch
+  Future<void> _loadUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        userDocId = userDoc.docs.first.id;
+        await _loadCategoryDetails();
+        await _loadTransactions();
+        setState(() {});
+      }
+    }
+  }
+
+  // Tải thông tin danh mục (tên và hình ảnh)
+  Future<void> _loadCategoryDetails() async {
+    if (userDocId != null) {
+      DocumentSnapshot categoryDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userDocId)
+          .collection(widget.isIncome ? 'danh_muc_thu' : 'danh_muc_chi')
+          .doc(widget.categoryId)
+          .get();
+
+      if (categoryDoc.exists) {
+        setState(() {
+          categoryName =
+              categoryDoc[widget.isIncome ? 'ten_muc_thu' : 'ten_muc_chi']
+                  as String;
+          categoryImage =
+              categoryDoc['image'] as String? ?? ''; // Nếu null thì gán rỗng
+        });
+      }
+    }
+  }
+
+  // Tải danh sách giao dịch
+  Future<void> _loadTransactions() async {
+    if (userDocId == null) return;
+
+    String monthStr = _focusedDay.month.toString().padLeft(2, '0');
+    String yearStr = _focusedDay.year.toString();
+    String startDate = '$yearStr-$monthStr-01';
+    String nextMonthStr =
+        ((_focusedDay.month + 1) % 12).toString().padLeft(2, '0');
+    String nextYearStr =
+        (_focusedDay.month == 12 ? _focusedDay.year + 1 : _focusedDay.year)
+            .toString();
+    if (_focusedDay.month == 12) nextMonthStr = '01';
+    String endDate = '$nextYearStr-$nextMonthStr-01';
+
+    QuerySnapshot transactionSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection(widget.isIncome ? 'thu_nhap' : 'chi_tieu')
+        .where(widget.isIncome ? 'muc_thu_nhap' : 'muc_chi_tieu',
+            isEqualTo: widget.categoryId)
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+
     setState(() {
-      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+      transactions = transactionSnapshot.docs.map((doc) {
+        return {
+          'date': doc['ngay'] as String,
+          'amount': (doc['so_tien'] as num).toDouble(),
+        };
+      }).toList();
     });
   }
 
+  void _changeMonth(int step) async {
+    // Cập nhật _focusedDay
+    _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+    // Gọi setState để cập nhật giao diện cho _focusedDay (tháng hiển thị)
+    setState(() {});
+    // Chờ _loadTransactions hoàn thành để cập nhật transactions
+    await _loadTransactions();
+  }
+
   void _deleteTransaction(String date, int index) {
-    // Handle the delete action, for now just print the index
     print("Deleted transaction at index $index on date $date");
+    setState(() {
+      transactions.removeAt(index);
+    });
   }
 
   @override
@@ -35,7 +132,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E201E),
         title: const Text(
-          'Lịch sử ghi chép',
+          'Lịch sử theo danh mục',
           style: TextStyle(
             fontFamily: 'Montserrat',
             color: Colors.white,
@@ -60,12 +157,13 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.chevron_left, size: 30),
+                    icon: const Icon(Icons.chevron_left, size: 30),
                     onPressed: () => _changeMonth(-1),
                   ),
                   Container(
                     width: 250,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black, width: 1),
                       borderRadius: BorderRadius.circular(8),
@@ -74,13 +172,13 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
                     child: Center(
                       child: Text(
                         DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.chevron_right, size: 30),
+                    icon: const Icon(Icons.chevron_right, size: 30),
                     onPressed: () => _changeMonth(1),
                   ),
                 ],
@@ -92,20 +190,22 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
               padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
               child: Row(
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    child: Image.asset(
-                      'assets/images/mypham.png', // Thay thế bằng đường dẫn đến hình ảnh của bạn
+                  if (categoryImage.isNotEmpty) // Chỉ hiển thị nếu có hình ảnh
+                    Container(
                       width: 40,
                       height: 40,
-                      fit: BoxFit.cover,
+                      child: Image.asset(
+                        categoryImage,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 5),
+                  if (categoryImage.isNotEmpty)
+                    const SizedBox(width: 5), // Khoảng cách chỉ khi có hình
                   Text(
-                    'Mỹ phẩm',
-                    style: TextStyle(
+                    categoryName.isNotEmpty ? categoryName : 'Đang tải...',
+                    style: const TextStyle(
                       fontFamily: 'Montserrat',
                       color: Colors.black,
                       fontSize: 17,
@@ -119,34 +219,51 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
             const SizedBox(height: 20),
 
             // Transaction list
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-              child: Container(
-                width: double.infinity,
-                color: Colors.white,
-                child: ListView(
-                  shrinkWrap: true, // Đảm bảo ListView chiếm không gian cần thiết
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: _buildTransactionItem(
-                        date: 'Thứ 7, 08/03/2025',
-                        amount: '-500,000 đ',
-                        index: 0,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: _buildTransactionItem(
-                        date: 'Chủ nhật, 09/03/2025',
-                        amount: '-500,000 đ',
-                        index: 1,
-                      ),
-                    ),
-                  ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.white,
+                  child: transactions.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'Không có giao dịch trong tháng này',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 15,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: transactions.length,
+                          itemBuilder: (context, index) {
+                            final transaction = transactions[index];
+                            String rawDate = transaction['date'];
+                            DateTime date = DateTime.parse(rawDate);
+                            String formattedDate =
+                                DateFormat('EEEE, dd/MM/yyyy', 'vi_VN')
+                                    .format(date);
+                            double amount = transaction['amount'];
+                            String formattedAmount = NumberFormat.currency(
+                                    locale: 'vi_VN', symbol: 'đ')
+                                .format(widget.isIncome ? amount : -amount);
+
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: _buildTransactionItem(
+                                date: formattedDate,
+                                amount: formattedAmount,
+                                index: index,
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -159,10 +276,9 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
     required int index,
   }) {
     return Dismissible(
-      key: Key(index.toString()), // Mỗi mục giao dịch cần có một key duy nhất
-      direction: DismissDirection.endToStart, // Chỉ cho phép kéo từ phải qua trái
+      key: Key(index.toString()),
+      direction: DismissDirection.endToStart,
       onDismissed: (direction) {
-        // Gọi hàm _deleteTransaction khi mục bị xóa
         _deleteTransaction(date, index);
       },
       background: Container(
@@ -180,7 +296,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
           children: [
             Text(
               date,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Montserrat',
                 color: Colors.black,
                 fontSize: 15,
@@ -190,7 +306,9 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
               amount,
               style: TextStyle(
                 fontFamily: 'Montserrat',
-                color: const Color(0xFFFE0000),
+                color: widget.isIncome
+                    ? const Color(0xFF4ABD57)
+                    : const Color(0xFFFE0000),
                 fontSize: 15,
               ),
             ),
