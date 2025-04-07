@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../widgets/cateitem/category2_item.dart';
 import 'themdanhmucthu_screen.dart';
 import '../../mainpage.dart';
@@ -11,16 +13,116 @@ class DanhMucThu extends StatefulWidget {
 }
 
 class _DanhMucThuState extends State<DanhMucThu> {
-  // Biến để theo dõi trạng thái checkbox cho từng danh mục
-  bool isTienLuongChecked = false;
-  bool isPhuCapChecked = false;
-  bool isThuNhapPhuChecked = false;
-  bool isTienThuongChecked = false;
-  bool isDauTuChecked = true;
-  bool isDiLaiChecked = false;
-  bool isTienNhaChecked = false;
-  bool isXaStressChecked = false;
-  bool isCapWifiChecked = false;
+  Map<String, bool> categoryCheckStates = {};
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _allCategories = [];
+  List<Map<String, dynamic>> _filteredCategories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+    _searchController.addListener(_filterCategories);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadCategories() async {
+    List<Map<String, dynamic>> categories = await _loadIncomeCategories();
+    setState(() {
+      _allCategories = categories;
+      _filteredCategories = List.from(_allCategories);
+      categoryCheckStates.clear();
+      for (var category in _allCategories) {
+        categoryCheckStates[category['id']] = false;
+      }
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> _loadIncomeCategories() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        String userDocId = userDoc.docs.first.id;
+        QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userDocId)
+            .collection('danh_muc_thu')
+            .get();
+
+        return categorySnapshot.docs.map((doc) {
+          return {
+            'id': doc.id,
+            'name': doc['ten_muc_thu'] as String,
+            'image': doc['image'] as String,
+          };
+        }).toList();
+      }
+    }
+    return [];
+  }
+
+  void _filterCategories() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredCategories = List.from(_allCategories);
+      } else {
+        _filteredCategories = _allCategories
+            .where((category) => category['name'].toLowerCase().contains(query))
+            .toList();
+      }
+    });
+  }
+
+  Future<void> _deleteSelectedCategories() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        String userDocId = userDoc.docs.first.id;
+        List<String> selectedCategoryIds = categoryCheckStates.entries
+            .where((entry) => entry.value)
+            .map((entry) => entry.key)
+            .toList();
+
+        if (selectedCategoryIds.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Vui lòng chọn ít nhất một danh mục để xóa')),
+          );
+          return;
+        }
+
+        for (String categoryId in selectedCategoryIds) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userDocId)
+              .collection('danh_muc_thu')
+              .doc(categoryId)
+              .delete();
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Đã xóa ${selectedCategoryIds.length} danh mục')),
+        );
+
+        await _loadCategories();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +152,6 @@ class _DanhMucThuState extends State<DanhMucThu> {
             width: double.infinity,
             child: Column(
               children: [
-                // Search Bar
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
                   child: Container(
@@ -74,13 +175,17 @@ class _DanhMucThuState extends State<DanhMucThu> {
                         ),
                         const SizedBox(width: 20),
                         Expanded(
-                          child: Text(
-                            'Tìm kiếm danh mục đã thêm',
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 15,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Tìm kiếm danh mục đã thêm',
+                              hintStyle: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 15,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
                         ),
@@ -88,18 +193,19 @@ class _DanhMucThuState extends State<DanhMucThu> {
                     ),
                   ),
                 ),
-
-                // Add Category Button
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
                   child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Mainpage(selectedIndex: 14),
+                          builder: (context) => const ThemDanhMucThu(),
                         ),
                       );
+                      if (result == true) {
+                        await _loadCategories();
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -131,8 +237,6 @@ class _DanhMucThuState extends State<DanhMucThu> {
                     ),
                   ),
                 ),
-
-                // Select All Option
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
                   child: Container(
@@ -150,25 +254,10 @@ class _DanhMucThuState extends State<DanhMucThu> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  // Toggle select all
-                                  bool newValue = !(isTienLuongChecked &&
-                                      isPhuCapChecked &&
-                                      isThuNhapPhuChecked &&
-                                      isTienThuongChecked &&
-                                      isDauTuChecked &&
-                                      isDiLaiChecked &&
-                                      isTienNhaChecked &&
-                                      isXaStressChecked &&
-                                      isCapWifiChecked);
-                                  isTienLuongChecked = newValue;
-                                  isPhuCapChecked = newValue;
-                                  isThuNhapPhuChecked = newValue;
-                                  isTienThuongChecked = newValue;
-                                  isDauTuChecked = newValue;
-                                  isDiLaiChecked = newValue;
-                                  isTienNhaChecked = newValue;
-                                  isXaStressChecked = newValue;
-                                  isCapWifiChecked = newValue;
+                                  bool newValue = !categoryCheckStates.values
+                                      .every((element) => element);
+                                  categoryCheckStates.updateAll(
+                                      (key, value) => newValue);
                                 });
                               },
                               child: Container(
@@ -182,15 +271,8 @@ class _DanhMucThuState extends State<DanhMucThu> {
                                     width: 1,
                                   ),
                                 ),
-                                child: (isTienLuongChecked &&
-                                        isPhuCapChecked &&
-                                        isThuNhapPhuChecked &&
-                                        isTienThuongChecked &&
-                                        isDauTuChecked &&
-                                        isDiLaiChecked &&
-                                        isTienNhaChecked &&
-                                        isXaStressChecked &&
-                                        isCapWifiChecked)
+                                child: categoryCheckStates.values
+                                        .every((element) => element)
                                     ? const Icon(Icons.check, size: 16)
                                     : null,
                               ),
@@ -207,18 +289,19 @@ class _DanhMucThuState extends State<DanhMucThu> {
                             ),
                           ],
                         ),
-                        Image.asset(
-                          'assets/images/delete_icon.png',
-                          width: 27,
-                          height: 27,
-                          fit: BoxFit.contain,
+                        GestureDetector(
+                          onTap: _deleteSelectedCategories,
+                          child: Image.asset(
+                            'assets/images/delete_icon.png',
+                            width: 27,
+                            height: 27,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-
-                // Category List
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 0.0),
                   child: Container(
@@ -231,92 +314,27 @@ class _DanhMucThuState extends State<DanhMucThu> {
                       ),
                     ),
                     child: SizedBox(
-                      // height: 370, // Điều chỉnh chiều cao để phù hợp với giao diện
-                      height: 280, // Điều chỉnh chiều cao để phù hợp với giao diện
+                      height: 370,
                       child: SingleChildScrollView(
                         child: Column(
-                          children: [
-                            // Danh sách CategoryItem
-                            // Tiền lương
-                            CategoryItem(
-                              categoryKey: 'tienLuong',
-                              title: 'Tiền lương',
-                              iconUrl: 'assets/images/cate29.png',
+                          children: _filteredCategories.asMap().entries.map((entry) {
+                            int index = entry.key;
+                            var category = entry.value;
+                            return CategoryItem(
+                              categoryKey: category['id'],
+                              title: category['name'],
+                              iconUrl: category['image'],
                               arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: true,
-                              isLastItem: false,
-                              isChecked: isTienLuongChecked,
+                              isFirstItem: index == 0,
+                              isLastItem: index == _filteredCategories.length - 1,
+                              isChecked: categoryCheckStates[category['id']]!,
                               onCheckboxChanged: (value) {
                                 setState(() {
-                                  isTienLuongChecked = value;
+                                  categoryCheckStates[category['id']] = value;
                                 });
                               },
-                            ),
-
-                            // Phụ cấp
-                            CategoryItem(
-                              categoryKey: 'phuCap',
-                              title: 'Phụ cấp',
-                              iconUrl: 'assets/images/cate33.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isPhuCapChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isPhuCapChecked = value;
-                                });
-                              },
-                            ),
-
-                            // Thu nhập phụ
-                            CategoryItem(
-                              categoryKey: 'thuNhapPhu',
-                              title: 'Thu nhập phụ',
-                              iconUrl: 'assets/images/cate31.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isThuNhapPhuChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isThuNhapPhuChecked = value;
-                                });
-                              },
-                            ),
-
-                            // Tiền thưởng
-                            CategoryItem(
-                              categoryKey: 'tienThuong',
-                              title: 'Tiền thưởng',
-                              iconUrl: 'assets/images/cate32.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isTienThuongChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isTienThuongChecked = value;
-                                });
-                              },
-                            ),
-
-                            // Đầu tư
-                            CategoryItem(
-                              categoryKey: 'dauTu',
-                              title: 'Đầu tư',
-                              iconUrl: 'assets/images/cate30.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: true,
-                              isChecked: isDauTuChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isDauTuChecked = value;
-                                });
-                              },
-                            ),
-                          ],
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),
