@@ -8,6 +8,7 @@ import '../chitieu/themkhoanchi_screen.dart';
 import '../../mainpage.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemKhoanThu extends StatefulWidget {
   const ThemKhoanThu({Key? key}) : super(key: key);
@@ -152,91 +153,91 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                 child: Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 15),
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 15.h),
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1)),
+                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1.w)),
                       ),
-                      constraints: BoxConstraints(minHeight: 78),
+                      constraints: BoxConstraints(minHeight: 78.h),
                       child: GestureDetector(
                         onTap: () => _selectDate(context),
                         child: Row(
                           children: [
-                            Image.asset('assets/images/calendar_icon.png', width: 30, height: 30, fit: BoxFit.contain),
-                            const SizedBox(width: 10),
-                            const Text('Ngày', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
-                            const SizedBox(width: 40),
-                            Container(width: 1, height: 40, color: const Color(0x331E201E)),
-                            const SizedBox(width: 18),
+                            Image.asset('assets/images/calendar_icon.png', width: 30.w, height: 30.h, fit: BoxFit.contain),
+                            SizedBox(width: 10.w),
+                            Text('Ngày', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                            SizedBox(width: 40.w),
+                            Container(width: 1.w, height: 40.h, color: const Color(0x331E201E)),
+                            SizedBox(width: 18.w),
                             Expanded(
                               child: Text(
                                 selectedDate == null ? 'Chọn ngày tháng năm' : dateFormat.format(selectedDate!),
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w400,
                                   fontFamily: 'Montserrat',
                                   color: selectedDate == null ? const Color(0x331E201E) : Colors.black,
                                 ),
                               ),
                             ),
-                            Image.asset('assets/images/arrow2_icon.png', width: 20, height: 20, fit: BoxFit.contain),
+                            Image.asset('assets/images/arrow2_icon.png', width: 20.w, height: 20.h, fit: BoxFit.contain),
                           ],
                         ),
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1)),
+                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         children: [
-                          Image.asset('assets/images/money_icon.png', width: 30, height: 30, fit: BoxFit.contain),
-                          const SizedBox(width: 7),
-                          const Text('Số tiền', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
-                          const SizedBox(width: 25),
-                          Container(width: 1, height: 40, color: const Color(0x331E201E)),
-                          const SizedBox(width: 18),
+                          Image.asset('assets/images/money_icon.png', width: 30.w, height: 30.h, fit: BoxFit.contain),
+                          SizedBox(width: 7.w),
+                          Text('Số tiền', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                          SizedBox(width: 25.w),
+                          Container(width: 1.w, height: 40.h, color: const Color(0x331E201E)),
+                          SizedBox(width: 18.w),
                           Expanded(
                             child: TextField(
                               controller: _amountController,
                               keyboardType: TextInputType.number,
                               inputFormatters: [FilteringTextInputFormatter.digitsOnly, MoneyInputFormatter()],
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Colors.black),
-                              decoration: const InputDecoration(
+                              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Colors.black),
+                              decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Nhập vào số tiền',
-                                hintStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Color(0x331E201E)),
+                                hintStyle: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Color(0x331E201E)),
                               ),
                             ),
                           ),
-                          const Text('đ', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400, fontFamily: 'Montserrat')),
+                          Text('đ', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat')),
                         ],
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.fromLTRB(16, 15, 72, 15),
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.fromLTRB(16.w, 15.h, 72.w, 15.h),
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1)),
+                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         children: [
-                          Image.asset('assets/images/note_icon.png', width: 30, height: 40, fit: BoxFit.contain),
-                          const SizedBox(width: 7),
-                          const Text('Ghi chú', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
-                          const SizedBox(width: 17),
-                          Container(width: 1, height: 40, color: const Color(0x331E201E)),
-                          const SizedBox(width: 18),
+                          Image.asset('assets/images/note_icon.png', width: 30.w, height: 40.h, fit: BoxFit.contain),
+                          SizedBox(width: 7.w),
+                          Text('Ghi chú', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                          SizedBox(width: 17.w),
+                          Container(width: 1.w, height: 40.h, color: const Color(0x331E201E)),
+                          SizedBox(width: 18.w),
                           Expanded(
                             child: TextField(
                               controller: _noteController,
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Colors.black),
-                              decoration: const InputDecoration(
+                              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Colors.black),
+                              decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Nhập vào ghi chú',
-                                hintStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Color(0x331E201E)),
+                                hintStyle: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Color(0x331E201E)),
                               ),
                             ),
                           ),
@@ -244,15 +245,15 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(16.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              const Text('Mục hay dùng', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
-                              const SizedBox(width: 7),
-                              Image.asset('assets/images/dropdown_icon.png', width: 20, height: 20, fit: BoxFit.contain),
+                              Text('Mục hay dùng', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                              SizedBox(width: 7.w),
+                              Image.asset('assets/images/dropdown_icon.png', width: 20.w, height: 20.h, fit: BoxFit.contain),
                             ],
                           ),
                           Transform.translate(
@@ -288,7 +289,7 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                             onTap: () async {
                                               final result = await Navigator.push(
                                                 context,
-                                                MaterialPageRoute(builder: (context) => const DanhMucThu()),
+                                                MaterialPageRoute(builder: (context) => Mainpage(selectedIndex: 11,)),
                                               );
                                               if (result == true) {
                                                 await _loadCategories();
@@ -319,22 +320,22 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 15),
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 15.h),
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1)),
+                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
-                              Image.asset('assets/images/wallet_icon.png', width: 30, height: 30, fit: BoxFit.contain),
-                              const SizedBox(width: 10),
-                              const Text('Ví tiền', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
-                              const SizedBox(width: 30),
-                              Container(width: 1, height: 40, color: const Color(0x331E201E)),
-                              const SizedBox(width: 18),
+                              Image.asset('assets/images/wallet_icon.png', width: 30.w, height: 30.h, fit: BoxFit.contain),
+                              SizedBox(width: 10.w),
+                              Text('Ví tiền', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                              SizedBox(width: 30.w),
+                              Container(width: 1.w, height: 40.h, color: const Color(0x331E201E)),
+                              SizedBox(width: 18.w),
                             ],
                           ),
                           Expanded(
@@ -396,7 +397,7 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                 child: Text(
                                   _selectedWallet,
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 15.sp,
                                     fontWeight: FontWeight.w400,
                                     fontFamily: 'Montserrat',
                                     color: _selectedWallet == 'Chọn ví tiền của bạn' ? const Color(0x331E201E) : Colors.black,
@@ -405,23 +406,23 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                               ),
                             ),
                           ),
-                          Image.asset('assets/images/arrow2_icon.png', width: 20, height: 20, fit: BoxFit.contain),
+                          Image.asset('assets/images/arrow2_icon.png', width: 20.w, height: 20.h, fit: BoxFit.contain),
                         ],
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.only(top: 20, bottom: 30),
+                      margin: EdgeInsets.only(top: 20.h, bottom: 30.h),
                       child: ElevatedButton(
                         onPressed: _saveIncome,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          padding: const EdgeInsets.symmetric(horizontal: 49, vertical: 12),
-                          minimumSize: const Size(220, 0),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+                          padding: EdgeInsets.symmetric(horizontal: 49.w, vertical: 12.h),
+                          minimumSize: Size(220.w, 0),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Lưu khoản thu',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500, color: Colors.white, fontFamily: 'Montserrat'),
+                          style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, color: Colors.white, fontFamily: 'Montserrat'),
                         ),
                       ),
                     ),

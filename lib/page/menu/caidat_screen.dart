@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/widgets/menuitem/settings_item.dart';
 import '../../../widgets/custom_app_bar.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CaiDat extends StatelessWidget {
   const CaiDat({Key? key}) : super(key: key);
@@ -13,7 +13,7 @@ class CaiDat extends StatelessWidget {
          title: Text(
           "Cài đặt",
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 20,
             color: Colors.white,
           ),
         ),
@@ -37,18 +37,18 @@ class CaiDat extends StatelessWidget {
                       children: [
                         // Display Section
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
+                          padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 0.0.h),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
+                                padding: EdgeInsets.only(bottom: 12.h),
                                 child: Text(
                                   'Hiển thị',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily:
                                         'Montserrat', // Sử dụng font Montserrat đã thêm
-                                    fontSize: 17,
+                                    fontSize: 17.sp,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.black,
                                   ),
@@ -57,7 +57,7 @@ class CaiDat extends StatelessWidget {
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(10.r),
                                 ),
                                 child: Column(
                                   children: [
@@ -91,48 +91,48 @@ class CaiDat extends StatelessWidget {
 
                         // Data Section
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
+                          padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 0.0.h),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.only(bottom: 12),
+                                padding: EdgeInsets.only(bottom: 12.h),
                                 child: Text(
                                   'Dữ liệu',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily:
                                         'Montserrat', // Sử dụng font Montserrat đã thêm
-                                    fontSize: 17,
+                                    fontSize: 17.sp,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.black,
                                   ),
                                 ),
                               ),
                               Container(
-                                height: 50,
+                                height: 50.h,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(10.r),
                                 ),
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 13),
+                                    EdgeInsets.symmetric(horizontal: 13.w),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       'Xoá tất cả dữ liệu',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontFamily:
                                             'Montserrat', // Sử dụng font Montserrat đã thêm
-                                        fontSize: 15,
+                                        fontSize: 15.sp,
                                         color: Color(0xFFFE0000),
                                       ),
                                     ),
                                     Image.asset(
                                       'assets/images/delete_icon.png', // Đường dẫn đến biểu tượng xóa
-                                      width: 25,
-                                      height: 25,
+                                      width: 25.w,
+                                      height: 25.h,
                                     ),
                                   ],
                                 ),

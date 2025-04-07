@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../widgets/cateitem/category2_item.dart';
 import 'themdanhmucchi_screen.dart';
 import '../../mainpage.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DanhMucChi extends StatefulWidget {
   const DanhMucChi({Key? key}) : super(key: key);
@@ -135,11 +136,11 @@ class _DanhMucChiState extends State<DanhMucChi> {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E201E),
-        title: const Text(
+        title: Text(
           'Danh mục chi tiêu',
           style: TextStyle(
             fontFamily: 'Montserrat',
-            fontSize: 20,
+            fontSize: 20.sp,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
@@ -153,41 +154,40 @@ class _DanhMucChiState extends State<DanhMucChi> {
       ),
       body: SafeArea(
         child: Center(
-          child: Container(
-            width: double.infinity,
+          child: SingleChildScrollView(
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
+                  padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 0.0.h),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.r),
                       border: Border.all(
                         color: const Color.fromRGBO(0, 0, 0, 0.5),
-                        width: 1,
+                        width: 1.w,
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 22, vertical: 11),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 13.w, vertical: 5.h),
                     child: Row(
                       children: [
                         Image.asset(
                           'assets/images/search_icon.png',
-                          width: 28,
-                          height: 28,
+                          width: 28.w,
+                          height: 28.h,
                           fit: BoxFit.contain,
                         ),
-                        const SizedBox(width: 20),
+                        SizedBox(width: 20.w),
                         Expanded(
                           child: TextField(
                             controller: _searchController,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Tìm kiếm danh mục đã thêm',
                               hintStyle: TextStyle(
                                 fontFamily: 'Montserrat',
-                                fontSize: 15,
+                                fontSize: 15.sp,
                                 color: Colors.black,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -199,14 +199,16 @@ class _DanhMucChiState extends State<DanhMucChi> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
+                  padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 0.0),
                   child: GestureDetector(
                     onTap: () async {
                       // Chuyển đến màn hình thêm danh mục và chờ kết quả
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ThemDanhMucChi(),
+                          builder: (context) => Mainpage(
+                            selectedIndex: 12,
+                          ),
                         ),
                       );
                       // Nếu thêm danh mục thành công, tải lại danh sách
@@ -217,26 +219,26 @@ class _DanhMucChiState extends State<DanhMucChi> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(10.r),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 17),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 15.w, vertical: 17.h),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             'Thêm danh mục',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Montserrat',
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               color: Colors.black,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           Image.asset(
                             'assets/images/arrow2_icon.png',
-                            width: 20,
-                            height: 20,
+                            width: 20.w,
+                            height: 20.h,
                             fit: BoxFit.contain,
                           ),
                         ],
@@ -245,14 +247,14 @@ class _DanhMucChiState extends State<DanhMucChi> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
+                  padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 0.0.h),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.r),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 19, vertical: 14),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 19.w, vertical: 14.h),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -268,28 +270,28 @@ class _DanhMucChiState extends State<DanhMucChi> {
                                 });
                               },
                               child: Container(
-                                width: 20,
-                                height: 20,
+                                width: 20.w,
+                                height: 20.h,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(5),
+                                  borderRadius: BorderRadius.circular(5.r),
                                   border: Border.all(
                                     color: Colors.black,
-                                    width: 1,
+                                    width: 1.w,
                                   ),
                                 ),
                                 child: categoryCheckStates.values
                                         .every((element) => element)
-                                    ? const Icon(Icons.check, size: 16)
+                                    ? Icon(Icons.check, size: 16.r)
                                     : null,
                               ),
                             ),
-                            const SizedBox(width: 13),
+                            SizedBox(width: 13.w),
                             Text(
                               'Chọn',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Montserrat',
-                                fontSize: 17,
+                                fontSize: 17.sp,
                                 color: Colors.black,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -300,8 +302,8 @@ class _DanhMucChiState extends State<DanhMucChi> {
                           onTap: _deleteSelectedCategories,
                           child: Image.asset(
                             'assets/images/delete_icon.png',
-                            width: 27,
-                            height: 27,
+                            width: 27.w,
+                            height: 27.h,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -310,41 +312,37 @@ class _DanhMucChiState extends State<DanhMucChi> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 0.0),
+                  padding: EdgeInsets.fromLTRB(16.0.w, 10.0.h, 16.0.w, 30.0),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(10.r),
                       border: Border.all(
                         color: const Color.fromRGBO(0, 0, 0, 0.1),
-                        width: 1,
+                        width: 1.w,
                       ),
                     ),
                     child: SizedBox(
-                      height: 370,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children:
-                              _filteredCategories.asMap().entries.map((entry) {
-                            int index = entry.key;
-                            var category = entry.value;
-                            return CategoryItem(
-                              categoryKey: category['id'],
-                              title: category['name'],
-                              iconUrl: category['image'],
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: index == 0,
-                              isLastItem:
-                                  index == _filteredCategories.length - 1,
-                              isChecked: categoryCheckStates[category['id']]!,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  categoryCheckStates[category['id']] = value;
-                                });
-                              },
-                            );
-                          }).toList(),
-                        ),
+                      child: Column(
+                        children:
+                            _filteredCategories.asMap().entries.map((entry) {
+                          int index = entry.key;
+                          var category = entry.value;
+                          return CategoryItem(
+                            categoryKey: category['id'],
+                            title: category['name'],
+                            iconUrl: category['image'],
+                            arrowUrl: 'assets/images/arrow2_icon.png',
+                            isFirstItem: index == 0,
+                            isLastItem: index == _filteredCategories.length - 1,
+                            isChecked: categoryCheckStates[category['id']]!,
+                            onCheckboxChanged: (value) {
+                              setState(() {
+                                categoryCheckStates[category['id']] = value;
+                              });
+                            },
+                          );
+                        }).toList(),
                       ),
                     ),
                   ),

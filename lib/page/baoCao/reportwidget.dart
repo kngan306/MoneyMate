@@ -226,7 +226,7 @@ class _ReportWidgetState extends State<ReportWidget> {
          title: Text(
           "Báo cáo",
           style: TextStyle(
-            fontSize: 17.sp,
+            fontSize: 20.sp,
             color: Colors.white,
           ),
         ),

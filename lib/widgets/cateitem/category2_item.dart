@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CategoryItem extends StatelessWidget {
   final String categoryKey;
@@ -30,21 +31,21 @@ class CategoryItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: !isLastItem
-            ? const Border(
+            ? Border(
                 bottom: BorderSide(
                   color: Color.fromRGBO(0, 0, 0, 0.1),
-                  width: 1,
+                  width: 1.w,
                 ),
               )
             : null,
         borderRadius: BorderRadius.only(
-          topLeft: isFirstItem ? const Radius.circular(10) : Radius.zero,
-          topRight: isFirstItem ? const Radius.circular(10) : Radius.zero,
-          bottomLeft: isLastItem ? const Radius.circular(10) : Radius.zero,
-          bottomRight: isLastItem ? const Radius.circular(10) : Radius.zero,
+          topLeft: isFirstItem ? Radius.circular(10.r) : Radius.zero,
+          topRight: isFirstItem ? Radius.circular(10.r) : Radius.zero,
+          bottomLeft: isLastItem ? Radius.circular(10.r) : Radius.zero,
+          bottomRight: isLastItem ? Radius.circular(10.r) : Radius.zero,
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -56,41 +57,41 @@ class CategoryItem extends StatelessWidget {
                   onCheckboxChanged(!isChecked);
                 },
                 child: Container(
-                  width: 20,
-                  height: 20,
+                  width: 20.w,
+                  height: 20.h,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(5.r),
                     border: Border.all(
                       color: Colors.black,
-                      width: 1,
+                      width: 1.w,
                     ),
                   ),
                   child: isChecked
                       ? Center(
                           child: Image.asset(
                             'assets/images/check_icon.png', // Hình ảnh checkbox từ assets
-                            width: 15,
-                            height: 15,
+                            width: 15.w,
+                            height: 15.h,
                             fit: BoxFit.contain,
                           ),
                         )
                       : null,
                 ),
               ),
-              const SizedBox(width: 13),
+              SizedBox(width: 13.w),
               Image.asset(
                 iconUrl, // Hình ảnh biểu tượng danh mục từ assets
-                width: 35,
-                height: 35,
+                width: 35.w,
+                height: 35.h,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(width: 13),
+              SizedBox(width: 13.w),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Montserrat',
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   color: Colors.black,
                   fontWeight: FontWeight.w400,
                 ),
@@ -99,8 +100,8 @@ class CategoryItem extends StatelessWidget {
           ),
           Image.asset(
             arrowUrl, // Hình ảnh mũi tên từ assets
-            width: 20,
-            height: 20,
+            width: 20.w,
+            height: 20.h,
             fit: BoxFit.contain,
           ),
         ],

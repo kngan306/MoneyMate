@@ -136,7 +136,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
         title: Text(
           "Lịch sử theo danh mục",
           style: TextStyle(
-            fontSize: 17.sp,
+            fontSize: 20.sp,
             color: Colors.white,
           ),
         ),
@@ -304,7 +304,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
                 color: widget.isIncome
                     ? const Color(0xFF4ABD57)
                     : const Color(0xFFFE0000),
-                fontSize: 15,
+                fontSize: 15.sp,
               ),
             ),
           ],

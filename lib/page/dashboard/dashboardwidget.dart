@@ -259,7 +259,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         title: Text(
           "Trang chủ",
           style: TextStyle(
-            fontSize: 17.sp,
+            fontSize: 20.sp,
             color: Colors.white,
           ),
         ),
@@ -522,77 +522,83 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 ),
               ),
               SizedBox(height: 20.h),
-              // Danh mục thu chi
-              Text(
-                "Danh mục thu chi",
-                style: TextStyle(
-                    fontSize: 17.sp,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10.h),
-              incomeCategories.isEmpty && expenseCategories.isEmpty
-                  ? Text(
-                      'Không có dữ liệu thu chi trong tháng này',
+              Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Danh mục thu chi
+                    Text(
+                      "Danh mục thu chi",
                       style: TextStyle(
-                          fontSize: 15.sp,
+                          fontSize: 17.sp,
                           fontFamily: 'Montserrat',
-                          color: Colors.black54),
-                    )
-                  : ListView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        // Danh mục thu nhập
-                        ...incomeCategories.entries.map((entry) {
-                          return ExpenseItem(
-                            iconPath: entry.value['image'],
-                            title: entry.value['name'],
-                            amount: NumberFormat.currency(
-                                    locale: 'vi_VN', symbol: 'đ')
-                                .format(entry.value['total']),
-                            isIncome: true,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LichSuTheoDanhMuc(
-                                    categoryId: entry.key, // Truyền categoryId
-                                    isIncome: true, // Đây là thu nhập
-                                    selectedMonth:
-                                        selectedMonth!, // Truyền tháng được chọn
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        }).toList(),
-                        // Danh mục chi tiêu
-                        ...expenseCategories.entries.map((entry) {
-                          return ExpenseItem(
-                            iconPath: entry.value['image'],
-                            title: entry.value['name'],
-                            amount: NumberFormat.currency(
-                                    locale: 'vi_VN', symbol: 'đ')
-                                .format(-entry.value['total']),
-                            isIncome: false,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LichSuTheoDanhMuc(
-                                    categoryId: entry.key, // Truyền categoryId
-                                    isIncome: false, // Đây là chi tiêu
-                                    selectedMonth:
-                                        selectedMonth!, // Truyền tháng được chọn
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        }).toList(),
-                      ],
+                          fontWeight: FontWeight.bold),
                     ),
+                    SizedBox(height: 10.h),
+                    incomeCategories.isEmpty && expenseCategories.isEmpty
+                        ? Text(
+                            'Không có dữ liệu thu chi trong tháng này',
+                            style: TextStyle(
+                                fontSize: 15.sp,
+                                fontFamily: 'Montserrat',
+                                color: Colors.black54),
+                          )
+                        : ListView(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              // Danh mục thu nhập
+                              ...incomeCategories.entries.map((entry) {
+                                return ExpenseItem(
+                                  iconPath: entry.value['image'],
+                                  title: entry.value['name'],
+                                  amount: NumberFormat.currency(
+                                          locale: 'vi_VN', symbol: 'đ')
+                                      .format(entry.value['total']),
+                                  isIncome: true,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LichSuTheoDanhMuc(
+                                          categoryId: entry.key,
+                                          isIncome: true,
+                                          selectedMonth: selectedMonth!,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }).toList(),
+                              // Danh mục chi tiêu
+                              ...expenseCategories.entries.map((entry) {
+                                return ExpenseItem(
+                                  iconPath: entry.value['image'],
+                                  title: entry.value['name'],
+                                  amount: NumberFormat.currency(
+                                          locale: 'vi_VN', symbol: 'đ')
+                                      .format(-entry.value['total']),
+                                  isIncome: false,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LichSuTheoDanhMuc(
+                                          categoryId: entry.key,
+                                          isIncome: false,
+                                          selectedMonth: selectedMonth!,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

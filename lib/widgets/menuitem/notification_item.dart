@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NotificationItem extends StatelessWidget {
   final String category;
@@ -20,19 +21,19 @@ class NotificationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 15.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
-          topLeft: isFirst ? const Radius.circular(10) : Radius.zero,
-          topRight: isFirst ? const Radius.circular(10) : Radius.zero,
-          bottomLeft: isLast ? const Radius.circular(10) : Radius.zero,
-          bottomRight: isLast ? const Radius.circular(10) : Radius.zero,
+          topLeft: isFirst ? Radius.circular(10.r) : Radius.zero,
+          topRight: isFirst ? Radius.circular(10.r) : Radius.zero,
+          bottomLeft: isLast ? Radius.circular(10.r) : Radius.zero,
+          bottomRight: isLast ? Radius.circular(10.r) : Radius.zero,
         ),
         border: Border(
           bottom: BorderSide(
             color: const Color(0x1A000000),
-            width: 1,
+            width: 1.w,
           ),
         ),
       ),
@@ -45,18 +46,18 @@ class NotificationItem extends StatelessWidget {
             children: [
               Text(
                 category,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.black,
-                  fontSize: 17,
+                  fontSize: 17.sp,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'Montserrat',
                 ),
               ),
               Text(
                 timeAgo,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.black,
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w400,
                   fontFamily: 'Montserrat',
                 ),
@@ -64,14 +65,14 @@ class NotificationItem extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
           // Notification message
           Text(
             message,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.black,
-              fontSize: 15,
+              fontSize: 15.sp,
               fontWeight: FontWeight.w400,
               fontFamily: 'Montserrat',
             ),

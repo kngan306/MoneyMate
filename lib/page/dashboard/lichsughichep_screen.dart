@@ -188,7 +188,7 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
         title: Text(
           "Lịch sử ghi chép",
           style: TextStyle(
-            fontSize: 17.sp,
+            fontSize: 20.sp,
             color: Colors.white,
           ),
         ),

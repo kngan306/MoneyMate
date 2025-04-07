@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SettingsItem extends StatelessWidget {
   final String title;
@@ -17,14 +18,14 @@ class SettingsItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 13),
+      height: 50.h,
+      padding: EdgeInsets.symmetric(horizontal: 13.w),
       decoration: BoxDecoration(
         border: hasBorder
-            ? const Border(
+            ? Border(
                 bottom: BorderSide(
                   color: Color(0x1A000000),
-                  width: 1,
+                  width: 1.w,
                 ),
               )
             : null,
@@ -33,27 +34,27 @@ class SettingsItem extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Montserrat', // Sử dụng font Montserrat đã thêm
-              fontSize: 15,
+              fontSize: 15.sp,
               color: Colors.black,
             ),
           ),
           const Spacer(),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Montserrat', // Sử dụng font Montserrat đã thêm
-              fontSize: 15,
+              fontSize: 15.sp,
               color: Colors.black,
             ),
           ),
-          const SizedBox(width: 7),
+          SizedBox(width: 7.w),
           // Sử dụng Image.asset để lấy biểu tượng từ assets
           Image.asset(
             icon, // Sử dụng icon từ tham số
-            width: 20,
-            height: 20,
+            width: 20.w,
+            height: 20.h,
           ),
         ],
       ),

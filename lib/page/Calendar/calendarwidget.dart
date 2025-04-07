@@ -190,7 +190,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
          title: Text(
           "Lịch",
           style: TextStyle(
-            fontSize: 17.sp,
+            fontSize: 20.sp,
             color: Colors.white,
           ),
         ),
@@ -460,7 +460,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                           .format(transaction['amount']),
                       style: TextStyle(
                         fontFamily: 'Montserrat',
-                        fontSize: 15,
+                        fontSize: 15.sp,
                         color: transaction['amount'] >= 0
                             ? const Color(0xFF4ABD57)
                             : const Color(0xFFFE0000),

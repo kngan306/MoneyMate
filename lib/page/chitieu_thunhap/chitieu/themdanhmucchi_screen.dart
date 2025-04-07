@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../widgets/cateitem/category3_item.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemDanhMucChi extends StatefulWidget {
   const ThemDanhMucChi({Key? key}) : super(key: key);
@@ -92,11 +93,11 @@ class _ThemDanhMucChiState extends State<ThemDanhMucChi> {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E201E),
-        title: const Text(
+        title: Text(
           'Danh mục chi tiêu',
           style: TextStyle(
             fontFamily: 'Montserrat',
-            fontSize: 20,
+            fontSize: 20.sp,
             color: Colors.white,
             fontWeight: FontWeight.w600,
           ),
@@ -113,71 +114,71 @@ class _ThemDanhMucChiState extends State<ThemDanhMucChi> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-                top: 25.0,
+              padding: EdgeInsets.only(
+                left: 16.0.w,
+                right: 16.0.w,
+                top: 25.0.h,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Tên danh mục",
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 17,
+                      fontSize: 17.sp,
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Container(
-                    margin: const EdgeInsets.only(top: 10),
+                    margin: EdgeInsets.only(top: 10.h),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: const Color(0x80000000),
-                        width: 1,
+                        width: 1.w,
                       ),
                     ),
                     child: TextField(
                       controller: _categoryNameController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: "Nhập tên danh mục",
                         hintStyle: TextStyle(
                           fontFamily: 'Montserrat',
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: 17,
-                          vertical: 18,
+                          horizontal: 17.w,
+                          vertical: 18.h,
                         ),
                         border: InputBorder.none,
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Montserrat',
-                        fontSize: 15,
+                        fontSize: 15.sp,
                         color: Colors.black,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 24.0),
+                  Padding(
+                    padding: EdgeInsets.only(top: 24.0.h),
                     child: Text(
                       "Biểu tượng",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 17,
+                        fontSize: 17.sp,
                         fontFamily: 'Montserrat',
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
+                    padding: EdgeInsets.only(top: 10.0.h),
                     child: GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -204,25 +205,25 @@ class _ThemDanhMucChiState extends State<ThemDanhMucChi> {
                   ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 20.0, bottom: 30),
+                      padding: EdgeInsets.only(top: 20.0.h, bottom: 30.h),
                       child: ElevatedButton(
                         onPressed: _saveCategory,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20.r),
                           ),
-                          minimumSize: const Size(220, 0),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 70,
-                            vertical: 12,
+                          minimumSize: Size(220.w, 0),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 70.w,
+                            vertical: 12.h,
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Lưu",
                           style: TextStyle(
                             fontFamily: 'Montserrat',
-                            fontSize: 17,
+                            fontSize: 17.sp,
                             color: Colors.white,
                             fontWeight: FontWeight.w500,
                           ),

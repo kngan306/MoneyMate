@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import '../../../widgets/custom_app_bar.dart';
 import '../../../widgets/menuitem/wallet_item.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ViTien extends StatefulWidget {
   const ViTien({Key? key}) : super(key: key);
@@ -161,7 +162,7 @@ class _ViTienState extends State<ViTien> {
          title: Text(
           "Ví của tôi",
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 20.sp,
             color: Colors.white,
           ),
         ),
@@ -178,17 +179,17 @@ class _ViTienState extends State<ViTien> {
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
+                  padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 0.0.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Greeting
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 22.0),
+                        padding: EdgeInsets.only(bottom: 22.0.h),
                         child: Text(
                           'Xin chào $username!', // Hiển thị username
-                          style: const TextStyle(
-                            fontSize: 19,
+                          style: TextStyle(
+                            fontSize: 18.sp,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Montserrat',
                           ),
@@ -203,7 +204,7 @@ class _ViTienState extends State<ViTien> {
                         showAction: false,
                       ),
 
-                      const SizedBox(height: 11),
+                      SizedBox(height: 11.h),
 
                       // Cash Card
                       WalletItem(
@@ -212,7 +213,7 @@ class _ViTienState extends State<ViTien> {
                         amount: NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(cashBalance),
                       ),
 
-                      const SizedBox(height: 11),
+                      SizedBox(height: 11.h),
 
                       // E-wallet Card
                       WalletItem(

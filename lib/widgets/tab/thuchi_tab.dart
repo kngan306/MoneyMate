@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThuchiTab extends StatelessWidget {
   final String label;
@@ -17,19 +18,19 @@ class ThuchiTab extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 7),
+        padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 7.h),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(15.r),
           border: Border.all(
             color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
-            width: isSelected ? 2 : 1,
+            width: isSelected ? 2.w : 1.w,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
             color: isSelected ? Colors.white : Colors.grey,
-            fontSize: 17,
+            fontSize: 17.sp,
             fontWeight: FontWeight.w500,
             fontFamily: 'Montserrat',
           ),

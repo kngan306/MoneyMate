@@ -291,7 +291,6 @@ class _DangKyState extends State<DangKy> {
                               await _auth.sendSignInLinkToEmail(
                                 email: email,
                                 actionCodeSettings: ActionCodeSettings(
-                                  // url: 'https://moneymateapp.page.link/email-link-verify', // Sử dụng Dynamic Link đã tạo
                                   url: dynamicLink, // Sử dụng Dynamic Link đã tạo
                                   handleCodeInApp: true,
                                   androidPackageName: 'com.example.flutter_moneymate_01',
@@ -306,19 +305,16 @@ class _DangKyState extends State<DangKy> {
                                     content: Text(
                                         'Mã xác thực đã được gửi đến $email. Vui lòng kiểm tra email của bạn.')),
                               );
-
-                              // Gọi hàm xử lý Dynamic Link
-                              _handleDynamicLinks();
                               
                               // Chuyển đến màn hình đăng ký hoàn tất
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => DangKyFinal(
-                              //         phoneNumber: '',
-                              //         email: email), // Chuyển đến DangKyFinal
-                              //   ),
-                              // );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DangKyFinal(
+                                      phoneNumber: '',
+                                      email: email), // Chuyển đến DangKyFinal
+                                ),
+                              );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
