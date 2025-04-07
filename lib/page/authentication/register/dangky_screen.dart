@@ -8,7 +8,7 @@ import '../../../widgets/input/email_input.dart';
 import '../../../widgets/tab/registration_tab.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-//import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DangKy extends StatefulWidget {
   const DangKy({Key? key}) : super(key: key);
