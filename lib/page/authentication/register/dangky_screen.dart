@@ -8,6 +8,7 @@ import '../../../widgets/input/email_input.dart';
 import '../../../widgets/tab/registration_tab.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+//import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DangKy extends StatefulWidget {
   const DangKy({Key? key}) : super(key: key);
@@ -72,31 +73,29 @@ class _DangKyState extends State<DangKy> {
       backgroundColor: const Color(0xFFECDFCC),
       body: SafeArea(
         child: SingleChildScrollView(
-          // constraints: const BoxConstraints(maxWidth: 360),
           child: Column(
             children: [
               Padding(
                 padding:
-                    // const EdgeInsets.only(left: 16.0, right: 16.0, top: 25.0),
-                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                EdgeInsets.only(left: 16.0.w, right: 16.0.w, top: 16.0.h),
                 child: Row(
                   children: [
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back,
-                        size: 26,
+                        size: 26.sp,
                         color: Colors.black,
                       ),
                     ),
                     Expanded(
                       child: Center(
-                        child: const Text(
+                        child: Text(
                           'Đăng ký',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                            letterSpacing: 1.0.sp,
                             color: Colors.black,
                             fontFamily: 'Montserrat',
                           ),
@@ -107,24 +106,20 @@ class _DangKyState extends State<DangKy> {
                 ),
               ),
               Padding(
-                // padding: const EdgeInsets.only(top: 30.0),
-                padding: const EdgeInsets.only(top: 20.0),
+                padding: EdgeInsets.only(top: 20.0.h),
                 child: Column(
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      // width: 70,
-                      // height: 70,
-                      width: 60,
-                      height: 60,
+                      width: 60.w,
+                      height: 60.h,
                     ),
-                    const Text(
+                    Text(
                       'MoneyMate',
                       style: TextStyle(
-                        // fontSize: 25,
-                        fontSize: 21,
+                        fontSize: 21.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 2.52,
+                        letterSpacing: 2.52.sp,
                         color: Color(0xFF1E201E),
                         fontFamily: 'Montserrat',
                       ),
@@ -136,11 +131,11 @@ class _DangKyState extends State<DangKy> {
                 margin: const EdgeInsets.only(top: 20.0),
                 padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 222.0),
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(40.r),
+                    topRight: Radius.circular(40.r),
                   ),
                 ),
                 child: Column(
@@ -162,7 +157,7 @@ class _DangKyState extends State<DangKy> {
                             },
                           ),
                         ),
-                        const SizedBox(width: 17),
+                        SizedBox(width: 17.w),
                         Expanded(
                           child: RegistrationTab(
                             icon: isPhoneSelected
@@ -179,24 +174,24 @@ class _DangKyState extends State<DangKy> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 45),
+                    SizedBox(height: 45.h),
                     if (isPhoneSelected) ...[
-                      const Text(
+                      Text(
                         'Nhập số điện thoại',
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 17,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.w500,
                           fontFamily: 'Montserrat',
                         ),
                       ),
-                      const SizedBox(height: 19),
-                      const Text(
+                      SizedBox(height: 19.h),
+                      Text(
                         'Vui lòng nhập chính xác số điện thoại để nhận mã OTP và tiếp tục xác thực.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'Montserrat',
                         ),
@@ -208,22 +203,22 @@ class _DangKyState extends State<DangKy> {
                       const SizedBox(height: 27),
                     ],
                     if (!isPhoneSelected) ...[
-                      const Text(
+                      Text(
                         'Nhập email',
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 17,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.w500,
                           fontFamily: 'Montserrat',
                         ),
                       ),
-                      const SizedBox(height: 19),
-                      const Text(
+                      SizedBox(height: 19.h),
+                      Text(
                         'Vui lòng nhập chính xác email để nhận mã OTP và tiếp tục xác thực.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'Montserrat',
                         ),
@@ -342,30 +337,30 @@ class _DangKyState extends State<DangKy> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF333333),
                         foregroundColor: Colors.white,
-                        minimumSize: const Size(150, 0),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 60,
-                          vertical: 12,
+                        minimumSize: Size(150.w, 0.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 60.w,
+                          vertical: 12.h,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(50.r),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Gửi',
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.w500,
                           fontFamily: 'Montserrat',
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     RichText(
                       text: TextSpan(
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.black,
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'Montserrat',
                         ),
@@ -378,7 +373,6 @@ class _DangKyState extends State<DangKy> {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                // Navigator.pushNamed(context, AppRoutes.login);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

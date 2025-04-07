@@ -3,6 +3,8 @@ import 'package:flutter/gestures.dart';
 import '../login/dangnhap_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 
 class DangKyFinal extends StatefulWidget {
   final String phoneNumber; // Thêm biến để lưu số điện thoại
@@ -59,20 +61,20 @@ class _DangKyFinalState extends State<DangKyFinal> {
                   children: [
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back,
-                        size: 26,
+                        size: 26.sp,
                         color: Colors.black,
                       ),
                     ),
                     Expanded(
                       child: Center(
-                        child: const Text(
+                        child: Text(
                           'Đăng ký',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                            letterSpacing: 1.0.sp,
                             color: Colors.black,
                             fontFamily: 'Montserrat',
                           ),
@@ -88,18 +90,15 @@ class _DangKyFinalState extends State<DangKyFinal> {
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      // width: 70,
-                      // height: 70,
-                      width: 60,
-                      height: 60,
+                      width: 60.w,
+                      height: 60.h,
                     ),
-                    const Text(
+                    Text(
                       'MoneyMate',
                       style: TextStyle(
-                        // fontSize: 25,
-                        fontSize: 21,
+                        fontSize: 21.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 2.52,
+                        letterSpacing: 2.52.sp,
                         color: Color(0xFF1E201E),
                         fontFamily: 'Montserrat',
                       ),
@@ -113,11 +112,11 @@ class _DangKyFinalState extends State<DangKyFinal> {
                 margin: const EdgeInsets.only(top: 20.0),
                 padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 25.0),
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(40.r),
+                    topRight: Radius.circular(40.r),
                   ),
                 ),
                 child: Form(
@@ -129,15 +128,15 @@ class _DangKyFinalState extends State<DangKyFinal> {
                         children: [
                           Image.asset(
                             'assets/images/phone_icon.png', // Replace with actual asset path
-                            width: 27,
-                            height: 27,
+                            width: 27.w,
+                            height: 27.h,
                             fit: BoxFit.contain,
                           ),
-                          const SizedBox(width: 2),
-                          const Text(
+                          SizedBox(width: 2.w),
+                          Text(
                             'Số điện thoại',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                               fontFamily: 'Montserrat',
@@ -145,23 +144,23 @@ class _DangKyFinalState extends State<DangKyFinal> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 7),
+                      SizedBox(height: 7.h),
                       TextFormField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16.w, vertical: 14.h),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
+                            borderRadius: BorderRadius.circular(15.r),
+                            borderSide: BorderSide(
                               color: Colors.black,
-                              width: 1,
+                              width: 1.w,
                             ),
                           ),
                         ),
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: TextStyle(
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           color: Colors.black,
                           fontFamily: 'Montserrat',
@@ -169,20 +168,20 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       ),
 
                       // Email field
-                      const SizedBox(height: 21),
+                      SizedBox(height: 21.h),
                       Row(
                         children: [
                           Image.asset(
                             'assets/images/email_icon.png', // Replace with actual asset path
-                            width: 27,
-                            height: 27,
+                            width: 27.w,
+                            height: 27.h,
                             fit: BoxFit.contain,
                           ),
-                          const SizedBox(width: 2),
-                          const Text(
+                          SizedBox(width: 2.w),
+                          Text(
                             'Email',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                               fontFamily: 'Montserrat',
@@ -190,23 +189,23 @@ class _DangKyFinalState extends State<DangKyFinal> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 7),
+                      SizedBox(height: 7.h),
                       TextFormField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16.w, vertical: 14.h),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
+                            borderRadius: BorderRadius.circular(15.r),
+                            borderSide: BorderSide(
                               color: Colors.black,
-                              width: 1,
+                              width: 1.w,
                             ),
                           ),
                         ),
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: TextStyle(
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           color: Colors.black,
                           fontFamily: 'Montserrat',
@@ -214,20 +213,20 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       ),
 
                       // Username field
-                      const SizedBox(height: 21),
+                      SizedBox(height: 21.h),
                       Row(
                         children: [
                           Image.asset(
                             'assets/images/user_icon.png', // Replace with actual asset path
-                            width: 27,
-                            height: 27,
+                            width: 27.w,
+                            height: 27.h,
                             fit: BoxFit.contain,
                           ),
-                          const SizedBox(width: 2),
-                          const Text(
+                          SizedBox(width: 2.w),
+                          Text(
                             'Tên đăng nhập',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                               fontFamily: 'Montserrat',
@@ -235,22 +234,22 @@ class _DangKyFinalState extends State<DangKyFinal> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 7),
+                      SizedBox(height: 7.h),
                       TextFormField(
                         controller: _usernameController,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 14),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 14.w, vertical: 14.h),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
+                            borderRadius: BorderRadius.circular(15.r),
+                            borderSide: BorderSide(
                               color: Colors.black,
-                              width: 1,
+                              width: 1.w,
                             ),
                           ),
                         ),
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: TextStyle(
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           color: Colors.black,
                           fontFamily: 'Montserrat',
@@ -258,20 +257,20 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       ),
 
                       // Password field
-                      const SizedBox(height: 21),
+                      SizedBox(height: 21.h),
                       Row(
                         children: [
                           Image.asset(
                             'assets/images/password_icon.png', // Replace with actual asset path
-                            width: 27,
-                            height: 27,
+                            width: 27.w,
+                            height: 27.h,
                             fit: BoxFit.contain,
                           ),
-                          const SizedBox(width: 2),
-                          const Text(
+                          SizedBox(width: 2.w),
+                          Text(
                             'Mật khẩu',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                               fontFamily: 'Montserrat',
@@ -279,18 +278,18 @@ class _DangKyFinalState extends State<DangKyFinal> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 7),
+                      SizedBox(height: 7.h),
                       TextFormField(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 17, vertical: 12),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 17.w, vertical: 12.h),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
+                            borderRadius: BorderRadius.circular(15.r),
+                            borderSide: BorderSide(
                               color: Colors.black,
-                              width: 1,
+                              width: 1.w,
                             ),
                           ),
                           suffixIcon: IconButton(
@@ -307,8 +306,8 @@ class _DangKyFinalState extends State<DangKyFinal> {
                             },
                           ),
                         ),
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: TextStyle(
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           color: Colors.black,
                           fontFamily: 'Montserrat',
@@ -316,20 +315,20 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       ),
 
                       // Confirm password field
-                      const SizedBox(height: 21),
+                      SizedBox(height: 21.h),
                       Row(
                         children: [
                           Image.asset(
                             'assets/images/password_icon.png', // Replace with actual asset path
-                            width: 27,
-                            height: 27,
+                            width: 27.w,
+                            height: 27.h,
                             fit: BoxFit.contain,
                           ),
-                          const SizedBox(width: 2),
-                          const Text(
+                          SizedBox(width: 2.w),
+                          Text(
                             'Xác nhận mật khẩu',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                               fontFamily: 'Montserrat',
@@ -337,18 +336,18 @@ class _DangKyFinalState extends State<DangKyFinal> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 7),
+                      SizedBox(height: 7.h),
                       TextFormField(
                         controller: _confirmPasswordController,
                         obscureText: !_isConfirmPasswordVisible,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 17, vertical: 12),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 17.w, vertical: 12.h),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: const BorderSide(
+                            borderRadius: BorderRadius.circular(15.r),
+                            borderSide: BorderSide(
                               color: Colors.black,
-                              width: 1,
+                              width: 1.w,
                             ),
                           ),
                           suffixIcon: IconButton(
@@ -366,8 +365,8 @@ class _DangKyFinalState extends State<DangKyFinal> {
                             },
                           ),
                         ),
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: TextStyle(
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.w400,
                           color: Colors.black,
                           fontFamily: 'Montserrat',
@@ -375,7 +374,7 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       ),
 
                       // Register button
-                      const SizedBox(height: 21),
+                      SizedBox(height: 21.h),
                       Center(
                         child: ElevatedButton(
                           onPressed: () async {
@@ -452,17 +451,17 @@ class _DangKyFinalState extends State<DangKyFinal> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1E201E),
                             foregroundColor: Colors.white,
-                            minimumSize: const Size(200, 48),
+                            minimumSize: Size(200.w, 48.h),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
+                              borderRadius: BorderRadius.circular(50.r),
                             ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 64, vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 64.w, vertical: 12.h),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Đăng ký',
                             style: TextStyle(
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.w500,
                               fontFamily: 'Montserrat',
                             ),
@@ -471,7 +470,7 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       ),
 
                       // Login link
-                      const SizedBox(height: 21),
+                      SizedBox(height: 21.h),
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -479,8 +478,8 @@ class _DangKyFinalState extends State<DangKyFinal> {
                           },
                           child: RichText(
                             text: TextSpan(
-                              style: const TextStyle(
-                                fontSize: 14,
+                              style: TextStyle(
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black,
                                 fontFamily: 'Montserrat',

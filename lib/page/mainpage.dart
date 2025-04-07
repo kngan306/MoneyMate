@@ -19,11 +19,22 @@ import 'baoCao/timkiembaocao_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
+//import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Mainpage extends StatefulWidget {
   //const Mainpage({Key? key}) : super(key: key);
   final int selectedIndex;
-  const Mainpage({Key? key, this.selectedIndex = 0}) : super(key: key);
+  final String? categoryId; // Thêm tham số cho LichSuTheoDanhMuc
+  final bool? isIncome; // Thêm tham số cho LichSuTheoDanhMuc
+  final String? selectedMonth; // Thêm tham số cho LichSuTheoDanhMuc
+
+  const Mainpage({
+    Key? key,
+    this.selectedIndex = 0,
+    this.categoryId,
+    this.isIncome,
+    this.selectedMonth,
+  }) : super(key: key);
 
   @override
   State<Mainpage> createState() => _MainpageState();
@@ -31,17 +42,35 @@ class Mainpage extends StatefulWidget {
 
 class _MainpageState extends State<Mainpage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.selectedIndex;
+
+    // Nếu index là 9 và có tham số, điều hướng trực tiếp đến LichSuTheoDanhMuc
+    if (_selectedIndex == 9 &&
+        widget.categoryId != null &&
+        widget.isIncome != null &&
+        widget.selectedMonth != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LichSuTheoDanhMuc(
+              categoryId: widget.categoryId!,
+              isIncome: widget.isIncome!,
+              selectedMonth: widget.selectedMonth!,
+            ),
+          ),
+        );
+      });
+    }
   }
 
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static TextStyle optionStyle =
+      TextStyle(fontSize: 30.sp, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
     DashboardWidget(),
     CalendarWidget(),
@@ -52,7 +81,8 @@ class _MainpageState extends State<Mainpage> {
     ViTien(), //6
     CaiDat(), //7
     LichSuGhiChep(), //8
-    LichSuTheoDanhMuc(), //9
+    // Index 9 sẽ được xử lý riêng, không khởi tạo mặc định ở đây
+    const SizedBox(), // Placeholder cho index 9
     DanhMucChi(), //10
     DanhMucThu(), //11
     ThemDanhMucChi(), //12
@@ -99,6 +129,20 @@ class _MainpageState extends State<Mainpage> {
 
   @override
   Widget build(BuildContext context) {
+    // Nếu index là 9 nhưng không có tham số, hiển thị thông báo lỗi hoặc quay lại Dashboard
+    if (_selectedIndex == 9 &&
+        (widget.categoryId == null ||
+            widget.isIncome == null ||
+            widget.selectedMonth == null)) {
+      return const Scaffold(
+        body: Center(
+          child: Text(
+            'Không thể hiển thị lịch sử theo danh mục mà không có dữ liệu.',
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       key: _scaffoldKey, // Key để mở Drawer từ trang con
       body: Center(
@@ -177,75 +221,98 @@ class _MainpageState extends State<Mainpage> {
                           email,
                           style: TextStyle(color: Colors.white),
                         ),
-                      ],
-                    ),
-                  );
-                }
-              },
-            ),
-            // Các mục menu trong Drawer
-            ListTile(
-              leading: const Icon(Icons.notifications_on_outlined),
-              title: const Text('Thông báo'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 5;
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_balance_wallet_outlined),
-              title: const Text('Ví của tôi'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 6;
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings_suggest_outlined),
-              title: const Text('Cài đặt'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 7;
-                });
-              },
-            ),
-            const Divider(color: Colors.black),
-            ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text('Đăng xuất'),
-              onTap: _logout, // Gọi hàm đăng xuất
-            ),
+                      ),
+                    );
+                  }
+                },
+              ),
+              // Các mục menu trong Drawer
+              ListTile(
+                leading: const Icon(Icons.notifications_on_outlined),
+                title: const Text('Thông báo'),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _selectedIndex = 5;
+                  });
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.account_balance_wallet_outlined),
+                title: const Text('Ví của tôi'),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _selectedIndex = 6;
+                  });
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings_suggest_outlined),
+                title: const Text('Cài đặt'),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _selectedIndex = 7;
+                  });
+                },
+              ),
+              const Divider(color: Colors.black),
+              ListTile(
+                leading: const Icon(Icons.exit_to_app),
+                title: const Text('Đăng xuất'),
+                onTap: _logout, // Gọi hàm đăng xuất
+              ),
+            ],
+          ),
+        ),
+              bottomNavigationBar: StyleProvider(
+        style: Style(),
+        child: ConvexAppBar(
+          backgroundColor: const Color(0xFF1E201E),
+          activeColor: Colors.white,
+          color: Colors.white70,
+          style: TabStyle.fixedCircle,
+          height: 55.h,
+          curveSize: 80.sp,
+          top: -20.h,
+          items: [
+            TabItem(icon: Icons.home, title: 'Trang chủ'),
+            TabItem(icon: Icons.calendar_month_outlined, title: 'Lịch'),
+            TabItem(icon: Icons.add),
+            TabItem(icon: Icons.pie_chart_rounded, title: 'Báo cáo'),
+            TabItem(icon: Icons.people, title: 'Tài khoản'),
           ],
+          onTap: (index) {
+            setState(() {
+              if (index < 5) {
+                _selectedIndex = index;
+              }
+            });
+          },
         ),
       ),
-      bottomNavigationBar: ConvexAppBar(
-        backgroundColor: const Color(0xFF1E201E),
-        activeColor: Colors.white,
-        color: Colors.white70,
-        style: TabStyle.fixedCircle,
-        height: 55,
-        curveSize: 80,
-        top: -20,
-        items: [
-          TabItem(icon: Icons.home, title: 'Trang chủ'),
-          TabItem(icon: Icons.calendar_month_outlined, title: 'Lịch'),
-          TabItem(icon: Icons.add),
-          TabItem(icon: Icons.pie_chart_rounded, title: 'Báo cáo'),
-          TabItem(icon: Icons.people, title: 'Tài khoản'),
-        ],
-        onTap: (index) {
-          setState(() {
-            if (index < 5) {
-              _selectedIndex = index;
-            }
-          });
-        },
-      ),
+      );
+  }
+}
+class Style extends StyleHook {
+  @override
+  double get activeIconSize => 40;
+
+  @override
+  double get activeIconMargin => 10;
+
+  @override
+  double get iconSize => 20;
+
+  // Update this method to match the correct signature
+  @override
+  TextStyle textStyle(Color color, String? title) {
+    return TextStyle(
+      fontSize: color == Colors.blue ? 16.sp : 12.sp, // Use the color parameter to decide the font size
+      color: color, // Use the color parameter here
     );
   }
 }
+
+
