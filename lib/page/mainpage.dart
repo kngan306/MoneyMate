@@ -22,7 +22,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 class Mainpage extends StatefulWidget {
   //const Mainpage({Key? key}) : super(key: key);
   final int selectedIndex;
-  const Mainpage({Key? key, this.selectedIndex = 0}) : super(key: key);
+  final String? categoryId; // Thêm tham số cho LichSuTheoDanhMuc
+  final bool? isIncome; // Thêm tham số cho LichSuTheoDanhMuc
+  final String? selectedMonth; // Thêm tham số cho LichSuTheoDanhMuc
+
+  const Mainpage({
+    Key? key,
+    this.selectedIndex = 0,
+    this.categoryId,
+    this.isIncome,
+    this.selectedMonth,
+  }) : super(key: key);
 
   @override
   State<Mainpage> createState() => _MainpageState();
@@ -30,13 +40,31 @@ class Mainpage extends StatefulWidget {
 
 class _MainpageState extends State<Mainpage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.selectedIndex;
+
+    // Nếu index là 9 và có tham số, điều hướng trực tiếp đến LichSuTheoDanhMuc
+    if (_selectedIndex == 9 &&
+        widget.categoryId != null &&
+        widget.isIncome != null &&
+        widget.selectedMonth != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LichSuTheoDanhMuc(
+              categoryId: widget.categoryId!,
+              isIncome: widget.isIncome!,
+              selectedMonth: widget.selectedMonth!,
+            ),
+          ),
+        );
+      });
+    }
   }
 
   static const TextStyle optionStyle =
@@ -51,7 +79,8 @@ class _MainpageState extends State<Mainpage> {
     ViTien(), //6
     CaiDat(), //7
     LichSuGhiChep(), //8
-    LichSuTheoDanhMuc(), //9
+    // Index 9 sẽ được xử lý riêng, không khởi tạo mặc định ở đây
+    const SizedBox(), // Placeholder cho index 9
     DanhMucChi(), //10
     DanhMucThu(), //11
     ThemDanhMucChi(), //12
@@ -98,6 +127,20 @@ class _MainpageState extends State<Mainpage> {
 
   @override
   Widget build(BuildContext context) {
+    // Nếu index là 9 nhưng không có tham số, hiển thị thông báo lỗi hoặc quay lại Dashboard
+    if (_selectedIndex == 9 &&
+        (widget.categoryId == null ||
+            widget.isIncome == null ||
+            widget.selectedMonth == null)) {
+      return const Scaffold(
+        body: Center(
+          child: Text(
+            'Không thể hiển thị lịch sử theo danh mục mà không có dữ liệu.',
+            style: TextStyle(fontSize: 16),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       key: _scaffoldKey, // Key để mở Drawer từ trang con
       body: Center(

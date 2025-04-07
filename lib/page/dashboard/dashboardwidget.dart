@@ -27,9 +27,25 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   double monthlyTotal = 0.0;
   String? userDocId; // Biến để lưu ID của document người dùng
 
+  // Dữ liệu động cho danh mục thu chi
+  Map<String, Map<String, dynamic>> incomeCategories =
+      {}; // {categoryId: {name, image, total}}
+  Map<String, Map<String, dynamic>> expenseCategories =
+      {}; // {categoryId: {name, image, total}}
+
   final List<String> months = [
-    'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-    'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+    'Tháng 1',
+    'Tháng 2',
+    'Tháng 3',
+    'Tháng 4',
+    'Tháng 5',
+    'Tháng 6',
+    'Tháng 7',
+    'Tháng 8',
+    'Tháng 9',
+    'Tháng 10',
+    'Tháng 11',
+    'Tháng 12'
   ];
 
   @override
@@ -54,6 +70,10 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         userDocId = userDoc.docs.first.id; // Lấy ID của document người dùng
         await _calculateTotalBalance(userDocId!);
         await _calculateMonthlyData(userDocId!, selectedMonth!);
+        await _loadIncomeCategories(
+            userDocId!, selectedMonth!); // Tải danh mục thu
+        await _loadExpenseCategories(
+            userDocId!, selectedMonth!); // Tải danh mục chi
         setState(() {});
       } else {
         print('Không tìm thấy thông tin người dùng trong Firestore.');
@@ -87,7 +107,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
   }
 
   // Hàm tính dữ liệu thu nhập và chi tiêu theo tháng
-  Future<void> _calculateMonthlyData(String userDocId, String selectedMonth) async {
+  Future<void> _calculateMonthlyData(
+      String userDocId, String selectedMonth) async {
     int monthIndex = months.indexOf(selectedMonth) + 1;
     String monthStr = monthIndex.toString().padLeft(2, '0');
     String yearStr = currentYear.toString();
@@ -128,6 +149,106 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     monthlyTotal = monthlyIncome - monthlyExpense;
   }
 
+  // Hàm tải danh mục thu nhập
+  Future<void> _loadIncomeCategories(
+      String userDocId, String selectedMonth) async {
+    int monthIndex = months.indexOf(selectedMonth) + 1;
+    String monthStr = monthIndex.toString().padLeft(2, '0');
+    String yearStr = currentYear.toString();
+    String startDate = '$yearStr-$monthStr-01';
+    String nextMonthStr = (monthIndex + 1).toString().padLeft(2, '0');
+    String nextYearStr = yearStr;
+    if (monthIndex == 12) {
+      nextMonthStr = '01';
+      nextYearStr = (currentYear + 1).toString();
+    }
+    String endDate = '$nextYearStr-$nextMonthStr-01';
+
+    QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('danh_muc_thu')
+        .get();
+
+    Map<String, Map<String, dynamic>> tempIncomeCategories = {};
+    for (var doc in categorySnapshot.docs) {
+      tempIncomeCategories[doc.id] = {
+        'name': doc['ten_muc_thu'] as String,
+        'image': doc['image'] as String,
+        'total': 0.0,
+      };
+    }
+
+    QuerySnapshot incomeSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+
+    for (var doc in incomeSnapshot.docs) {
+      String categoryId = doc['muc_thu_nhap'] as String;
+      double amount = (doc['so_tien'] as num).toDouble();
+      if (tempIncomeCategories.containsKey(categoryId)) {
+        tempIncomeCategories[categoryId]!['total'] += amount;
+      }
+    }
+
+    incomeCategories = Map.fromEntries(tempIncomeCategories.entries
+        .where((entry) => entry.value['total'] > 0));
+  }
+
+  // Hàm tải danh mục chi tiêu
+  Future<void> _loadExpenseCategories(
+      String userDocId, String selectedMonth) async {
+    int monthIndex = months.indexOf(selectedMonth) + 1;
+    String monthStr = monthIndex.toString().padLeft(2, '0');
+    String yearStr = currentYear.toString();
+    String startDate = '$yearStr-$monthStr-01';
+    String nextMonthStr = (monthIndex + 1).toString().padLeft(2, '0');
+    String nextYearStr = yearStr;
+    if (monthIndex == 12) {
+      nextMonthStr = '01';
+      nextYearStr = (currentYear + 1).toString();
+    }
+    String endDate = '$nextYearStr-$nextMonthStr-01';
+
+    QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('danh_muc_chi')
+        .get();
+
+    Map<String, Map<String, dynamic>> tempExpenseCategories = {};
+    for (var doc in categorySnapshot.docs) {
+      tempExpenseCategories[doc.id] = {
+        'name': doc['ten_muc_chi'] as String,
+        'image': doc['image'] as String,
+        'total': 0.0,
+      };
+    }
+
+    QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('chi_tieu')
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+
+    for (var doc in expenseSnapshot.docs) {
+      String categoryId = doc['muc_chi_tieu'] as String;
+      double amount = (doc['so_tien'] as num).toDouble();
+      if (tempExpenseCategories.containsKey(categoryId)) {
+        tempExpenseCategories[categoryId]!['total'] += amount;
+      }
+    }
+
+    expenseCategories = Map.fromEntries(tempExpenseCategories.entries
+        .where((entry) => entry.value['total'] > 0));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,7 +271,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               Container(
                 padding: EdgeInsets.only(bottom: 10.h),
                 decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Color(0xFF697565), width: 1)),
+                  border: Border(
+                      bottom: BorderSide(color: Color(0xFF697565), width: 1)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +287,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         Expanded(
                           child: Text(
                             _isBalanceVisible
-                                ? NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                                ? NumberFormat.currency(
+                                        locale: 'vi_VN', symbol: 'đ')
                                     .format(totalBalance)
                                 : "******",
                             style: TextStyle(
@@ -309,7 +432,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                 )),
                             SizedBox(height: 5.h),
                             Text(
-                                NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                                NumberFormat.currency(
+                                        locale: 'vi_VN', symbol: 'đ')
                                     .format(monthlyIncome),
                                 style: TextStyle(
                                   color: Colors.green,
@@ -328,7 +452,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                 )),
                             SizedBox(height: 5.h),
                             Text(
-                                NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                                NumberFormat.currency(
+                                        locale: 'vi_VN', symbol: 'đ')
                                     .format(monthlyExpense),
                                 style: TextStyle(
                                   color: Colors.red,
@@ -347,7 +472,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                 )),
                             SizedBox(height: 5.h),
                             Text(
-                                NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                                NumberFormat.currency(
+                                        locale: 'vi_VN', symbol: 'đ')
                                     .format(monthlyTotal),
                                 style: TextStyle(
                                   fontSize: 15,
@@ -387,55 +513,77 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                 ),
               ),
               SizedBox(height: 20.h),
-              Text("Danh mục thu chi",
-                  style: TextStyle(
-                      fontSize: 17,
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold)),
-              SizedBox(height: 10.h),
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  ExpenseItem(
-                    iconPath: "assets/images/food.png",
-                    title: "Ăn uống",
-                    amount: "-1,000,000 đ",
-                    onTap: () {},
-                  ),
-                  ExpenseItem(
-                    iconPath: "assets/images/quanao.png",
-                    title: "Quần áo",
-                    amount: "-500,000 đ",
-                    onTap: () {},
-                  ),
-                  ExpenseItem(
-                    iconPath: "assets/images/mypham.png",
-                    title: "Mỹ phẩm",
-                    amount: "-400,000 đ",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Mainpage(selectedIndex: 9),
-                        ),
-                      );
-                    },
-                  ),
-                  ExpenseItem(
-                    iconPath: "assets/images/yte.png",
-                    title: "Y tế",
-                    amount: "-100,000 đ",
-                    onTap: () {},
-                  ),
-                  ExpenseItem(
-                    iconPath: "assets/images/xemay.png",
-                    title: "Đi lại",
-                    amount: "-500,000 đ",
-                    onTap: () {},
-                  ),
-                ],
+              // Danh mục thu chi
+              const Text(
+                "Danh mục thu chi",
+                style: TextStyle(
+                    fontSize: 17,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.bold),
               ),
+              SizedBox(height: 10.h),
+              incomeCategories.isEmpty && expenseCategories.isEmpty
+                  ? const Text(
+                      'Không có dữ liệu thu chi trong tháng này',
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'Montserrat',
+                          color: Colors.black54),
+                    )
+                  : ListView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        // Danh mục thu nhập
+                        ...incomeCategories.entries.map((entry) {
+                          return ExpenseItem(
+                            iconPath: entry.value['image'],
+                            title: entry.value['name'],
+                            amount: NumberFormat.currency(
+                                    locale: 'vi_VN', symbol: 'đ')
+                                .format(entry.value['total']),
+                            isIncome: true,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LichSuTheoDanhMuc(
+                                    categoryId: entry.key, // Truyền categoryId
+                                    isIncome: true, // Đây là thu nhập
+                                    selectedMonth:
+                                        selectedMonth!, // Truyền tháng được chọn
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
+                        // Danh mục chi tiêu
+                        ...expenseCategories.entries.map((entry) {
+                          return ExpenseItem(
+                            iconPath: entry.value['image'],
+                            title: entry.value['name'],
+                            amount: NumberFormat.currency(
+                                    locale: 'vi_VN', symbol: 'đ')
+                                .format(-entry.value['total']),
+                            isIncome: false,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LichSuTheoDanhMuc(
+                                    categoryId: entry.key, // Truyền categoryId
+                                    isIncome: false, // Đây là chi tiêu
+                                    selectedMonth:
+                                        selectedMonth!, // Truyền tháng được chọn
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
+                      ],
+                    ),
             ],
           ),
         ),
@@ -445,18 +593,18 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 }
 
 class ExpenseItem extends StatelessWidget {
-  final IconData? icon;
+  final String? iconPath;
   final String title;
   final String amount;
-  final String? iconPath;
+  final bool isIncome; // Thêm biến để xác định là thu nhập hay chi tiêu
   final VoidCallback onTap;
 
   const ExpenseItem({
     Key? key,
-    this.icon,
+    this.iconPath,
     required this.title,
     required this.amount,
-    this.iconPath,
+    required this.isIncome,
     required this.onTap,
   }) : super(key: key);
 
@@ -474,20 +622,28 @@ class ExpenseItem extends StatelessWidget {
         child: Row(
           children: [
             if (iconPath != null)
-              Image.asset(iconPath!, width: 30.w, height: 30.h)
-            else if (icon != null)
-              Icon(icon, size: 30.sp, color: Colors.redAccent),
+              Image.asset(
+                iconPath!,
+                width: 30.w,
+                height: 30.h,
+                fit: BoxFit.contain,
+              ),
             SizedBox(width: 10.w),
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(fontSize: 15, fontFamily: 'Montserrat'),
+                style: const TextStyle(fontSize: 15, fontFamily: 'Montserrat'),
               ),
             ),
             Text(
               amount,
               style: TextStyle(
-                  fontSize: 15, fontFamily: 'Montserrat', color: Colors.red),
+                fontSize: 15,
+                fontFamily: 'Montserrat',
+                color: isIncome
+                    ? const Color(0xFF4ABD57)
+                    : const Color(0xFFFE0000),
+              ),
             ),
           ],
         ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LichSuGhiChep extends StatefulWidget {
   const LichSuGhiChep({Key? key}) : super(key: key);
@@ -10,92 +12,167 @@ class LichSuGhiChep extends StatefulWidget {
 
 class _LichSuGhiChepState extends State<LichSuGhiChep> {
   late DateTime _focusedDay;
-
-  // This map stores transactions by date to check if there are any transactions left for that day
-  Map<String, List<Map<String, dynamic>>> transactions = {
-    '03/03/2025 (Thứ 2)': [
-      {  
-        'title': 'Tiền lương',
-        'amount': '+5,000,000 đ',
-        'isIncome': true,
-        'iconUrl': 'assets/images/cate29.png',
-        'index': 0
-      },
-    ],
-    '05/03/2025 (Thứ 7)': [
-      {
-        'title': 'Tiền điện',
-        'amount': '-630,000 đ',
-        'isIncome': false,
-        'iconUrl': 'assets/images/cate25.png',
-        'index': 1
-      },
-      {
-        'title': 'Tiền nước',
-        'amount': '-318,000 đ',
-        'isIncome': false,
-        'iconUrl': 'assets/images/cate26.png',
-        'index': 2
-      },
-    ],
-    '08/03/2025 (Thứ 7)': [
-      {
-        'title': 'Mỹ phẩm',
-        'amount': '-500,000 đ',
-        'isIncome': false,
-        'iconUrl': 'assets/images/mypham.png',
-        'index': 3
-      },
-    ],
-    '09/03/2025 (Chủ nhật)': [
-      {
-        'title': 'Mỹ phẩm',
-        'amount': '-500,000 đ',
-        'isIncome': false,
-        'iconUrl': 'assets/images/mypham.png',
-        'index': 4
-      },
-      {
-        'title': 'Ăn uống',
-        'amount': '-240,000 đ',
-        'isIncome': false,
-        'iconUrl': 'assets/images/food.png',
-        'index': 5
-      },
-    ],
-    '11/03/2025 (Thứ 3)': [
-      {
-        'title': 'Tiền wifi',
-        'amount': '-220,000 đ',
-        'isIncome': false,
-        'iconUrl': 'assets/images/cate23.png',
-        'index': 6
-      },
-    ],
-  };
+  String? userDocId;
+  Map<String, List<Map<String, dynamic>>> transactions = {};
+  int transactionIndex = 0; // Để gán index cho từng giao dịch
 
   @override
   void initState() {
     super.initState();
-    _focusedDay = DateTime.now(); // Initialize to the current date
+    _focusedDay = DateTime.now();
+    _loadUserData();
   }
 
-  void _changeMonth(int step) {
+  // Tải thông tin người dùng và dữ liệu giao dịch
+  Future<void> _loadUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        userDocId = userDoc.docs.first.id;
+        await _loadTransactions();
+        setState(() {});
+      }
+    }
+  }
+
+  // Tải danh sách giao dịch từ Firestore
+  Future<void> _loadTransactions() async {
+    if (userDocId == null) return;
+
+    String monthStr = _focusedDay.month.toString().padLeft(2, '0');
+    String yearStr = _focusedDay.year.toString();
+    String startDate = '$yearStr-$monthStr-01';
+    String nextMonthStr = ((_focusedDay.month + 1) % 12).toString().padLeft(2, '0');
+    String nextYearStr =
+        (_focusedDay.month == 12 ? _focusedDay.year + 1 : _focusedDay.year).toString();
+    if (_focusedDay.month == 12) nextMonthStr = '01';
+    String endDate = '$nextYearStr-$nextMonthStr-01';
+
+    // Truy vấn thu nhập
+    QuerySnapshot incomeSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+
+    // Truy vấn chi tiêu
+    QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('chi_tieu')
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+
+    // Truy vấn danh mục thu nhập
+    QuerySnapshot incomeCategorySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('danh_muc_thu')
+        .get();
+    Map<String, Map<String, dynamic>> incomeCategories = {};
+    for (var doc in incomeCategorySnapshot.docs) {
+      incomeCategories[doc.id] = {
+        'name': doc['ten_muc_thu'] as String,
+        'image': doc['image'] as String,
+      };
+    }
+
+    // Truy vấn danh mục chi tiêu
+    QuerySnapshot expenseCategorySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('danh_muc_chi')
+        .get();
+    Map<String, Map<String, dynamic>> expenseCategories = {};
+    for (var doc in expenseCategorySnapshot.docs) {
+      expenseCategories[doc.id] = {
+        'name': doc['ten_muc_chi'] as String,
+        'image': doc['image'] as String,
+      };
+    }
+
+    // Kết hợp thu nhập và chi tiêu
+    Map<String, List<Map<String, dynamic>>> tempTransactions = {};
+    transactionIndex = 0;
+
+    // Xử lý thu nhập
+    for (var doc in incomeSnapshot.docs) {
+      String date = doc['ngay'] as String;
+      DateTime parsedDate = DateTime.parse(date);
+      String formattedDate = DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').format(parsedDate);
+      String categoryId = doc['muc_thu_nhap'] as String;
+      double amount = (doc['so_tien'] as num).toDouble();
+
+      if (!tempTransactions.containsKey(formattedDate)) {
+        tempTransactions[formattedDate] = [];
+      }
+
+      tempTransactions[formattedDate]!.add({
+        'title': incomeCategories[categoryId]?['name'] ?? 'Không xác định',
+        'amount': NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(amount),
+        'isIncome': true,
+        'iconUrl': incomeCategories[categoryId]?['image'] ?? '',
+        'index': transactionIndex++,
+      });
+    }
+
+    // Xử lý chi tiêu
+    for (var doc in expenseSnapshot.docs) {
+      String date = doc['ngay'] as String;
+      DateTime parsedDate = DateTime.parse(date);
+      String formattedDate = DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').format(parsedDate);
+      String categoryId = doc['muc_chi_tieu'] as String;
+      double amount = (doc['so_tien'] as num).toDouble();
+
+      if (!tempTransactions.containsKey(formattedDate)) {
+        tempTransactions[formattedDate] = [];
+      }
+
+      tempTransactions[formattedDate]!.add({
+        'title': expenseCategories[categoryId]?['name'] ?? 'Không xác định',
+        'amount': NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(-amount),
+        'isIncome': false,
+        'iconUrl': expenseCategories[categoryId]?['image'] ?? '',
+        'index': transactionIndex++,
+      });
+    }
+
+    // Sắp xếp giao dịch theo ngày
+    var sortedKeys = tempTransactions.keys.toList()
+      ..sort((a, b) {
+        DateTime dateA = DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').parse(a);
+        DateTime dateB = DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').parse(b);
+        return dateA.compareTo(dateB);
+      });
+
+    Map<String, List<Map<String, dynamic>>> sortedTransactions = {};
+    for (var key in sortedKeys) {
+      sortedTransactions[key] = tempTransactions[key]!;
+    }
+
     setState(() {
-      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+      transactions = sortedTransactions;
     });
   }
 
+  void _changeMonth(int step) async {
+    _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+    setState(() {});
+    await _loadTransactions();
+  }
+
   void _deleteTransaction(String date, int index) {
-    // Handle the delete action, for now just print the index
     print("Deleted transaction at index $index on date $date");
-
-    // Remove the transaction from the list
     setState(() {
-      transactions[date]
-          ?.removeWhere((transaction) => transaction['index'] == index);
-
-      // If there are no more transactions for that date, remove the date header too
+      transactions[date]?.removeWhere((transaction) => transaction['index'] == index);
       if (transactions[date]?.isEmpty ?? true) {
         transactions.remove(date);
       }
@@ -135,12 +212,12 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.chevron_left, size: 30),
+                    icon: const Icon(Icons.chevron_left, size: 30),
                     onPressed: () => _changeMonth(-1),
                   ),
                   Container(
                     width: 250,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black, width: 1),
                       borderRadius: BorderRadius.circular(8),
@@ -149,13 +226,12 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
                     child: Center(
                       child: Text(
                         DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.chevron_right, size: 30),
+                    icon: const Icon(Icons.chevron_right, size: 30),
                     onPressed: () => _changeMonth(1),
                   ),
                 ],
@@ -165,33 +241,43 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
             Expanded(
               child: Container(
                 margin: const EdgeInsets.only(top: 19),
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    // Iterate through the date groups and display them
-                    ...transactions.entries.map((entry) {
-                      String date = entry.key;
-                      List<Map<String, dynamic>> transactionList = entry.value;
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                child: transactions.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'Không có giao dịch trong tháng này',
+                          style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 15,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      )
+                    : ListView(
+                        padding: EdgeInsets.zero,
                         children: [
-                          _buildDateHeader(date),
-                          ...transactionList.map((transaction) {
-                            return _buildTransactionItem(
-                              iconUrl: transaction['iconUrl'],
-                              title: transaction['title'],
-                              amount: transaction['amount'],
-                              isIncome: transaction['isIncome'],
-                              index: transaction['index'],
-                              date: date,
+                          ...transactions.entries.map((entry) {
+                            String date = entry.key;
+                            List<Map<String, dynamic>> transactionList = entry.value;
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _buildDateHeader(date),
+                                ...transactionList.map((transaction) {
+                                  return _buildTransactionItem(
+                                    iconUrl: transaction['iconUrl'],
+                                    title: transaction['title'],
+                                    amount: transaction['amount'],
+                                    isIncome: transaction['isIncome'],
+                                    index: transaction['index'],
+                                    date: date,
+                                  );
+                                }).toList(),
+                              ],
                             );
                           }).toList(),
                         ],
-                      );
-                    }).toList(),
-                  ],
-                ),
+                      ),
               ),
             ),
           ],
@@ -207,7 +293,7 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Text(
         date,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Montserrat',
           fontSize: 14,
           color: Colors.white,
@@ -228,7 +314,6 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
       key: Key(index.toString()),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
-        // Handle the delete action when swiped
         _deleteTransaction(date, index);
       },
       background: Container(
@@ -254,7 +339,7 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
                 const SizedBox(width: 4),
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Montserrat',
                     fontSize: 15,
                     color: Colors.black,
