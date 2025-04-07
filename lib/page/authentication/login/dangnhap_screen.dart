@@ -7,6 +7,7 @@ import '../../dashboard/dashboardwidget.dart';
 import '../../mainpage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DangNhap extends StatefulWidget {
   const DangNhap({Key? key}) : super(key: key);
@@ -143,26 +144,25 @@ class _DangNhapState extends State<DangNhap> {
             children: [
               Padding(
                 padding:
-                    // const EdgeInsets.only(left: 16.0, right: 16.0, top: 25.0),
-                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                    EdgeInsets.only(left: 16.0.w, right: 16.0.w, top: 16.0.h),
                 child: Row(
                   children: [
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back,
-                        size: 26,
+                        size: 26.sp,
                         color: Colors.black,
                       ),
                     ),
                     Expanded(
                       child: Center(
-                        child: const Text(
+                        child: Text(
                           'Đăng nhập',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                            letterSpacing: 1.0.sp,
                             color: Colors.black,
                             fontFamily: 'Montserrat',
                           ),
@@ -173,24 +173,20 @@ class _DangNhapState extends State<DangNhap> {
                 ),
               ),
               Padding(
-                // padding: const EdgeInsets.only(top: 30.0),
-                padding: const EdgeInsets.only(top: 20.0),
+                padding: EdgeInsets.only(top: 20.0.h),
                 child: Column(
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      // width: 70,
-                      // height: 70,
-                      width: 60,
-                      height: 60,
+                      width: 60.w,
+                      height: 60.h,
                     ),
-                    const Text(
+                    Text(
                       'MoneyMate',
                       style: TextStyle(
-                        // fontSize: 25,
-                        fontSize: 21,
+                        fontSize: 21.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 2.52,
+                        letterSpacing: 2.52.sp,
                         color: Color(0xFF1E201E),
                         fontFamily: 'Montserrat',
                       ),
@@ -199,16 +195,14 @@ class _DangNhapState extends State<DangNhap> {
                 ),
               ),
               Container(
-                // margin: const EdgeInsets.only(top: 30.0),
-                margin: const EdgeInsets.only(top: 20.0),
-                padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 88.0),
-                // padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 25.0),
+                margin: EdgeInsets.only(top: 20.0.h),
+                padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 88.0.h),
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(40.r),
+                    topRight: Radius.circular(40.r),
                   ),
                 ),
                 child: Column(
@@ -219,93 +213,93 @@ class _DangNhapState extends State<DangNhap> {
                       children: [
                         Image.asset(
                           'assets/images/user_icon.png', // Replace with actual asset path
-                          width: 27,
-                          height: 27,
+                          width: 27.w,
+                          height: 27.h,
                           fit: BoxFit.contain,
                         ),
-                        const SizedBox(width: 2),
-                        const Text(
+                        SizedBox(width: 2.w),
+                        Text(
                           'Email',
                           style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 17.sp,
                             fontWeight: FontWeight.w500,
                             fontFamily: 'Montserrat',
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 7),
+                    SizedBox(height: 7.h),
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 14,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 14.h,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: const BorderSide(
+                          borderRadius: BorderRadius.circular(15.r),
+                          borderSide: BorderSide(
                             color: Colors.black,
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         hintText: 'Nhập tên đăng nhập',
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontFamily:
                               'Montserrat', // Áp dụng font cho hint text
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           color: Colors.grey,
                         ),
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily:
                             'Montserrat', // Áp dụng font cho nội dung nhập vào
-                        fontSize: 15,
+                        fontSize: 15.sp,
                         color: Colors.black,
                       ),
                     ),
 
                     // Password field
-                    const SizedBox(height: 21),
+                    SizedBox(height: 21.h),
                     Row(
                       children: [
                         Image.asset(
                           'assets/images/password_icon.png', // Replace with actual asset path
-                          width: 27,
-                          height: 27,
+                          width: 27.w,
+                          height: 27.h,
                           fit: BoxFit.contain,
                         ),
-                        const SizedBox(width: 2),
-                        const Text(
+                        SizedBox(width: 2.w),
+                        Text(
                           'Mật khẩu',
                           style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 17.sp,
                             fontWeight: FontWeight.w500,
                             fontFamily: 'Montserrat',
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 7),
+                    SizedBox(height: 7.h),
                     TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 17,
-                          vertical: 12,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 17.w,
+                          vertical: 12.h,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: const BorderSide(
+                          borderRadius: BorderRadius.circular(15.r),
+                          borderSide: BorderSide(
                             color: Colors.black,
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         hintText: 'Nhập mật khẩu',
-                        hintStyle: const TextStyle(
+                        hintStyle: TextStyle(
                           fontFamily: 'Montserrat',
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           color: Colors.grey,
                         ),
                         suffixIcon: IconButton(
@@ -322,9 +316,9 @@ class _DangNhapState extends State<DangNhap> {
                           },
                         ),
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Montserrat',
-                        fontSize: 15,
+                        fontSize: 15.sp,
                         color: Colors.black,
                       ),
                     ),
@@ -332,12 +326,12 @@ class _DangNhapState extends State<DangNhap> {
                     // Hiển thị lỗi (nếu có)
                     if (_errorMessage != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
+                        padding: EdgeInsets.only(top: 8.0.h),
                         child: Text(
                           _errorMessage!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.red,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontFamily: 'Montserrat',
                           ),
                         ),
@@ -347,10 +341,9 @@ class _DangNhapState extends State<DangNhap> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 8),
+                        padding: EdgeInsets.only(top: 8.h),
                         child: GestureDetector(
                           onTap: () {
-                            // Navigator.pushNamed(context, '/quenmatkhau');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -358,10 +351,10 @@ class _DangNhapState extends State<DangNhap> {
                               ),
                             );
                           },
-                          child: const Text(
+                          child: Text(
                             'Quên mật khẩu?',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               fontFamily: 'Montserrat',
                             ),
                           ),
@@ -370,7 +363,7 @@ class _DangNhapState extends State<DangNhap> {
                     ),
 
                     // Login button
-                    const SizedBox(height: 21),
+                    SizedBox(height: 21.h),
                     Center(
                       child: GestureDetector(
                         onTap: _login, // Gọi hàm đăng nhập
@@ -384,18 +377,18 @@ class _DangNhapState extends State<DangNhap> {
                         //   );
                         // },
                         child: Container(
-                          width: 200,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          width: 200.w,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1E201E),
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(50.r),
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             'Đăng nhập',
                             style: TextStyle(
                               fontFamily: 'Montserrat',
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.w500,
                               color: Colors.white,
                             ),
@@ -405,12 +398,12 @@ class _DangNhapState extends State<DangNhap> {
                     ),
 
                     // Register link
-                    const SizedBox(height: 21),
+                    SizedBox(height: 21.h),
                     Center(
                       child: RichText(
                         text: TextSpan(
-                          style: const TextStyle(
-                            fontSize: 14,
+                          style: TextStyle(
+                            fontSize: 14.sp,
                             fontFamily: 'Montserrat',
                             color: Colors.black,
                           ),
@@ -437,21 +430,21 @@ class _DangNhapState extends State<DangNhap> {
                     ),
 
                     // Divider
-                    const SizedBox(height: 21),
+                    SizedBox(height: 21.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: 133,
-                          height: 1,
+                          width: 133.w,
+                          height: 1.h,
                           color: const Color(0x4D000000),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 2),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2.w),
                           child: Text(
                             'hoặc',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w300,
                               fontFamily: 'Montserrat',
                               color: Colors.black,
@@ -459,28 +452,28 @@ class _DangNhapState extends State<DangNhap> {
                           ),
                         ),
                         Container(
-                          width: 133,
-                          height: 1,
+                          width: 133.w,
+                          height: 1.h,
                           color: const Color(0x4D000000),
                         ),
                       ],
                     ),
 
                     // Google login button
-                    const SizedBox(height: 30),
+                    SizedBox(height: 30.h),
                     GestureDetector(
                       onTap: () {
                         login();
                       },
                       child: Container(
-                        constraints: const BoxConstraints(maxWidth: 300),
-                        padding: const EdgeInsets.fromLTRB(17, 10, 17, 10),
+                        constraints: BoxConstraints(maxWidth: 300.w),
+                        padding: EdgeInsets.fromLTRB(17.w, 10.h, 17.w, 10.h),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(15.r),
                           border: Border.all(
                             color: const Color(0xFF1E201E),
-                            width: 1,
+                            width: 1.w,
                           ),
                         ),
                         child: Row(
@@ -490,15 +483,15 @@ class _DangNhapState extends State<DangNhap> {
                               children: [
                                 Image.asset(
                                   'assets/images/google_icon.png',
-                                  width: 30,
-                                  height: 30,
+                                  width: 30.w,
+                                  height: 30.h,
                                   fit: BoxFit.contain,
                                 ),
-                                const SizedBox(width: 10),
+                                SizedBox(width: 10.w),
                                 Text(
                                   'Tiếp tục với Google',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 16.sp,
                                     fontFamily: 'Montserrat',
                                     color: Colors.black,
                                   ),
@@ -507,7 +500,7 @@ class _DangNhapState extends State<DangNhap> {
                             ),
                             Icon(
                               Icons.arrow_forward,
-                              size: 26,
+                              size: 26.sp,
                               color: Colors.black,
                             ),
                           ],
@@ -516,46 +509,56 @@ class _DangNhapState extends State<DangNhap> {
                     ),
 
                     // Facebook login button
-                    const SizedBox(height: 26),
-                    Container(
-                      constraints: const BoxConstraints(maxWidth: 300),
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: const Color(0xFF1E201E),
-                          width: 1,
+                    SizedBox(height: 26.h),
+                    GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Tính năng này chưa được hỗ trợ'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 300.w),
+                        padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15.r),
+                          border: Border.all(
+                            color: const Color(0xFF1E201E),
+                            width: 1.w,
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/facebook_icon.png',
-                                width: 35,
-                                height: 35,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 7),
-                              Text(
-                                'Tiếp tục với Facebook',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Montserrat',
-                                  color: Colors.black,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Image.asset(
+                                  'assets/images/facebook_icon.png',
+                                  width: 35.w,
+                                  height: 35.h,
+                                  fit: BoxFit.contain,
                                 ),
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.arrow_forward,
-                            size: 26,
-                            color: Colors.black,
-                          ),
-                        ],
+                                SizedBox(width: 7.w),
+                                Text(
+                                  'Tiếp tục với Facebook',
+                                  style: TextStyle(
+                                    fontSize: 16.sp,
+                                    fontFamily: 'Montserrat',
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Icon(
+                              Icons.arrow_forward,
+                              size: 26.sp,
+                              color: Colors.black,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

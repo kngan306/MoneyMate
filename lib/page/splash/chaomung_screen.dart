@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_moneymate_01/page/authentication/login/dangnhap_screen.dart';
 import 'package:flutter_moneymate_01/page/authentication/register/dangky_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChaoMung extends StatelessWidget {
   const ChaoMung({Key? key}) : super(key: key);
@@ -16,26 +17,25 @@ class ChaoMung extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 65),
+              SizedBox(height: 65.h),
               // logo image
               Image.asset(
                 'assets/images/logo.png', // Replace with actual asset path
-                width: 70,
-                height: 70,
+                width: 70.w,
+                height: 70.h,
                 fit: BoxFit.contain,
               ),
 
               // App name
               Padding(
-                padding: const EdgeInsets.only(top: 5),
+                padding: EdgeInsets.only(top: 5.h),
                 child: Text(
                   'MoneyMate',
                   style: TextStyle(
                     color: Color(0xFF3C3D37),
-                    // fontSize: 30,
-                    fontSize: 26,
+                    fontSize: 26.sp,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 2.52,
+                    letterSpacing: 2.52.sp,
                     fontFamily: 'Montserrat',
                   ),
                 ),
@@ -43,29 +43,25 @@ class ChaoMung extends StatelessWidget {
 
               // Tagline
               Padding(
-                padding: const EdgeInsets.only(top: 14),
+                padding: EdgeInsets.only(top: 14.h),
                 child: Text(
                   'Bạn đồng hành quản lý tiền bạc',
-                  style: const TextStyle(
-                    // fontSize: 18,
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Montserrat',
                     color: Colors.black,
-                    // letterSpacing: 2.0,
-                    letterSpacing: 1.5,
+                    letterSpacing: 1.5.sp,
                   ),
                 ),
               ),
 
               // Main image
               Padding(
-                // padding: const EdgeInsets.only(top: 70),
-                padding: const EdgeInsets.only(top: 60),
+                padding: EdgeInsets.only(top: 60.h),
                 child: Image.asset(
                   'assets/images/main_image.png',
-                  // width: 289,
-                  width: 250,
+                  width: 250.w,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -75,12 +71,12 @@ class ChaoMung extends StatelessWidget {
                 width: double.infinity,
                 // padding: const EdgeInsets.fromLTRB(50, 40, 50, 36),
                 // padding: const EdgeInsets.fromLTRB(50, 40, 50, 94),
-                padding: const EdgeInsets.fromLTRB(50, 65, 50, 94),
-                decoration: const BoxDecoration(
+                padding: EdgeInsets.fromLTRB(50.w, 65.h, 50.w, 94.h),
+                decoration: BoxDecoration(
                   color: Color(0xFFECDFCC), // Cream
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(40.r),
+                    topRight: Radius.circular(40.r),
                   ),
                 ),
                 child: Column(
@@ -99,19 +95,19 @@ class ChaoMung extends StatelessWidget {
                           );
                         },
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(
+                          side: BorderSide(
                             color: Color(0xFF697565), // Dark Green
-                            width: 5,
+                            width: 5.w,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(50.r),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 17),
+                          padding: EdgeInsets.symmetric(vertical: 17.h),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Đăng nhập',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Montserrat',
                             color: Color(0xFF697565), // Dark Green
@@ -120,15 +116,12 @@ class ChaoMung extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 25),
-
+                    SizedBox(height: 25.h),
                     // Register button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Handle register action
-                          // Navigator.pushNamed(context, AppRoutes.register);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -141,14 +134,14 @@ class ChaoMung extends StatelessWidget {
                               const Color(0xFF697565), // Dark Green
                           foregroundColor: const Color(0xFFECDFCC), // Cream
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(50.r),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 17),
+                          padding: EdgeInsets.symmetric(vertical: 17.h),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Đăng ký',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Montserrat',
                           ),
