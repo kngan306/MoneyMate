@@ -13,8 +13,7 @@ class CaiDat extends StatelessWidget {
          title: Text(
           "Cài đặt",
           style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
+            fontSize: 17,
             color: Colors.white,
           ),
         ),
