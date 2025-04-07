@@ -74,7 +74,10 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             userDocId!, selectedMonth!); // Tải danh mục thu
         await _loadExpenseCategories(
             userDocId!, selectedMonth!); // Tải danh mục chi
-        setState(() {});
+        if (mounted) {
+          // Kiểm tra mounted trước khi gọi setState
+          setState(() {});
+        }
       } else {
         print('Không tìm thấy thông tin người dùng trong Firestore.');
       }
@@ -357,11 +360,11 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                               ))
                           .toList(),
                       value: selectedMonth,
-                      onChanged: (String? value) {
+                      onChanged: (String? value) async {
                         setState(() {
                           selectedMonth = value;
-                          _loadData();
                         });
+                        await _loadData();
                       },
                       buttonStyleData: ButtonStyleData(
                         padding: EdgeInsets.symmetric(horizontal: 15.w),

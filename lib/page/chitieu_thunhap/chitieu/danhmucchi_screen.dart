@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../widgets/cateitem/category2_item.dart';
 import 'themdanhmucchi_screen.dart';
 import '../../mainpage.dart';
@@ -11,15 +13,121 @@ class DanhMucChi extends StatefulWidget {
 }
 
 class _DanhMucChiState extends State<DanhMucChi> {
-  // Biến để theo dõi trạng thái checkbox cho từng danh mục
-  bool isAnUongChecked = false;
-  bool isQuanAoChecked = false;
-  bool isMyPhamChecked = false;
-  bool isYTeChecked = true; // Mặc định là checked
-  bool isDiLaiChecked = false;
-  bool isTienNhaChecked = false;
-  bool isXaStressChecked = false;
-  bool isCapWifiChecked = false;
+  Map<String, bool> categoryCheckStates = {};
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _allCategories = [];
+  List<Map<String, dynamic>> _filteredCategories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories(); // Tải danh mục khi khởi tạo
+    _searchController.addListener(_filterCategories);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  // Hàm tải danh mục từ Firestore
+  Future<void> _loadCategories() async {
+    List<Map<String, dynamic>> categories = await _loadExpenseCategories();
+    setState(() {
+      _allCategories = categories;
+      _filteredCategories = List.from(_allCategories);
+      // Đặt lại trạng thái checkbox
+      categoryCheckStates.clear();
+      for (var category in _allCategories) {
+        categoryCheckStates[category['id']] = false;
+      }
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> _loadExpenseCategories() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        String userDocId = userDoc.docs.first.id;
+        QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userDocId)
+            .collection('danh_muc_chi')
+            .get();
+
+        return categorySnapshot.docs.map((doc) {
+          return {
+            'id': doc.id,
+            'name': doc['ten_muc_chi'] as String,
+            'image': doc['image'] as String,
+          };
+        }).toList();
+      }
+    }
+    return [];
+  }
+
+  void _filterCategories() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      if (query.isEmpty) {
+        _filteredCategories = List.from(_allCategories);
+      } else {
+        _filteredCategories = _allCategories
+            .where((category) => category['name'].toLowerCase().contains(query))
+            .toList();
+      }
+    });
+  }
+
+  Future<void> _deleteSelectedCategories() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        String userDocId = userDoc.docs.first.id;
+        List<String> selectedCategoryIds = categoryCheckStates.entries
+            .where((entry) => entry.value)
+            .map((entry) => entry.key)
+            .toList();
+
+        if (selectedCategoryIds.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Vui lòng chọn ít nhất một danh mục để xóa')),
+          );
+          return;
+        }
+
+        for (String categoryId in selectedCategoryIds) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userDocId)
+              .collection('danh_muc_chi')
+              .doc(categoryId)
+              .delete();
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Đã xóa ${selectedCategoryIds.length} danh mục')),
+        );
+
+        // Tải lại danh mục sau khi xóa
+        await _loadCategories();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +157,6 @@ class _DanhMucChiState extends State<DanhMucChi> {
             width: double.infinity,
             child: Column(
               children: [
-                // Search Bar
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
                   child: Container(
@@ -73,13 +180,17 @@ class _DanhMucChiState extends State<DanhMucChi> {
                         ),
                         const SizedBox(width: 20),
                         Expanded(
-                          child: Text(
-                            'Tìm kiếm danh mục đã thêm',
-                            style: const TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 15,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400,
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Tìm kiếm danh mục đã thêm',
+                              hintStyle: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 15,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
                           ),
                         ),
@@ -87,18 +198,21 @@ class _DanhMucChiState extends State<DanhMucChi> {
                     ),
                   ),
                 ),
-
-                // Add Category Button
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
                   child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      // Chuyển đến màn hình thêm danh mục và chờ kết quả
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Mainpage(selectedIndex: 12),
+                          builder: (context) => const ThemDanhMucChi(),
                         ),
                       );
+                      // Nếu thêm danh mục thành công, tải lại danh sách
+                      if (result == true) {
+                        await _loadCategories();
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -130,8 +244,6 @@ class _DanhMucChiState extends State<DanhMucChi> {
                     ),
                   ),
                 ),
-
-                // Select All Option
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 30.0, 16.0, 0.0),
                   child: Container(
@@ -149,23 +261,10 @@ class _DanhMucChiState extends State<DanhMucChi> {
                             GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  // Toggle select all
-                                  bool newValue = !(isAnUongChecked &&
-                                      isQuanAoChecked &&
-                                      isMyPhamChecked &&
-                                      isYTeChecked &&
-                                      isDiLaiChecked &&
-                                      isTienNhaChecked &&
-                                      isXaStressChecked &&
-                                      isCapWifiChecked);
-                                  isAnUongChecked = newValue;
-                                  isQuanAoChecked = newValue;
-                                  isMyPhamChecked = newValue;
-                                  isYTeChecked = newValue;
-                                  isDiLaiChecked = newValue;
-                                  isTienNhaChecked = newValue;
-                                  isXaStressChecked = newValue;
-                                  isCapWifiChecked = newValue;
+                                  bool newValue = !categoryCheckStates.values
+                                      .every((element) => element);
+                                  categoryCheckStates
+                                      .updateAll((key, value) => newValue);
                                 });
                               },
                               child: Container(
@@ -179,14 +278,8 @@ class _DanhMucChiState extends State<DanhMucChi> {
                                     width: 1,
                                   ),
                                 ),
-                                child: (isAnUongChecked &&
-                                        isQuanAoChecked &&
-                                        isMyPhamChecked &&
-                                        isYTeChecked &&
-                                        isDiLaiChecked &&
-                                        isTienNhaChecked &&
-                                        isXaStressChecked &&
-                                        isCapWifiChecked)
+                                child: categoryCheckStates.values
+                                        .every((element) => element)
                                     ? const Icon(Icons.check, size: 16)
                                     : null,
                               ),
@@ -203,18 +296,19 @@ class _DanhMucChiState extends State<DanhMucChi> {
                             ),
                           ],
                         ),
-                        Image.asset(
-                          'assets/images/delete_icon.png',
-                          width: 27,
-                          height: 27,
-                          fit: BoxFit.contain,
+                        GestureDetector(
+                          onTap: _deleteSelectedCategories,
+                          child: Image.asset(
+                            'assets/images/delete_icon.png',
+                            width: 27,
+                            height: 27,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-
-                // Category List
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 10.0, 16.0, 0.0),
                   child: Container(
@@ -227,140 +321,29 @@ class _DanhMucChiState extends State<DanhMucChi> {
                       ),
                     ),
                     child: SizedBox(
-                      height: 370, // Điều chỉnh chiều cao để phù hợp với giao diện
+                      height: 370,
                       child: SingleChildScrollView(
                         child: Column(
-                          children: [
-                            // Danh sách CategoryItem
-                            // Ăn uống
-                            CategoryItem(
-                              categoryKey: 'anUong',
-                              title: 'Ăn uống',
-                              iconUrl: 'assets/images/food.png',
+                          children:
+                              _filteredCategories.asMap().entries.map((entry) {
+                            int index = entry.key;
+                            var category = entry.value;
+                            return CategoryItem(
+                              categoryKey: category['id'],
+                              title: category['name'],
+                              iconUrl: category['image'],
                               arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: true,
-                              isLastItem: false,
-                              isChecked: isAnUongChecked,
+                              isFirstItem: index == 0,
+                              isLastItem:
+                                  index == _filteredCategories.length - 1,
+                              isChecked: categoryCheckStates[category['id']]!,
                               onCheckboxChanged: (value) {
                                 setState(() {
-                                  isAnUongChecked = value;
+                                  categoryCheckStates[category['id']] = value;
                                 });
                               },
-                            ),
-
-                            // Quần áo
-                            CategoryItem(
-                              categoryKey: 'quanAo',
-                              title: 'Quần áo',
-                              iconUrl: 'assets/images/quanao.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isQuanAoChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isQuanAoChecked = value;
-                                });
-                              },
-                            ),
-
-                            // Mỹ phẩm
-                            CategoryItem(
-                              categoryKey: 'myPham',
-                              title: 'Mỹ phẩm',
-                              iconUrl: 'assets/images/mypham.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isMyPhamChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isMyPhamChecked = value;
-                                });
-                              },
-                            ),
-
-                            // Y tế
-                            CategoryItem(
-                              categoryKey: 'yTe',
-                              title: 'Y tế',
-                              iconUrl: 'assets/images/yte.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isYTeChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isYTeChecked = value;
-                                });
-                              },
-                              hasCheckmark: true,
-                            ),
-
-                            // Đi lại
-                            CategoryItem(
-                              categoryKey: 'diLai',
-                              title: 'Đi lại',
-                              iconUrl: 'assets/images/xemay.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isDiLaiChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isDiLaiChecked = value;
-                                });
-                              },
-                            ),
-
-                            // Tiền nhà
-                            CategoryItem(
-                              categoryKey: 'tienNha',
-                              title: 'Tiền nhà',
-                              iconUrl: 'assets/images/nha.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isTienNhaChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isTienNhaChecked = value;
-                                });
-                              },
-                            ),
-
-                            // Xã stress
-                            CategoryItem(
-                              categoryKey: 'xaStress',
-                              title: 'Xã stress',
-                              iconUrl: 'assets/images/bia.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: false,
-                              isChecked: isXaStressChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isXaStressChecked = value;
-                                });
-                              },
-                            ),
-
-                            // Cáp & wifi
-                            CategoryItem(
-                              categoryKey: 'capWifi',
-                              title: 'Cáp & wifi',
-                              iconUrl: 'assets/images/wifi.png',
-                              arrowUrl: 'assets/images/arrow2_icon.png',
-                              isFirstItem: false,
-                              isLastItem: true,
-                              isChecked: isCapWifiChecked,
-                              onCheckboxChanged: (value) {
-                                setState(() {
-                                  isCapWifiChecked = value;
-                                });
-                              },
-                            ),
-                          ],
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),

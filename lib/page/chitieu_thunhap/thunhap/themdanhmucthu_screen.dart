@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../widgets/cateitem/category3_item.dart'; // Đảm bảo rằng bạn đã import đúng widget CategoryItem
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../../widgets/cateitem/category3_item.dart';
 
 class ThemDanhMucThu extends StatefulWidget {
   const ThemDanhMucThu({Key? key}) : super(key: key);
@@ -12,7 +14,6 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
   final TextEditingController _categoryNameController = TextEditingController();
   int? _selectedIconIndex;
 
-  // List of icon category from cate1.png to cate56.png
   final List<String> _iconCate =
       List.generate(56, (index) => 'assets/images/cate${index + 1}.png');
 
@@ -20,6 +21,69 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
   void dispose() {
     _categoryNameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveCategory() async {
+    if (_categoryNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng nhập tên danh mục')),
+      );
+      return;
+    }
+
+    if (_selectedIconIndex == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng chọn một biểu tượng')),
+      );
+      return;
+    }
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        var userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: user.email)
+            .get();
+
+        if (userDoc.docs.isNotEmpty) {
+          String userDocId = userDoc.docs.first.id;
+
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userDocId)
+              .collection('danh_muc_thu')
+              .add({
+            'ten_muc_thu': _categoryNameController.text,
+            'image': _iconCate[_selectedIconIndex!],
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đã lưu danh mục thành công')),
+          );
+
+          setState(() {
+            _categoryNameController.clear();
+            _selectedIconIndex = null;
+          });
+
+          // Trả về true để thông báo rằng danh mục đã được thêm thành công
+          Navigator.pop(context, true);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Không tìm thấy thông tin người dùng')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi khi lưu danh mục: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng đăng nhập để lưu danh mục')),
+      );
+    }
   }
 
   @override
@@ -57,7 +121,6 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Category Name Label
                   const Text(
                     "Tên danh mục",
                     style: TextStyle(
@@ -67,8 +130,6 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-
-                  // Category Name Input
                   Container(
                     margin: const EdgeInsets.only(top: 10),
                     decoration: BoxDecoration(
@@ -103,8 +164,6 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
                       ),
                     ),
                   ),
-
-                  // Icon Label
                   const Padding(
                     padding: EdgeInsets.only(top: 24.0),
                     child: Text(
@@ -117,8 +176,6 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
                       ),
                     ),
                   ),
-
-                  // Icon Grid
                   Padding(
                     padding: const EdgeInsets.only(top: 10.0),
                     child: GridView.builder(
@@ -134,27 +191,22 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
                       itemCount: _iconCate.length,
                       itemBuilder: (context, index) {
                         return CategoryItem(
-                          imageUrl:
-                              _iconCate[index], // Sử dụng đường dẫn hình ảnh
-                          isSelected: _selectedIconIndex ==
-                              index, // Kiểm tra xem biểu tượng có được chọn không
+                          imageUrl: _iconCate[index],
+                          isSelected: _selectedIconIndex == index,
                           onTap: () {
                             setState(() {
-                              _selectedIconIndex =
-                                  index; // Cập nhật chỉ số biểu tượng đã chọn
+                              _selectedIconIndex = index;
                             });
                           },
                         );
                       },
                     ),
                   ),
-
-                  // Save Button
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 20.0, bottom: 30),
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _saveCategory,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),
                           shape: RoundedRectangleBorder(
