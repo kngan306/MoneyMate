@@ -364,6 +364,7 @@ class _DangNhapState extends State<DangNhap> {
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontFamily: 'Montserrat',
+                              decoration: TextDecoration.underline,
                             ),
                           ),
                         ),
