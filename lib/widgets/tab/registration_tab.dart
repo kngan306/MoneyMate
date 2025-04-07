@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RegistrationTab extends StatelessWidget {
   final String icon;
@@ -19,41 +20,41 @@ class RegistrationTab extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 13,
-          vertical: 14,
+        padding: EdgeInsets.symmetric(
+          horizontal: 13.w,
+          vertical: 14.h,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(50),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(50.r),
+          boxShadow: [
             BoxShadow(
               color: Color.fromRGBO(0, 0, 0, 0.07),
-              blurRadius: 4,
-              offset: Offset(0, 4),
+              blurRadius: 4.r,
+              offset: Offset(0.w, 4.h),
             ),
           ],
           border: Border.all(
             color: isSelected
                 ? const Color(0xFF1E201E)
                 : const Color.fromRGBO(0, 0, 0, 0.2),
-            width: 1,
+            width: 1.w,
           ),
         ),
         child: Row(
           children: [
             Image.asset(
               icon,
-              width: 18,
-              height: 18,
+              width: 18.w,
+              height: 18.h,
               fit: BoxFit.contain,
             ),
-            const SizedBox(width: 5),
+            SizedBox(width: 5.w),
             Text(
               label,
               style: TextStyle(
                 color: Colors.black,
-                fontSize: 15,
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'Montserrat',
               ),
