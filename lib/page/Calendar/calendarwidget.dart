@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../widgets/custom_app_bar.dart';
-
 
 class CalendarWidget extends StatefulWidget {
   const CalendarWidget({Key? key}) : super(key: key);
@@ -14,64 +15,184 @@ class CalendarWidget extends StatefulWidget {
 class _CalendarWidgetState extends State<CalendarWidget> {
   late CalendarFormat _calendarFormat;
   late DateTime _focusedDay;
-  late DateTime _selectedDay;
+  DateTime? _selectedDay;
+  String? userDocId;
 
   // Dữ liệu thu nhập/chi tiêu
-  Map<DateTime, List<String>> expenses = {
-    DateTime(2025, 3, 1): ["-240,000"],
-    DateTime(2025, 3, 3): ["+1,000,000"],
-    DateTime(2025, 3, 8): ["-500,000"],
-    DateTime(2025, 3, 12): ["+7,000,000", "-50,000"],
-  };
-  final List<Map<String, dynamic>> transactions = [
-    {
-      "date": DateTime(2025, 3, 1),
-      "day": "Thứ 7",
-      "icon": Icons.restaurant,
-      "name": "Ăn uống",
-      "amount": -240000,
-    },
-    {
-      "date": DateTime(2025, 3, 3),
-      "day": "Thứ 2",
-      "icon": Icons.account_balance_wallet,
-      "name": "Tiền lương",
-      "amount": 1000000,
-    },
-    {
-      "date": DateTime(2025, 3, 8),
-      "day": "Thứ 7",
-      "icon": Icons.brush,
-      "name": "Mỹ phẩm",
-      "amount": -500000,
-    },
-  ];
+  Map<DateTime, List<Map<String, dynamic>>> transactions = {};
+  Map<DateTime, List<String>> expenses = {}; // Để hiển thị chấm xanh/đỏ
+  double monthlyIncome = 0.0;
+  double monthlyExpense = 0.0;
+  double monthlyTotal = 0.0;
+
   @override
   void initState() {
     super.initState();
     _calendarFormat = CalendarFormat.month;
     _focusedDay = DateTime.now();
-    _selectedDay = _focusedDay;
+    _selectedDay = null; // Ban đầu không chọn ngày
+    _loadUserData();
   }
 
-  void _changeMonth(int step) {
+  // Tải thông tin người dùng và dữ liệu giao dịch
+  Future<void> _loadUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        userDocId = userDoc.docs.first.id;
+        await _loadTransactions();
+        setState(() {});
+      }
+    }
+  }
+
+  // Tải danh sách giao dịch từ Firestore
+  Future<void> _loadTransactions() async {
+    if (userDocId == null) return;
+
+    String monthStr = _focusedDay.month.toString().padLeft(2, '0');
+    String yearStr = _focusedDay.year.toString();
+    String startDate = '$yearStr-$monthStr-01';
+    String nextMonthStr = ((_focusedDay.month + 1) % 12).toString().padLeft(2, '0');
+    String nextYearStr =
+        (_focusedDay.month == 12 ? _focusedDay.year + 1 : _focusedDay.year).toString();
+    if (_focusedDay.month == 12) nextMonthStr = '01';
+    String endDate = '$nextYearStr-$nextMonthStr-01';
+
+    // Truy vấn thu nhập
+    QuerySnapshot incomeSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+
+    // Truy vấn chi tiêu
+    QuerySnapshot expenseSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('chi_tieu')
+        .where('ngay', isGreaterThanOrEqualTo: startDate)
+        .where('ngay', isLessThan: endDate)
+        .get();
+
+    // Truy vấn danh mục thu nhập
+    QuerySnapshot incomeCategorySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('danh_muc_thu')
+        .get();
+    Map<String, Map<String, dynamic>> incomeCategories = {};
+    for (var doc in incomeCategorySnapshot.docs) {
+      incomeCategories[doc.id] = {
+        'name': doc['ten_muc_thu'] as String,
+        'image': doc['image'] as String,
+      };
+    }
+
+    // Truy vấn danh mục chi tiêu
+    QuerySnapshot expenseCategorySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('danh_muc_chi')
+        .get();
+    Map<String, Map<String, dynamic>> expenseCategories = {};
+    for (var doc in expenseCategorySnapshot.docs) {
+      expenseCategories[doc.id] = {
+        'name': doc['ten_muc_chi'] as String,
+        'image': doc['image'] as String,
+      };
+    }
+
+    // Kết hợp thu nhập và chi tiêu
+    Map<DateTime, List<Map<String, dynamic>>> tempTransactions = {};
+    Map<DateTime, List<String>> tempExpenses = {};
+    monthlyIncome = 0.0;
+    monthlyExpense = 0.0;
+
+    // Xử lý thu nhập
+    for (var doc in incomeSnapshot.docs) {
+      String dateStr = doc['ngay'] as String;
+      DateTime date = DateTime.parse(dateStr);
+      DateTime normalizedDate = DateTime(date.year, date.month, date.day);
+      String categoryId = doc['muc_thu_nhap'] as String;
+      double amount = (doc['so_tien'] as num).toDouble();
+
+      if (!tempTransactions.containsKey(normalizedDate)) {
+        tempTransactions[normalizedDate] = [];
+        tempExpenses[normalizedDate] = [];
+      }
+
+      tempTransactions[normalizedDate]!.add({
+        'date': date,
+        'day': DateFormat('EEEE', 'vi_VN').format(date),
+        'icon': incomeCategories[categoryId]?['image'] ?? '',
+        'name': incomeCategories[categoryId]?['name'] ?? 'Không xác định',
+        'amount': amount,
+      });
+
+      tempExpenses[normalizedDate]!.add('+$amount');
+      monthlyIncome += amount;
+    }
+
+    // Xử lý chi tiêu
+    for (var doc in expenseSnapshot.docs) {
+      String dateStr = doc['ngay'] as String;
+      DateTime date = DateTime.parse(dateStr);
+      DateTime normalizedDate = DateTime(date.year, date.month, date.day);
+      String categoryId = doc['muc_chi_tieu'] as String;
+      double amount = (doc['so_tien'] as num).toDouble();
+
+      if (!tempTransactions.containsKey(normalizedDate)) {
+        tempTransactions[normalizedDate] = [];
+        tempExpenses[normalizedDate] = [];
+      }
+
+      tempTransactions[normalizedDate]!.add({
+        'date': date,
+        'day': DateFormat('EEEE', 'vi_VN').format(date),
+        'icon': expenseCategories[categoryId]?['image'] ?? '',
+        'name': expenseCategories[categoryId]?['name'] ?? 'Không xác định',
+        'amount': -amount,
+      });
+
+      tempExpenses[normalizedDate]!.add('-$amount');
+      monthlyExpense += amount;
+    }
+
+    monthlyTotal = monthlyIncome - monthlyExpense;
+
     setState(() {
-      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+      transactions = tempTransactions;
+      expenses = tempExpenses;
     });
+  }
+
+  void _changeMonth(int step) async {
+    _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
+    _selectedDay = null; // Reset ngày được chọn khi đổi tháng
+    setState(() {});
+    await _loadTransactions();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: CustomAppBar(
+      appBar: CustomAppBar(
         title: "Lịch",
         showToggleButtons: false,
-        showMenuButton: true, // Hiển thị nút menu (Drawer)
+        showMenuButton: true,
         onMenuPressed: () {
-          Scaffold.of(context).openDrawer(); // Mở drawer từ MainPage
+          Scaffold.of(context).openDrawer();
         },
       ),
-      backgroundColor: const Color(0xFFF5F5F5), // Đặt màu nền tối như ảnh
+      backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -83,29 +204,26 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.chevron_left, size: 30),
+                      icon: const Icon(Icons.chevron_left, size: 30),
                       onPressed: () => _changeMonth(-1),
                     ),
                     Container(
                       width: 250,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 1),
                         borderRadius: BorderRadius.circular(8),
                         color: Colors.white,
                       ),
                       child: Center(
-                        // Căn giữa nội dung
                         child: Text(
                           DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.chevron_right, size: 30),
+                      icon: const Icon(Icons.chevron_right, size: 30),
                       onPressed: () => _changeMonth(1),
                     ),
                   ],
@@ -128,33 +246,30 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   });
                 },
                 onPageChanged: (focusedDay) {
-                  // Cập nhật thanh tháng khi kéo lịch
                   setState(() {
                     _focusedDay = focusedDay;
+                    _selectedDay = null; // Reset ngày được chọn khi đổi tháng
+                    _loadTransactions();
                   });
                 },
-                daysOfWeekHeight: 30, // Chiều cao hàng tiêu đề ngày
-                rowHeight: 60, // Tăng chiều cao ô ngày
-                // Loại bỏ vòng tròn xanh ở ngày hiện tại
-                calendarStyle: CalendarStyle(
-                  todayDecoration: BoxDecoration(), // Xóa vòng tròn xanh
+                daysOfWeekHeight: 30,
+                rowHeight: 60,
+                calendarStyle: const CalendarStyle(
+                  todayDecoration: BoxDecoration(),
                   todayTextStyle: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold, // In đậm ngày hiện tại
-                    color: Colors.black, // Màu chữ đen bình thường
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
-
                 calendarBuilders: CalendarBuilders(
                   defaultBuilder: (context, date, focusedDay) {
-                    DateTime normalizedDate =
-                        DateTime(date.year, date.month, date.day);
-                    List<String>? transactions = expenses[normalizedDate];
+                    DateTime normalizedDate = DateTime(date.year, date.month, date.day);
+                    List<String>? dayExpenses = expenses[normalizedDate];
 
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Hiển thị số ngày
                         Text(
                           '${date.day}',
                           style: TextStyle(
@@ -164,30 +279,27 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                                 : FontWeight.normal,
                           ),
                         ),
-                        // Nếu ngày có giao dịch, hiển thị chấm tròn
-                        if (transactions != null && transactions.isNotEmpty)
+                        if (dayExpenses != null && dayExpenses.isNotEmpty)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              if (transactions
-                                  .any((t) => t.startsWith('+'))) // Có thu nhập
+                              if (dayExpenses.any((t) => t.startsWith('+')))
                                 Container(
-                                  margin: EdgeInsets.only(top: 3, right: 2),
+                                  margin: const EdgeInsets.only(top: 3, right: 2),
                                   width: 6,
                                   height: 6,
-                                  decoration: BoxDecoration(
-                                    color: Colors.green, // Xanh cho thu nhập
+                                  decoration: const BoxDecoration(
+                                    color: Colors.green,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
-                              if (transactions
-                                  .any((t) => t.startsWith('-'))) // Có chi tiêu
+                              if (dayExpenses.any((t) => t.startsWith('-')))
                                 Container(
-                                  margin: EdgeInsets.only(top: 3, left: 2),
+                                  margin: const EdgeInsets.only(top: 3, left: 2),
                                   width: 6,
                                   height: 6,
-                                  decoration: BoxDecoration(
-                                    color: Colors.red, // Đỏ cho chi tiêu
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -201,193 +313,31 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
               // Thanh tổng thu nhập, chi tiêu
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _buildSummaryColumn(
-                        "Thu nhập", "1,000,000 đ", Colors.green),
-                    _buildSummaryColumn("Chi Tiêu", "740,000 đ", Colors.red),
-                    _buildSummaryColumn("Tổng", "+360,000 đ", Colors.black),
+                        "Thu nhập",
+                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(monthlyIncome),
+                        Colors.green),
+                    _buildSummaryColumn(
+                        "Chi Tiêu",
+                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(monthlyExpense),
+                        Colors.red),
+                    _buildSummaryColumn(
+                        "Tổng",
+                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(monthlyTotal),
+                        Colors.black),
                   ],
                 ),
               ),
+
+              // Danh sách giao dịch
               Padding(
                 padding: const EdgeInsets.only(top: 14.0, bottom: 28.0),
-                child: Column(
-                  children: [
-                    // First transaction date
-                    Container(
-                      width: double.infinity,
-                      color: const Color(0xFF697565),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
-                      child: const Text(
-                        '01/03/2025 (Thứ 7)',
-                        style: TextStyle(
-                          //fontFamily: 'Inter',
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-
-                    // First transaction
-                    Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/cate5.png',
-                                width: 30,
-                                height: 30,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Ăn uống',
-                                style: TextStyle(
-                                  //fontFamily: 'Montserrat',
-                                  //fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Color(0xFF000000),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Text(
-                            '-240,000 đ',
-                            style: TextStyle(
-                              //fontFamily: 'Montserrat',
-                              // fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Color(0xFFFE0000),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Second transaction date
-                    Container(
-                      width: double.infinity,
-                      color: const Color(0xFF697565),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
-                      child: const Text(
-                        '03/03/2025 (Thứ 2)',
-                        style: TextStyle(
-                          //fontFamily: 'Inter',
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-
-                    // Second transaction
-                    Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 13),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/cate29.png',
-                                width: 35,
-                                height: 35,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                'Tiền lương',
-                                style: TextStyle(
-                                  //fontWeight: FontWeight.bold,
-                                  //fontFamily: 'Montserrat',
-                                  fontSize: 15,
-                                  color: Color(0xFF000000),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Text(
-                            '+1,000,000 đ',
-                            style: TextStyle(
-                              //fontFamily: 'Montserrat',
-                              // fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Color(0xFF4ABD57),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Third transaction date
-                    Container(
-                      width: double.infinity,
-                      color: const Color(0xFF697565),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 4),
-                      child: const Text(
-                        '08/03/2025 (Thứ 7)',
-                        style: TextStyle(
-                          //fontFamily: 'Inter',
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-
-                    // Third transaction
-                    Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/cate17.png',
-                                width: 40,
-                                height: 40,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 5),
-                              const Text(
-                                'Mỹ phẩm',
-                                style: TextStyle(
-                                  //fontWeight: FontWeight.bold,
-                                  //fontFamily: 'Montserrat',
-                                  fontSize: 15,
-                                  color: Color(0xFF000000),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Text(
-                            '-500,000 đ',
-                            style: TextStyle(
-                              // fontWeight: FontWeight.bold,
-                              //fontFamily: 'Montserrat',
-                              fontSize: 15,
-                              color: Color(0xFFFE0000),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )
+                child: _buildTransactionList(),
+              ),
             ],
           ),
         ),
@@ -398,11 +348,123 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   Widget _buildSummaryColumn(String label, String amount, Color color) {
     return Column(
       children: [
-        Text(label, style: TextStyle(fontSize: 16, color: Colors.black)),
-        Text(amount,
-            style: TextStyle(
-                color: color, fontSize: 16, fontWeight: FontWeight.w600)),
+        Text(label, style: const TextStyle(fontSize: 16, color: Colors.black)),
+        Text(
+          amount,
+          style: TextStyle(
+            color: color,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget _buildTransactionList() {
+    // Nếu chưa chọn ngày, hiển thị tất cả giao dịch trong tháng
+    List<Map<String, dynamic>> displayTransactions = [];
+    if (_selectedDay == null) {
+      transactions.forEach((date, transactionList) {
+        displayTransactions.addAll(transactionList);
+      });
+    } else {
+      DateTime normalizedSelectedDay =
+          DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
+      displayTransactions = transactions[normalizedSelectedDay] ?? [];
+    }
+
+    // Sắp xếp giao dịch theo ngày
+    displayTransactions.sort((a, b) => a['date'].compareTo(b['date']));
+
+    if (displayTransactions.isEmpty) {
+      return const Center(
+        child: Text(
+          'Không có giao dịch trong ngày này',
+          style: TextStyle(
+            fontFamily: 'Montserrat',
+            fontSize: 15,
+            color: Colors.black54,
+          ),
+        ),
+      );
+    }
+
+    // Nhóm giao dịch theo ngày
+    Map<String, List<Map<String, dynamic>>> groupedTransactions = {};
+    for (var transaction in displayTransactions) {
+      String formattedDate =
+          DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').format(transaction['date']);
+      if (!groupedTransactions.containsKey(formattedDate)) {
+        groupedTransactions[formattedDate] = [];
+      }
+      groupedTransactions[formattedDate]!.add(transaction);
+    }
+
+    return Column(
+      children: groupedTransactions.entries.map((entry) {
+        String date = entry.key;
+        List<Map<String, dynamic>> transactionList = entry.value;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: double.infinity,
+              color: const Color(0xFF697565),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Text(
+                date,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            ...transactionList.map((transaction) {
+              return Container(
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Image.asset(
+                          transaction['icon'],
+                          width: 35,
+                          height: 35,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          transaction['name'],
+                          style: const TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 15,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                          .format(transaction['amount']),
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 15,
+                        color: transaction['amount'] >= 0
+                            ? const Color(0xFF4ABD57)
+                            : const Color(0xFFFE0000),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ],
+        );
+      }).toList(),
     );
   }
 }
