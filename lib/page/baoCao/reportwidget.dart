@@ -10,6 +10,7 @@ import 'timkiembaocao_screen.dart';
 import '../mainpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ReportWidget extends StatefulWidget {
   const ReportWidget({super.key});
@@ -241,33 +242,33 @@ class _ReportWidgetState extends State<ReportWidget> {
             children: [
               // Thanh chọn tháng
               Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 19.0, 16.0, 0.0),
+                padding: EdgeInsets.fromLTRB(16.0.w, 19.0.h, 16.0.w, 0.0.h),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chevron_left, size: 30),
+                      icon: Icon(Icons.chevron_left, size: 30.sp),
                       onPressed: () => _changeMonth(-1),
                     ),
                     Container(
-                      width: 250,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                      width: 250.w,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black, width: 1),
-                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.black, width: 1.w),
+                        borderRadius: BorderRadius.circular(8.r),
                         color: Colors.white,
                       ),
                       child: Center(
                         child: Text(
                           DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 18.sp, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.chevron_right, size: 30),
+                      icon: Icon(Icons.chevron_right, size: 30.sp),
                       onPressed: () => _changeMonth(1),
                     ),
                   ],
@@ -276,13 +277,13 @@ class _ReportWidgetState extends State<ReportWidget> {
 
               // Summary card
               Padding(
-                padding: const EdgeInsets.only(top: 19, left: 16, right: 16),
+                padding: EdgeInsets.only(top: 19.h, left: 16.w, right: 16.w),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
-                  padding: const EdgeInsets.fromLTRB(0, 7, 0, 13),
+                  padding: EdgeInsets.fromLTRB(0.w, 10.h, 0.w, 13.h),
                   child: Column(
                     children: [
                       Row(
@@ -294,9 +295,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                                 NumberFormat.currency(
                                         locale: 'vi_VN', symbol: 'đ')
                                     .format(-monthlyExpense),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Montserrat',
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFFFE0000),
                                 ),
@@ -304,8 +305,8 @@ class _ReportWidgetState extends State<ReportWidget> {
                             ),
                           ),
                           Container(
-                            width: 1,
-                            height: 35,
+                            width: 1.w,
+                            height: 35.h,
                             color: const Color(0xFFD9D9D9),
                           ),
                           Expanded(
@@ -315,9 +316,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                                 NumberFormat.currency(
                                         locale: 'vi_VN', symbol: 'đ')
                                     .format(monthlyIncome),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Montserrat',
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w600,
                                   color: Color(0xFF4ABD57),
                                 ),
@@ -327,33 +328,32 @@ class _ReportWidgetState extends State<ReportWidget> {
                         ],
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 7),
-                        height: 1,
+                        margin: EdgeInsets.only(top: 5.h),
+                        height: 1.h,
                         color: const Color(0xFFD9D9D9),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: SizedBox(
-                          width: 159,
+                        padding: EdgeInsets.only(top: 14.h),
+                        child: Expanded(
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
-                                'Tổng',
+                              Text(
+                                'Tổng: ',
                                 style: TextStyle(
                                   fontFamily: 'Montserrat',
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.black,
                                 ),
                               ),
                               Text(
-                                NumberFormat.currency(
-                                        locale: 'vi_VN', symbol: 'đ')
+                                NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
                                     .format(monthlyTotal),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Montserrat',
-                                  fontSize: 17,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black,
                                 ),
@@ -369,7 +369,7 @@ class _ReportWidgetState extends State<ReportWidget> {
 
               // Tab selector
               Padding(
-                padding: const EdgeInsets.only(top: 19, left: 16, right: 16),
+                padding: EdgeInsets.only(top: 19.h, left: 16.w, right: 16.w),
                 child: BaoCaoTab(
                   isExpenseSelected: isExpenseSelected,
                   onTabSelected: (isExpense) {
@@ -382,59 +382,58 @@ class _ReportWidgetState extends State<ReportWidget> {
 
               // Content based on selected tab
               Padding(
-                padding: const EdgeInsets.only(
-                    top: 5, left: 16, right: 16, bottom: 50),
+                padding: EdgeInsets.only(
+                    top: 5.h, left: 16.w, right: 16.w, bottom: 50.h),
                 child: isExpenseSelected
                     ? Column(
                         children: [
                           Container(
-                            margin: const EdgeInsets.only(top: 8),
+                            margin: EdgeInsets.only(top: 8.h),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(10.r),
                             ),
-                            padding: const EdgeInsets.only(top: 16, bottom: 5),
+                            padding: EdgeInsets.only(top: 16.h, bottom: 5.h),
                             child: Column(
                               children: [
                                 // Chart section
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
-                                          const Text(
+                                          Text(
                                             'Biểu đồ',
                                             style: TextStyle(
                                               fontFamily: 'Montserrat',
-                                              fontSize: 15,
+                                              fontSize: 15.sp,
                                               fontWeight: FontWeight.w400,
                                               color: Colors.black,
                                             ),
                                           ),
-                                          const SizedBox(width: 4),
+                                          SizedBox(width: 4.w),
                                           DropdownButtonHideUnderline(
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 borderRadius:
-                                                    BorderRadius.circular(10),
+                                                    BorderRadius.circular(10.r),
                                                 color: Colors.white,
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Colors.black
                                                         .withOpacity(0.1),
                                                     blurRadius: 6,
-                                                    offset: const Offset(0, 2),
+                                                    offset: Offset(0, 2.h),
                                                   ),
                                                 ],
                                               ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 4),
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 12.w,
+                                                  vertical: 4.h),
                                               child: DropdownButton<String>(
                                                 value: selectedChartChiTieu,
                                                 items: ["Cột", "Tròn"]
@@ -444,8 +443,8 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                     value: chart,
                                                     child: Text(
                                                       chart,
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
+                                                      style: TextStyle(
+                                                        fontSize: 14.sp,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                         color: Colors.black87,
@@ -464,66 +463,66 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                 isDense: true,
                                                 dropdownColor: Colors.white,
                                                 borderRadius:
-                                                    BorderRadius.circular(10),
+                                                    BorderRadius.circular(10.r),
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 35),
+                                      SizedBox(height: 35.h),
                                       SizedBox(
-                                        height: 300,
+                                        height: 300.h,
                                         child: getSelectedChartChiTieu(),
                                       ),
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  margin: const EdgeInsets.only(top: 0),
-                                  height: 1,
+                                  margin: EdgeInsets.only(top: 0.h),
+                                  height: 1.h,
                                   color: const Color(0xFFD9D9D9),
                                 ),
                                 // Expense details section
                                 Padding(
                                   padding:
-                                      const EdgeInsets.symmetric(horizontal: 9),
+                                      EdgeInsets.symmetric(horizontal: 9.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 19, left: 0),
+                                        padding: EdgeInsets.only(
+                                            top: 19.h, left: 0.w),
                                         child: Row(
                                           children: [
-                                            const Text(
+                                            Text(
                                               'Chi tiết chi tiêu',
                                               style: TextStyle(
                                                 fontFamily: 'Montserrat',
-                                                fontSize: 15,
+                                                fontSize: 15.sp,
                                                 fontWeight: FontWeight.w400,
                                                 color: Colors.black,
                                               ),
                                             ),
-                                            const SizedBox(width: 4),
+                                            SizedBox(width: 4.w),
                                             Image.asset(
                                               'assets/images/dropdown_icon.png',
-                                              width: 16,
-                                              height: 16,
+                                              width: 16.w,
+                                              height: 16.h,
                                               fit: BoxFit.contain,
                                             ),
                                           ],
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 10, left: 0),
+                                        padding: EdgeInsets.only(
+                                            top: 10.h, left: 0.w),
                                         child: expenseDetails.isEmpty
-                                            ? const Text(
+                                            ? Text(
                                                 'Không có chi tiêu trong tháng này',
                                                 style: TextStyle(
                                                   fontFamily: 'Montserrat',
-                                                  fontSize: 15,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.w400,
                                                   color: Colors.black54,
                                                 ),
@@ -533,7 +532,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                     .map((entry) {
                                                   return Column(
                                                     children: [
-                                                      const SizedBox(height: 8),
+                                                      SizedBox(height: 8.h),
                                                       Row(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
@@ -544,21 +543,21 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                               Image.asset(
                                                                 entry.value[
                                                                     'image'],
-                                                                width: 30,
-                                                                height: 30,
+                                                                width: 30.w,
+                                                                height: 30.h,
                                                                 fit: BoxFit
                                                                     .contain,
                                                               ),
-                                                              const SizedBox(
-                                                                  width: 6),
+                                                              SizedBox(
+                                                                  width: 6.w),
                                                               Text(
                                                                 entry.value[
                                                                     'name'],
                                                                 style:
-                                                                    const TextStyle(
+                                                                    TextStyle(
                                                                   fontFamily:
                                                                       'Montserrat',
-                                                                  fontSize: 15,
+                                                                  fontSize: 15.sp,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w400,
@@ -577,10 +576,10 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                                         .value[
                                                                     'total']),
                                                             style:
-                                                                const TextStyle(
+                                                                TextStyle(
                                                               fontFamily:
                                                                   'Montserrat',
-                                                              fontSize: 15,
+                                                              fontSize: 15.sp,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w400,
@@ -591,9 +590,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                         ],
                                                       ),
                                                       Container(
-                                                        margin: const EdgeInsets
-                                                            .only(top: 5),
-                                                        height: 0.5,
+                                                        margin: EdgeInsets
+                                                            .only(top: 5.h),
+                                                        height: 0.5.h,
                                                         color: const Color(
                                                             0xFFD9D9D9),
                                                       ),
@@ -613,53 +612,53 @@ class _ReportWidgetState extends State<ReportWidget> {
                     : Column(
                         children: [
                           Container(
-                            margin: const EdgeInsets.only(top: 8),
+                            margin: EdgeInsets.only(top: 8.h),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(10.r),
                             ),
-                            padding: const EdgeInsets.only(top: 16, bottom: 5),
+                            padding: EdgeInsets.only(top: 16.h, bottom: 5.h),
                             child: Column(
                               children: [
                                 // Chart section
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
-                                          const Text(
+                                          Text(
                                             'Biểu đồ',
                                             style: TextStyle(
                                               fontFamily: 'Montserrat',
-                                              fontSize: 15,
+                                              fontSize: 15.sp,
                                               fontWeight: FontWeight.w400,
                                               color: Colors.black,
                                             ),
                                           ),
-                                          const SizedBox(width: 4),
+                                          SizedBox(width: 4.w),
                                           DropdownButtonHideUnderline(
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 borderRadius:
-                                                    BorderRadius.circular(10),
+                                                    BorderRadius.circular(10.r),
                                                 color: Colors.white,
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Colors.black
                                                         .withOpacity(0.1),
                                                     blurRadius: 6,
-                                                    offset: const Offset(0, 2),
+                                                    offset: Offset(0, 2.h),
                                                   ),
                                                 ],
                                               ),
                                               padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 4),
+                                                  EdgeInsets.symmetric(
+                                                      horizontal: 12.h,
+                                                      vertical: 4.w),
                                               child: DropdownButton<String>(
                                                 value: selectedChartThuNhap,
                                                 items: ["Cột", "Tròn"]
@@ -669,8 +668,8 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                     value: chart,
                                                     child: Text(
                                                       chart,
-                                                      style: const TextStyle(
-                                                        fontSize: 14,
+                                                      style: TextStyle(
+                                                        fontSize: 14.sp,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                         color: Colors.black87,
@@ -689,66 +688,66 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                 isDense: true,
                                                 dropdownColor: Colors.white,
                                                 borderRadius:
-                                                    BorderRadius.circular(10),
+                                                    BorderRadius.circular(10.r),
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 35),
+                                      SizedBox(height: 35.h),
                                       SizedBox(
-                                        height: 300,
+                                        height: 300.h,
                                         child: getSelectedChartThuNhap(),
                                       ),
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  margin: const EdgeInsets.only(top: 0),
-                                  height: 1,
+                                  margin: EdgeInsets.only(top: 0.h),
+                                  height: 1.h,
                                   color: const Color(0xFFD9D9D9),
                                 ),
                                 // Income details section
                                 Padding(
                                   padding:
-                                      const EdgeInsets.symmetric(horizontal: 9),
+                                      EdgeInsets.symmetric(horizontal: 9.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 19, left: 0),
+                                        padding: EdgeInsets.only(
+                                            top: 19.h, left: 0.w),
                                         child: Row(
                                           children: [
-                                            const Text(
+                                            Text(
                                               'Chi tiết thu nhập',
                                               style: TextStyle(
                                                 fontFamily: 'Montserrat',
-                                                fontSize: 15,
+                                                fontSize: 15.sp,
                                                 fontWeight: FontWeight.w400,
                                                 color: Colors.black,
                                               ),
                                             ),
-                                            const SizedBox(width: 4),
+                                            SizedBox(width: 4.w),
                                             Image.asset(
                                               'assets/images/dropdown_icon.png',
-                                              width: 16,
-                                              height: 16,
+                                              width: 16.w,
+                                              height: 16.h,
                                               fit: BoxFit.contain,
                                             ),
                                           ],
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 10, left: 0),
+                                        padding: EdgeInsets.only(
+                                            top: 10.h, left: 0.w),
                                         child: incomeDetails.isEmpty
-                                            ? const Text(
+                                            ? Text(
                                                 'Không có thu nhập trong tháng này',
                                                 style: TextStyle(
                                                   fontFamily: 'Montserrat',
-                                                  fontSize: 15,
+                                                  fontSize: 15.sp,
                                                   fontWeight: FontWeight.w400,
                                                   color: Colors.black54,
                                                 ),
@@ -758,7 +757,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                     .map((entry) {
                                                   return Column(
                                                     children: [
-                                                      const SizedBox(height: 8),
+                                                      SizedBox(height: 8.h),
                                                       Row(
                                                         mainAxisAlignment:
                                                             MainAxisAlignment
@@ -769,21 +768,21 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                               Image.asset(
                                                                 entry.value[
                                                                     'image'],
-                                                                width: 30,
-                                                                height: 30,
+                                                                width: 30.w,
+                                                                height: 30.w,
                                                                 fit: BoxFit
                                                                     .contain,
                                                               ),
-                                                              const SizedBox(
-                                                                  width: 6),
+                                                              SizedBox(
+                                                                  width: 6.w),
                                                               Text(
                                                                 entry.value[
                                                                     'name'],
                                                                 style:
-                                                                    const TextStyle(
+                                                                    TextStyle(
                                                                   fontFamily:
                                                                       'Montserrat',
-                                                                  fontSize: 15,
+                                                                  fontSize: 15.sp,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w400,
@@ -802,10 +801,10 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                                         .value[
                                                                     'total']),
                                                             style:
-                                                                const TextStyle(
+                                                                TextStyle(
                                                               fontFamily:
                                                                   'Montserrat',
-                                                              fontSize: 15,
+                                                              fontSize: 15.sp,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w400,
@@ -816,9 +815,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                         ],
                                                       ),
                                                       Container(
-                                                        margin: const EdgeInsets
-                                                            .only(top: 5),
-                                                        height: 0.5,
+                                                        margin: EdgeInsets
+                                                            .only(top: 5.h),
+                                                        height: 0.5.h,
                                                         color: const Color(
                                                             0xFFD9D9D9),
                                                       ),

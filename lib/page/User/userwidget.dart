@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UserWidget extends StatefulWidget {
   const UserWidget({super.key});
@@ -95,31 +96,31 @@ class _UserWidgetState extends State<UserWidget> {
             return AlertDialog(
               backgroundColor: Colors.transparent,
               content: Container(
-                width: 400,
-                padding: const EdgeInsets.all(16),
+                width: 400.w,
+                padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(20.r),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
-                      blurRadius: 8,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 4),
+                      blurRadius: 8.r,
+                      spreadRadius: 2.r,
+                      offset: Offset(0, 4.h),
                     ),
                   ],
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    Text(
                       "Đổi mật khẩu",
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     _buildPasswordField(
                       "Mật khẩu mới",
                       _newPasswordController,
@@ -140,7 +141,7 @@ class _UserWidgetState extends State<UserWidget> {
                         });
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -150,17 +151,17 @@ class _UserWidgetState extends State<UserWidget> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(
+                              borderRadius: BorderRadius.circular(10.r),
+                              side: BorderSide(
                                 color: Color(0xFFFE0000), // Màu viền nút Hủy
-                                width: 1,
+                                width: 1.w,
                               ),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Hủy',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w500,
                               color: Color(0xFFFE0000), // Màu chữ nút Hủy
                             ),
@@ -211,17 +212,17 @@ class _UserWidgetState extends State<UserWidget> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: const BorderSide(
+                              borderRadius: BorderRadius.circular(10.r),
+                              side: BorderSide(
                                 color: const Color(0xFF4ABD57),
-                                width: 1,
+                                width: 1.w,
                               ),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Xác nhận',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 14.sp,
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFF4ABD57), // Màu chữ nút Hủy
                             ),
@@ -247,18 +248,18 @@ class _UserWidgetState extends State<UserWidget> {
     VoidCallback toggleVisibility,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 8.0.h),
       child: TextField(
         controller: controller,
         obscureText: isObscured,
-        style: const TextStyle(fontSize: 14), // <-- Thêm dòng này
+        style: TextStyle(fontSize: 14.sp), // <-- Thêm dòng này
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(fontSize: 14), // <-- Font size cho label
+          labelStyle: TextStyle(fontSize: 14.sp), // <-- Font size cho label
           suffixIcon: IconButton(
             icon: Icon(
               isObscured ? Icons.visibility_off : Icons.visibility,
-              size: 22, // 👈 Kích thước icon
+              size: 22.sp, // 👈 Kích thước icon
             ),
             onPressed: toggleVisibility,
           ),
@@ -315,15 +316,15 @@ class _UserWidgetState extends State<UserWidget> {
         child: Center(
           child: SingleChildScrollView(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
+              constraints: BoxConstraints(maxWidth: 400.w),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 30.0),
+                padding: EdgeInsets.symmetric(vertical: 30.0.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Phần hiển thị thông tin chính
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -332,7 +333,7 @@ class _UserWidgetState extends State<UserWidget> {
                             child: Stack(
                               children: [
                                 CircleAvatar(
-                                  radius: 65,
+                                  radius: 65.r,
                                   backgroundColor: _selectedImage == null && (_imageUrl == null || _imageUrl!.isEmpty)
                                       ? Colors.white // Hình tròn trắng nếu không có hình
                                       : null,
@@ -347,13 +348,13 @@ class _UserWidgetState extends State<UserWidget> {
                                           : null),
                                 ),
                                 Positioned(
-                                  bottom: 5,
-                                  right: 5,
+                                  bottom: 5.h,
+                                  right: 5.w,
                                   child: GestureDetector(
                                     onTap: _changeAvatar, // Gọi hàm thay đổi hình ảnh
                                     child: Container(
-                                      width: 35,
-                                      height: 35,
+                                      width: 35.w,
+                                      height: 35.h,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: Colors.white,
@@ -361,15 +362,15 @@ class _UserWidgetState extends State<UserWidget> {
                                           BoxShadow(
                                             color:
                                                 Colors.black.withOpacity(0.2),
-                                            blurRadius: 4,
-                                            spreadRadius: 1,
+                                            blurRadius: 4.r,
+                                            spreadRadius: 1.r,
                                           ),
                                         ],
                                       ),
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.camera_alt,
                                         color: Colors.black54,
-                                        size: 20,
+                                        size: 20.sp,
                                       ),
                                     ),
                                   ),
@@ -377,40 +378,40 @@ class _UserWidgetState extends State<UserWidget> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16.h),
                           // Phần tên đăng nhập
                           Row(
                             children: [
                               Image.asset(
                                 'assets/images/user_icon.png',
-                                width: 27,
-                                height: 27,
+                                width: 27.w,
+                                height: 27.h,
                                 fit: BoxFit.contain,
                               ),
-                              const SizedBox(width: 3),
-                              const Text(
+                              SizedBox(width: 3.w),
+                              Text(
                                 'Tên đăng nhập',
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 17.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 7),
+                          SizedBox(height: 7.h),
                           Container(
-                            height: 55,
+                            height: 55.h,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(15.r),
                               border: Border.all(
                                 color: const Color(0xFF1E201E),
-                                width: 2,
+                                width: 2.w,
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 2,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 2.h,
                             ),
                             child: Row(
                               children: [
@@ -418,7 +419,7 @@ class _UserWidgetState extends State<UserWidget> {
                                   child: TextField(
                                     controller:
                                         _usernameController, // Sử dụng controller từ Firestore
-                                    style: const TextStyle(fontSize: 15),
+                                    style: TextStyle(fontSize: 15.sp),
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       hintText: 'Nhập tên...',
@@ -429,39 +430,39 @@ class _UserWidgetState extends State<UserWidget> {
                             ),
                           ),
                           // Phần email
-                          const SizedBox(height: 21),
+                          SizedBox(height: 21.h),
                           Row(
                             children: [
                               Image.asset(
                                 'assets/images/image.png',
-                                width: 27,
-                                height: 27,
+                                width: 27.w,
+                                height: 27.h,
                                 fit: BoxFit.contain,
                               ),
-                              const SizedBox(width: 2),
-                              const Text(
+                              SizedBox(width: 2.w),
+                              Text(
                                 'Email',
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 17.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 7),
+                          SizedBox(height: 7.h),
                           Container(
-                            height: 55,
+                            height: 55.h,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(15.r),
                               border: Border.all(
                                 color: const Color(0xFF1E201E),
-                                width: 2,
+                                width: 2.w,
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 2,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 2.h,
                             ),
                             child: Row(
                               children: [
@@ -469,7 +470,7 @@ class _UserWidgetState extends State<UserWidget> {
                                   child: TextField(
                                     controller:
                                         _emailController, // Sử dụng controller từ Firestore
-                                    style: const TextStyle(fontSize: 15),
+                                    style: TextStyle(fontSize: 15.sp),
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       hintText: 'Nhập email...',
@@ -480,39 +481,39 @@ class _UserWidgetState extends State<UserWidget> {
                             ),
                           ),
                           // Phần số điện thoại
-                          const SizedBox(height: 21),
+                          SizedBox(height: 21.h),
                           Row(
                             children: [
                               Image.asset(
                                 'assets/images/phone_icon.png',
-                                width: 27,
-                                height: 27,
+                                width: 27.w,
+                                height: 27.h,
                                 fit: BoxFit.contain,
                               ),
-                              const SizedBox(width: 2),
-                              const Text(
+                              SizedBox(width: 2.w),
+                              Text(
                                 'Số điện thoại',
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 17.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 7),
+                          SizedBox(height: 7.h),
                           Container(
-                            height: 55,
+                            height: 55.h,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(15.r),
                               border: Border.all(
                                 color: const Color(0xFF1E201E),
-                                width: 2,
+                                width: 2.w,
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 2,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 2.h,
                             ),
                             child: Row(
                               children: [
@@ -520,7 +521,7 @@ class _UserWidgetState extends State<UserWidget> {
                                   child: TextField(
                                     controller:
                                         _phoneController, // Sử dụng controller từ Firestore
-                                    style: const TextStyle(fontSize: 15),
+                                    style: TextStyle(fontSize: 15.sp),
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       hintText: 'Nhập số điện thoại...',
@@ -531,46 +532,46 @@ class _UserWidgetState extends State<UserWidget> {
                             ),
                           ),
                           // Phần mật khẩu
-                          const SizedBox(height: 21),
+                          SizedBox(height: 21.h),
                           Row(
                             children: [
                               Image.asset(
                                 'assets/images/password_icon.png',
-                                width: 27,
-                                height: 27,
+                                width: 27.w,
+                                height: 27.h,
                                 fit: BoxFit.contain,
                               ),
-                              const SizedBox(width: 2),
-                              const Text(
+                              SizedBox(width: 2.w),
+                              Text(
                                 'Mật khẩu',
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 17.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 7),
+                          SizedBox(height: 7.h),
                           Container(
-                            height: 55,
+                            height: 55.h,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(15.r),
                               border: Border.all(
                                 color: const Color(0xFF1E201E),
-                                width: 2,
+                                width: 2.w,
                               ),
                             ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 2,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 2.h,
                             ),
                             child: Row(
                               children: [
                                 Expanded(
                                   child: TextField(
                                     controller: TextEditingController(text: displayText),
-                                    style: const TextStyle(fontSize: 15),
+                                    style: TextStyle(fontSize: 15.sp),
                                     readOnly: true,
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
@@ -595,24 +596,24 @@ class _UserWidgetState extends State<UserWidget> {
                             ),
                           ),
                           // Link đổi mật khẩu
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               GestureDetector(
                                 onTap: showChangePasswordDialog,
-                                child: const Text(
+                                child: Text(
                                   'Đổi mật khẩu ',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 15.sp,
                                     color: Colors.black,
                                   ),
                                 ),
                               ),
                               Image.asset(
                                 'assets/images/arrow2_icon.png',
-                                width: 15,
-                                height: 15,
+                                width: 15.w,
+                                height: 15.h,
                                 fit: BoxFit.contain,
                               ),
                             ],
@@ -621,9 +622,9 @@ class _UserWidgetState extends State<UserWidget> {
                       ),
                     ),
                     // Phần nút "Lưu thay đổi" và "Hủy"
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20.h),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
                       child: Row(
                         children: [
                           // Nút hủy
@@ -636,24 +637,24 @@ class _UserWidgetState extends State<UserWidget> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: const BorderSide(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                  side: BorderSide(
                                     color: Color(0xFFFE0000),
-                                    width: 1,
+                                    width: 1.w,
                                   ),
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Hủy',
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w500,
                                   color: Color(0xFFFE0000),
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 16.w),
                           // Nút lưu thay đổi
                           Expanded(
                             child: ElevatedButton(
@@ -687,17 +688,17 @@ class _UserWidgetState extends State<UserWidget> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: const BorderSide(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                  side: BorderSide(
                                     color: Color(0xFF4ABD57),
-                                    width: 1,
+                                    width: 1.w,
                                   ),
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Lưu thay đổi',
                                 style: TextStyle(
-                                  fontSize: 17,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w500,
                                   color: Color(0xFF4ABD57),
                                 ),

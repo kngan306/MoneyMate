@@ -263,23 +263,23 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0.r),
+          padding: EdgeInsets.all(16.0.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Phần hiển thị tổng số dư
               Container(
                 padding: EdgeInsets.only(bottom: 10.h),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   border: Border(
-                      bottom: BorderSide(color: Color(0xFF697565), width: 1)),
+                      bottom: BorderSide(color: Color(0xFF697565), width: 1.w)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Tổng số dư",
                         style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 17.sp,
                             fontFamily: 'Montserrat',
                             fontWeight: FontWeight.bold)),
                     Row(
@@ -293,7 +293,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                 : "******",
                             style: TextStyle(
                                 fontFamily: 'Montserrat',
-                                fontSize: 17,
+                                fontSize: 17.sp,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF697565)),
                           ),
@@ -303,7 +303,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                               _isBalanceVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              size: 22),
+                              size: 22.sp),
                           onPressed: () {
                             setState(() {
                               _isBalanceVisible = !_isBalanceVisible;
@@ -324,7 +324,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   Text(
                     "Tình hình thu chi",
                     style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 17.sp,
                         fontFamily: 'Montserrat',
                         fontWeight: FontWeight.bold),
                   ),
@@ -335,7 +335,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         'Chọn tháng',
                         style: TextStyle(
                           fontFamily: 'Montserrat',
-                          fontSize: 13,
+                          fontSize: 13.sp,
                           color: Theme.of(context).hintColor,
                         ),
                       ),
@@ -345,7 +345,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                 child: Text(
                                   item,
                                   style: TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 13.sp,
                                     color: selectedMonth == item
                                         ? Colors.blueAccent
                                         : Colors.black,
@@ -366,7 +366,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       buttonStyleData: ButtonStyleData(
                         padding: EdgeInsets.symmetric(horizontal: 15.w),
                         height: 40.h,
-                        width: 130.w,
+                        width: 150.w,
                       ),
                       menuItemStyleData: MenuItemStyleData(
                         height: 40.h,
@@ -427,7 +427,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           children: [
                             Text("Thu nhập",
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontFamily: 'Montserrat',
                                 )),
                             SizedBox(height: 5.h),
@@ -437,7 +437,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                     .format(monthlyIncome),
                                 style: TextStyle(
                                   color: Colors.green,
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontFamily: 'Montserrat',
                                   fontWeight: FontWeight.w600,
                                 )),
@@ -447,7 +447,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           children: [
                             Text("Chi Tiêu",
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontFamily: 'Montserrat',
                                 )),
                             SizedBox(height: 5.h),
@@ -457,7 +457,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                     .format(monthlyExpense),
                                 style: TextStyle(
                                   color: Colors.red,
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontFamily: 'Montserrat',
                                   fontWeight: FontWeight.w600,
                                 )),
@@ -467,7 +467,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           children: [
                             Text("Tổng",
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontFamily: 'Montserrat',
                                 )),
                             SizedBox(height: 5.h),
@@ -476,7 +476,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                         locale: 'vi_VN', symbol: 'đ')
                                     .format(monthlyTotal),
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontFamily: 'Montserrat',
                                   fontWeight: FontWeight.w600,
                                 )),
@@ -500,11 +500,11 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           Text(
                             "Lịch sử ghi chép",
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 13.sp,
                               fontFamily: 'Montserrat',
                             ),
                           ),
-                          const SizedBox(width: 5),
+                          SizedBox(width: 5.w),
                           const Icon(Icons.chevron_right, color: Colors.black),
                         ],
                       ),
@@ -514,19 +514,19 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               ),
               SizedBox(height: 20.h),
               // Danh mục thu chi
-              const Text(
+              Text(
                 "Danh mục thu chi",
                 style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 17.sp,
                     fontFamily: 'Montserrat',
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10.h),
               incomeCategories.isEmpty && expenseCategories.isEmpty
-                  ? const Text(
+                  ? Text(
                       'Không có dữ liệu thu chi trong tháng này',
                       style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           fontFamily: 'Montserrat',
                           color: Colors.black54),
                     )
@@ -614,7 +614,7 @@ class ExpenseItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.h),
-        padding: EdgeInsets.all(16.r),
+        padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10.r),
@@ -632,13 +632,13 @@ class ExpenseItem extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(fontSize: 15, fontFamily: 'Montserrat'),
+                style: TextStyle(fontSize: 15.sp, fontFamily: 'Montserrat'),
               ),
             ),
             Text(
               amount,
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 15.sp,
                 fontFamily: 'Montserrat',
                 color: isIncome
                     ? const Color(0xFF4ABD57)
