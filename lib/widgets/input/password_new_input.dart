@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class PasswordInputField extends StatelessWidget {
+class NewPasswordInputField extends StatelessWidget {
   final TextEditingController controller;
   final bool isPasswordVisible;
   final VoidCallback onToggleVisibility;
 
-  const PasswordInputField({
+  const NewPasswordInputField({
     Key? key,
     required this.controller,
     required this.isPasswordVisible,

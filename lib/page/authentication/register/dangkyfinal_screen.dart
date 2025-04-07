@@ -5,7 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DangKyFinal extends StatefulWidget {
-  const DangKyFinal({Key? key}) : super(key: key);
+  final String phoneNumber; // Thêm biến để lưu số điện thoại
+  final String email; // Thêm biến để lưu email
+
+  const DangKyFinal({Key? key, required this.phoneNumber, required this.email})
+      : super(key: key);
 
   @override
   State<DangKyFinal> createState() => _DangKyFinalState();
@@ -15,15 +19,20 @@ class _DangKyFinalState extends State<DangKyFinal> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  final TextEditingController _phoneController =
-      TextEditingController(text: '0123456789');
-  final TextEditingController _emailController =
-      TextEditingController(text: 'kimngan@gmail.com');
-  final TextEditingController _usernameController =
-      TextEditingController(text: 'kngan306');
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Gán số điện thoại và email vào controller
+    _phoneController.text = widget.phoneNumber; // Sử dụng số điện thoại đã truyền vào
+    _emailController.text = widget.email; // Sử dụng email đã truyền vào
+  }
 
   @override
   void dispose() {
@@ -45,7 +54,6 @@ class _DangKyFinalState extends State<DangKyFinal> {
             children: [
               Padding(
                 padding:
-                    // const EdgeInsets.only(left: 16.0, right: 16.0, top: 25.0),
                     const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
                 child: Row(
                   children: [
@@ -75,7 +83,6 @@ class _DangKyFinalState extends State<DangKyFinal> {
                 ),
               ),
               Padding(
-                // padding: const EdgeInsets.only(top: 30),
                 padding: const EdgeInsets.only(top: 20),
                 child: Column(
                   children: [
@@ -103,7 +110,6 @@ class _DangKyFinalState extends State<DangKyFinal> {
 
               // Form section
               Container(
-                // margin: const EdgeInsets.only(top: 30.0),
                 margin: const EdgeInsets.only(top: 20.0),
                 padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 25.0),
                 width: double.infinity,
@@ -372,14 +378,76 @@ class _DangKyFinalState extends State<DangKyFinal> {
                       const SizedBox(height: 21),
                       Center(
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Navigator.pushNamed(context, AppRoutes.login);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const DangNhap(),
-                              ),
-                            );
+                          onPressed: () async {
+                            // Lấy dữ liệu từ các trường nhập liệu
+                            String email = _emailController.text.trim();
+                            String username = _usernameController.text.trim();
+                            String password = _passwordController.text.trim();
+                            String confirmPassword =
+                                _confirmPasswordController.text.trim();
+                            String phoneNumber = _phoneController.text.trim();
+
+                            // Kiểm tra các trường bắt buộc
+                            if (email.isEmpty ||
+                                username.isEmpty ||
+                                password.isEmpty ||
+                                phoneNumber.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content:
+                                        Text('Vui lòng điền đầy đủ thông tin')),
+                              );
+                              return;
+                            }
+
+                            // Kiểm tra mật khẩu
+                            if (password != confirmPassword) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Mật khẩu không khớp')),
+                              );
+                              return;
+                            }
+
+                            try {
+                              // Tạo người dùng mới trong Firebase Authentication
+                              UserCredential userCredential = await FirebaseAuth
+                                  .instance
+                                  .createUserWithEmailAndPassword(
+                                email: email,
+                                password: password,
+                              );
+
+                              // Lưu thông tin người dùng vào Firestore
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(userCredential.user?.uid)
+                                  .set({
+                                'email': email,
+                                'username': username,
+                                'sdt': phoneNumber,
+                                'password': password,
+                                'image': '', // Trường này có thể cập nhật sau
+                              });
+
+                              // Hiển thị thông báo đăng ký thành công
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Đăng ký thành công!')),
+                              );
+
+                              // Chuyển hướng đến màn hình đăng nhập hoặc màn hình chính
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const DangNhap(),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Đăng ký không thành công: ${e.toString()}')),
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1E201E),

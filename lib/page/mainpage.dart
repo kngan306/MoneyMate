@@ -18,6 +18,7 @@ import 'authentication/login/dangnhap_screen.dart';
 import 'baoCao/timkiembaocao_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
 
 class Mainpage extends StatefulWidget {
   //const Mainpage({Key? key}) : super(key: key);
@@ -161,9 +162,11 @@ class _MainpageState extends State<Mainpage> {
                               : null, // Hình tròn trắng nếu image null
                           backgroundImage: image.isNotEmpty
                               ? (image.startsWith('assets/')
-                                  ? AssetImage(image)
-                                  : NetworkImage(image)) as ImageProvider
-                              : null,
+                                  ? AssetImage(image) // For local asset images
+                                  : (image.startsWith('http') // Check if the image is a network image
+                                      ? NetworkImage(image) // For network images
+                                      : FileImage(File(image)))) // For file images
+                              : null, // For null image     
                         ),
                         SizedBox(height: 8),
                         Text(

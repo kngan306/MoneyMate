@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'chaomung_screen.dart';
+import '../dashboard/dashboardwidget.dart';
+import '../mainpage.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -11,13 +14,37 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    _checkLoginStatus();
+    // Timer(Duration(seconds: 3), () {
+    //   if (mounted) {
+    //     Navigator.pushReplacement(
+    //       context,
+    //       MaterialPageRoute(builder: (context) => ChaoMung()),
+    //     );
+    //     // Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+    //   }
+    // });
+  }
+
+  void _checkLoginStatus() {
     Timer(Duration(seconds: 3), () {
-      if (mounted) {
+      if (!mounted) return;
+
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Đã đăng nhập -> vào Dashboard
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Mainpage(selectedIndex: 0),
+          ),
+        );
+      } else {
+        // Chưa đăng nhập -> vào Chào Mừng
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => ChaoMung()),
         );
-        // Navigator.pushReplacementNamed(context, AppRoutes.welcome);
       }
     });
   }

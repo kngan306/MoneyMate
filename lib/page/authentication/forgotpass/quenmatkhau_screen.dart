@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import '../../../widgets/input/email_input.dart';
-import 'xacthuc_quenmk_screen.dart';
+import 'resetpass_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class QuenMatKhau extends StatefulWidget {
   const QuenMatKhau({Key? key}) : super(key: key);
@@ -14,15 +15,38 @@ class _QuenMatKhauState extends State<QuenMatKhau> {
   final TextEditingController _emailController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    _emailController.text = "kimngan@gmail.com"; // Pre-filled email for demo
-  }
-
-  @override
   void dispose() {
     _emailController.dispose();
     super.dispose();
+  }
+
+  Future<void> _resetPassword() async {
+    String email = _emailController.text.trim();
+    if (email.isEmpty) {
+      // Hiển thị thông báo lỗi nếu email trống
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng nhập email')),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      // Hiển thị thông báo thành công
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Đã gửi email khôi phục mật khẩu. Vui lòng kiểm tra hộp thư của bạn.')),
+      );
+      // Chuyển hướng đến màn hình ResetPassword với email đã nhập
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ResetPassword(email: email)),
+      );
+    } catch (e) {
+      // Hiển thị thông báo lỗi
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Có lỗi xảy ra: $e')),
+      );
+    }
   }
 
   @override
@@ -131,19 +155,11 @@ class _QuenMatKhauState extends State<QuenMatKhau> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    const EmailInput(),
+                    EmailInput(controller: _emailController), // Truyền controller vào đây
                     const SizedBox(height: 27),
                     // button Gửi
                     ElevatedButton(
-                      onPressed: () {
-                        // Navigator.pushNamed(context, '/xacthucquenmk');
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const XacThucQuenMatKhau(),
-                          ),
-                        );
-                      },
+                      onPressed: _resetPassword,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(30, 32, 30, 1),
                         foregroundColor: Colors.white,

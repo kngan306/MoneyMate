@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class EmailInput extends StatefulWidget {
-  const EmailInput({Key? key}) : super(key: key);
+  final TextEditingController controller; // Thêm biến controller
+
+  const EmailInput({Key? key, required this.controller}) : super(key: key); // Nhận controller từ bên ngoài
 
   @override
   _EmailInputState createState() => _EmailInputState();
 }
 
 class _EmailInputState extends State<EmailInput> {
-  final TextEditingController _emailController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -53,7 +53,7 @@ class _EmailInputState extends State<EmailInput> {
           ),
           Expanded(
             child: TextField(
-              controller: _emailController,
+              controller: widget.controller, // Sử dụng controller từ widget
               keyboardType: TextInputType.emailAddress,
               style: const TextStyle(
                 fontSize: 15,
@@ -62,7 +62,7 @@ class _EmailInputState extends State<EmailInput> {
                 color: Colors.black,
               ),
               decoration: const InputDecoration(
-                hintText: 'kimngan@gmail.com',
+                hintText: 'moneymate@gmail.com',
                 hintStyle: TextStyle(
                   color: Colors.grey,
                   fontSize: 15,
@@ -80,7 +80,7 @@ class _EmailInputState extends State<EmailInput> {
               size: 22,
             ),
             onPressed: () {
-              _emailController.clear();
+              widget.controller.clear(); // Xóa nội dung của controller
             },
           ),
         ],
