@@ -557,8 +557,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                           locale: 'vi_VN', symbol: 'đ')
                                       .format(entry.value['total']),
                                   isIncome: true,
-                                  onTap: () {
-                                    Navigator.push(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => LichSuTheoDanhMuc(
@@ -568,6 +568,10 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                         ),
                                       ),
                                     );
+                                    // Nếu result là true, làm mới dữ liệu Dashboard
+                                    if (result == true) {
+                                      await _loadData();
+                                    }
                                   },
                                 );
                               }).toList(),
@@ -580,8 +584,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                           locale: 'vi_VN', symbol: 'đ')
                                       .format(-entry.value['total']),
                                   isIncome: false,
-                                  onTap: () {
-                                    Navigator.push(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => LichSuTheoDanhMuc(
@@ -591,6 +595,10 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                                         ),
                                       ),
                                     );
+                                    // Nếu result là true, làm mới dữ liệu Dashboard
+                                    if (result == true) {
+                                      await _loadData();
+                                    }
                                   },
                                 );
                               }).toList(),

@@ -11,7 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemKhoanThu extends StatefulWidget {
-  const ThemKhoanThu({Key? key}) : super(key: key);
+  final Map<String, dynamic>? transaction; // Thêm tham số transaction
+  const ThemKhoanThu({Key? key, this.transaction}) : super(key: key);
 
   @override
   State<ThemKhoanThu> createState() => _ThemKhoanThuState();
@@ -29,7 +30,30 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
   @override
   void initState() {
     super.initState();
-    _loadCategories();
+    if (widget.transaction != null) {
+      final transaction = widget.transaction!;
+      selectedDate = DateTime.parse(transaction['date']);
+      _amountController.text =
+          NumberFormat.currency(locale: 'vi_VN', symbol: '')
+              .format(transaction['amount']); // Định dạng số tiền
+      _noteController.text = transaction['note'];
+      _selectedWallet = transaction['walletId'] == "QXf9f0y54ga0CH3VFym0"
+          ? "Tiền mặt"
+          : "Chuyển khoản";
+      // Tìm danh mục tương ứng
+      _loadCategories().then((_) {
+        for (int i = 0; i < _categories.length; i++) {
+          if (_categories[i]['id'] == transaction['categoryId']) {
+            setState(() {
+              selectedCategoryIndex = i;
+            });
+            break;
+          }
+        }
+      });
+    } else {
+      _loadCategories();
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -108,28 +132,49 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
       if (userDoc.docs.isNotEmpty) {
         String userDocId = userDoc.docs.first.id;
         String categoryId = _categories[selectedCategoryIndex]['id'];
-
-        String walletId = _selectedWallet == "Tiền mặt" ? "QXf9f0y54ga0CH3VFym0" : "X0dMqKhCQguVdmKRSOon";
-
-        String cleanedAmount = _amountController.text.replaceAll(RegExp(r'[.,]'), '');
+        String walletId = _selectedWallet == "Tiền mặt"
+            ? "QXf9f0y54ga0CH3VFym0"
+            : "X0dMqKhCQguVdmKRSOon";
+        String cleanedAmount =
+            _amountController.text.replaceAll(RegExp(r'[.,]'), '');
         double amount = double.parse(cleanedAmount);
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userDocId)
-            .collection('thu_nhap')
-            .add({
-          'ghi_chu': _noteController.text,
-          'loai_vi': walletId,
-          'muc_thu_nhap': categoryId,
-          'ngay': DateFormat('yyyy-MM-dd').format(selectedDate!),
-          'so_tien': amount,
-        });
+        if (widget.transaction != null) {
+          // Cập nhật giao dịch
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userDocId)
+              .collection('thu_nhap')
+              .doc(widget.transaction!['id'])
+              .update({
+            'ghi_chu': _noteController.text,
+            'loai_vi': walletId,
+            'muc_thu_nhap': categoryId,
+            'ngay': DateFormat('yyyy-MM-dd').format(selectedDate!),
+            'so_tien': amount,
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đã cập nhật khoản thu')),
+          );
+        } else {
+          // Thêm mới giao dịch
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userDocId)
+              .collection('thu_nhap')
+              .add({
+            'ghi_chu': _noteController.text,
+            'loai_vi': walletId,
+            'muc_thu_nhap': categoryId,
+            'ngay': DateFormat('yyyy-MM-dd').format(selectedDate!),
+            'so_tien': amount,
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đã lưu khoản thu')),
+          );
+        }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đã lưu khoản thu')),
-        );
-
+        // Reset form sau khi lưu hoặc cập nhật
         setState(() {
           selectedDate = null;
           _amountController.clear();
@@ -137,6 +182,9 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
           _selectedWallet = 'Chọn ví tiền của bạn';
           selectedCategoryIndex = -1;
         });
+
+        // Trả về true để báo hiệu rằng giao dịch đã được cập nhật
+        Navigator.pop(context, true);
       }
     }
   }
@@ -153,66 +201,108 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                 child: Column(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 15.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 13.w, vertical: 15.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1.w)),
+                        border: Border(
+                            bottom: BorderSide(
+                                color: Color(0x1A000000), width: 1.w)),
                       ),
                       constraints: BoxConstraints(minHeight: 78.h),
                       child: GestureDetector(
                         onTap: () => _selectDate(context),
                         child: Row(
                           children: [
-                            Image.asset('assets/images/calendar_icon.png', width: 30.w, height: 30.h, fit: BoxFit.contain),
+                            Image.asset('assets/images/calendar_icon.png',
+                                width: 30.w, height: 30.h, fit: BoxFit.contain),
                             SizedBox(width: 10.w),
-                            Text('Ngày', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                            Text('Ngày',
+                                style: TextStyle(
+                                    fontSize: 17.sp,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'Montserrat')),
                             SizedBox(width: 40.w),
-                            Container(width: 1.w, height: 40.h, color: const Color(0x331E201E)),
+                            Container(
+                                width: 1.w,
+                                height: 40.h,
+                                color: const Color(0x331E201E)),
                             SizedBox(width: 18.w),
                             Expanded(
                               child: Text(
-                                selectedDate == null ? 'Chọn ngày tháng năm' : dateFormat.format(selectedDate!),
+                                selectedDate == null
+                                    ? 'Chọn ngày tháng năm'
+                                    : dateFormat.format(selectedDate!),
                                 style: TextStyle(
                                   fontSize: 15.sp,
                                   fontWeight: FontWeight.w400,
                                   fontFamily: 'Montserrat',
-                                  color: selectedDate == null ? const Color(0x331E201E) : Colors.black,
+                                  color: selectedDate == null
+                                      ? const Color(0x331E201E)
+                                      : Colors.black,
                                 ),
                               ),
                             ),
-                            Image.asset('assets/images/arrow2_icon.png', width: 20.w, height: 20.h, fit: BoxFit.contain),
+                            Image.asset('assets/images/arrow2_icon.png',
+                                width: 20.w, height: 20.h, fit: BoxFit.contain),
                           ],
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.w, vertical: 15.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1.w)),
+                        border: Border(
+                            bottom: BorderSide(
+                                color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         children: [
-                          Image.asset('assets/images/money_icon.png', width: 30.w, height: 30.h, fit: BoxFit.contain),
+                          Image.asset('assets/images/money_icon.png',
+                              width: 30.w, height: 30.h, fit: BoxFit.contain),
                           SizedBox(width: 7.w),
-                          Text('Số tiền', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                          Text('Số tiền',
+                              style: TextStyle(
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Montserrat')),
                           SizedBox(width: 25.w),
-                          Container(width: 1.w, height: 40.h, color: const Color(0x331E201E)),
+                          Container(
+                              width: 1.w,
+                              height: 40.h,
+                              color: const Color(0x331E201E)),
                           SizedBox(width: 18.w),
                           Expanded(
                             child: TextField(
                               controller: _amountController,
                               keyboardType: TextInputType.number,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly, MoneyInputFormatter()],
-                              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Colors.black),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                MoneyInputFormatter()
+                              ],
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'Montserrat',
+                                  color: Colors.black),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Nhập vào số tiền',
-                                hintStyle: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Color(0x331E201E)),
+                                hintStyle: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'Montserrat',
+                                    color: Color(0x331E201E)),
                               ),
                             ),
                           ),
-                          Text('đ', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat')),
+                          Text('đ',
+                              style: TextStyle(
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'Montserrat')),
                         ],
                       ),
                     ),
@@ -220,24 +310,42 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                       padding: EdgeInsets.fromLTRB(16.w, 15.h, 72.w, 15.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1.w)),
+                        border: Border(
+                            bottom: BorderSide(
+                                color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         children: [
-                          Image.asset('assets/images/note_icon.png', width: 30.w, height: 40.h, fit: BoxFit.contain),
+                          Image.asset('assets/images/note_icon.png',
+                              width: 30.w, height: 40.h, fit: BoxFit.contain),
                           SizedBox(width: 7.w),
-                          Text('Ghi chú', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                          Text('Ghi chú',
+                              style: TextStyle(
+                                  fontSize: 17.sp,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Montserrat')),
                           SizedBox(width: 17.w),
-                          Container(width: 1.w, height: 40.h, color: const Color(0x331E201E)),
+                          Container(
+                              width: 1.w,
+                              height: 40.h,
+                              color: const Color(0x331E201E)),
                           SizedBox(width: 18.w),
                           Expanded(
                             child: TextField(
                               controller: _noteController,
-                              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Colors.black),
+                              style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'Montserrat',
+                                  color: Colors.black),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Nhập vào ghi chú',
-                                hintStyle: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w400, fontFamily: 'Montserrat', color: Color(0x331E201E)),
+                                hintStyle: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: 'Montserrat',
+                                    color: Color(0x331E201E)),
                               ),
                             ),
                           ),
@@ -251,9 +359,16 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                         children: [
                           Row(
                             children: [
-                              Text('Mục hay dùng', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                              Text('Mục hay dùng',
+                                  style: TextStyle(
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'Montserrat')),
                               SizedBox(width: 7.w),
-                              Image.asset('assets/images/dropdown_icon.png', width: 20.w, height: 20.h, fit: BoxFit.contain),
+                              Image.asset('assets/images/dropdown_icon.png',
+                                  width: 20.w,
+                                  height: 20.h,
+                                  fit: BoxFit.contain),
                             ],
                           ),
                           Transform.translate(
@@ -261,10 +376,12 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                             child: Container(
                               padding: const EdgeInsets.only(top: 10.0),
                               child: _categories.isEmpty
-                                  ? const Center(child: Text('Không có danh mục thu'))
+                                  ? const Center(
+                                      child: Text('Không có danh mục thu'))
                                   : GridView.builder(
                                       shrinkWrap: true,
-                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 3,
                                         childAspectRatio: 1,
                                         crossAxisSpacing: 5,
@@ -277,7 +394,8 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                           return CategoryItem(
                                             imageUrl: category['image'],
                                             label: category['name'],
-                                            isSelected: selectedCategoryIndex == index,
+                                            isSelected:
+                                                selectedCategoryIndex == index,
                                             onTap: () {
                                               setState(() {
                                                 selectedCategoryIndex = index;
@@ -287,9 +405,14 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                         } else {
                                           return GestureDetector(
                                             onTap: () async {
-                                              final result = await Navigator.push(
+                                              final result =
+                                                  await Navigator.push(
                                                 context,
-                                                MaterialPageRoute(builder: (context) => Mainpage(selectedIndex: 11,)),
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Mainpage(
+                                                          selectedIndex: 11,
+                                                        )),
                                               );
                                               if (result == true) {
                                                 await _loadCategories();
@@ -299,14 +422,20 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                               padding: const EdgeInsets.all(10),
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(15),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
                                               ),
                                               child: const Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Icon(Icons.edit, size: 30),
                                                   SizedBox(height: 5),
-                                                  Text('Chỉnh sửa', style: TextStyle(fontSize: 15, fontFamily: 'Montserrat')),
+                                                  Text('Chỉnh sửa',
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontFamily:
+                                                              'Montserrat')),
                                                 ],
                                               ),
                                             ),
@@ -320,32 +449,48 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 15.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 13.w, vertical: 15.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(bottom: BorderSide(color: Color(0x1A000000), width: 1.w)),
+                        border: Border(
+                            bottom: BorderSide(
+                                color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
                             children: [
-                              Image.asset('assets/images/wallet_icon.png', width: 30.w, height: 30.h, fit: BoxFit.contain),
+                              Image.asset('assets/images/wallet_icon.png',
+                                  width: 30.w,
+                                  height: 30.h,
+                                  fit: BoxFit.contain),
                               SizedBox(width: 10.w),
-                              Text('Ví tiền', style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, fontFamily: 'Montserrat')),
+                              Text('Ví tiền',
+                                  style: TextStyle(
+                                      fontSize: 17.sp,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'Montserrat')),
                               SizedBox(width: 30.w),
-                              Container(width: 1.w, height: 40.h, color: const Color(0x331E201E)),
+                              Container(
+                                  width: 1.w,
+                                  height: 40.h,
+                                  color: const Color(0x331E201E)),
                               SizedBox(width: 18.w),
                             ],
                           ),
                           Expanded(
                             child: GestureDetector(
                               onTap: () async {
-                                String? selectedWallet = await showDialog<String>(
+                                String? selectedWallet =
+                                    await showDialog<String>(
                                   context: context,
                                   builder: (BuildContext context) {
                                     return Dialog(
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
                                       backgroundColor: Colors.white,
                                       child: Container(
                                         padding: const EdgeInsets.all(20),
@@ -353,31 +498,57 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                         height: 200,
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(20),
-                                          boxShadow: const [BoxShadow(color: Color(0x10000000), blurRadius: 10, spreadRadius: 5)],
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                                color: Color(0x10000000),
+                                                blurRadius: 10,
+                                                spreadRadius: 5)
+                                          ],
                                         ),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             const Center(
                                               child: Text(
                                                 "Chọn ví tiền",
-                                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF3E4A59)),
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xFF3E4A59)),
                                               ),
                                             ),
                                             const SizedBox(height: 15),
                                             ListTile(
-                                              leading: Image.asset('assets/images/cate30.png', width: 30, height: 30),
+                                              leading: Image.asset(
+                                                  'assets/images/cate30.png',
+                                                  width: 30,
+                                                  height: 30),
                                               title: const Text("Tiền mặt"),
-                                              trailing: _selectedWallet == "Tiền mặt" ? const Icon(Icons.check, color: Colors.green) : null,
-                                              onTap: () => Navigator.pop(context, "Tiền mặt"),
+                                              trailing:
+                                                  _selectedWallet == "Tiền mặt"
+                                                      ? const Icon(Icons.check,
+                                                          color: Colors.green)
+                                                      : null,
+                                              onTap: () => Navigator.pop(
+                                                  context, "Tiền mặt"),
                                             ),
                                             ListTile(
-                                              leading: Image.asset('assets/images/cate29.png', width: 30, height: 30),
+                                              leading: Image.asset(
+                                                  'assets/images/cate29.png',
+                                                  width: 30,
+                                                  height: 30),
                                               title: const Text("Chuyển khoản"),
-                                              trailing: _selectedWallet == "Chuyển khoản" ? const Icon(Icons.check, color: Colors.green) : null,
-                                              onTap: () => Navigator.pop(context, "Chuyển khoản"),
+                                              trailing: _selectedWallet ==
+                                                      "Chuyển khoản"
+                                                  ? const Icon(Icons.check,
+                                                      color: Colors.green)
+                                                  : null,
+                                              onTap: () => Navigator.pop(
+                                                  context, "Chuyển khoản"),
                                             ),
                                           ],
                                         ),
@@ -393,20 +564,25 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                 }
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
                                 child: Text(
                                   _selectedWallet,
                                   style: TextStyle(
                                     fontSize: 15.sp,
                                     fontWeight: FontWeight.w400,
                                     fontFamily: 'Montserrat',
-                                    color: _selectedWallet == 'Chọn ví tiền của bạn' ? const Color(0x331E201E) : Colors.black,
+                                    color: _selectedWallet ==
+                                            'Chọn ví tiền của bạn'
+                                        ? const Color(0x331E201E)
+                                        : Colors.black,
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                          Image.asset('assets/images/arrow2_icon.png', width: 20.w, height: 20.h, fit: BoxFit.contain),
+                          Image.asset('assets/images/arrow2_icon.png',
+                              width: 20.w, height: 20.h, fit: BoxFit.contain),
                         ],
                       ),
                     ),
@@ -416,13 +592,21 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                         onPressed: _saveIncome,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1E201E),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-                          padding: EdgeInsets.symmetric(horizontal: 49.w, vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 49.w, vertical: 12.h),
                           minimumSize: Size(220.w, 0),
                         ),
                         child: Text(
-                          'Lưu khoản thu',
-                          style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500, color: Colors.white, fontFamily: 'Montserrat'),
+                          widget.transaction != null
+                              ? 'Cập nhật khoản thu'
+                              : 'Lưu khoản thu',
+                          style: TextStyle(
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                              fontFamily: 'Montserrat'),
                         ),
                       ),
                     ),
