@@ -36,7 +36,15 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
   @override
   void initState() {
     super.initState();
-    _loadUserData(); // Tải dữ liệu người dùng và ví
+    _initializeData();
+  }
+
+  // Đồng bộ hóa các tác vụ bất đồng bộ
+  Future<void> _initializeData() async {
+    // Đầu tiên, tải dữ liệu người dùng và ví
+    await _loadUserData();
+
+    // Sau khi có userDocId, tải danh mục và ví (nếu đang chỉnh sửa giao dịch)
     if (widget.transaction != null) {
       final transaction = widget.transaction!;
       selectedDate = DateTime.parse(transaction['date']);
@@ -44,19 +52,25 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
           NumberFormat.currency(locale: 'vi_VN', symbol: '')
               .format(transaction['amount']);
       _noteController.text = transaction['note'];
-      _loadWalletName(transaction['walletId']); // Tải tên ví từ ID
-      _loadCategories().then((_) {
-        for (int i = 0; i < _categories.length; i++) {
-          if (_categories[i]['id'] == transaction['categoryId']) {
-            setState(() {
-              selectedCategoryIndex = i;
-            });
-            break;
-          }
+
+      // Tải tên ví từ walletId
+      if (transaction['walletId'] != null) {
+        await _loadWalletName(transaction['walletId']);
+      }
+
+      // Tải danh mục và chọn danh mục tương ứng
+      await _loadCategories();
+      for (int i = 0; i < _categories.length; i++) {
+        if (_categories[i]['id'] == transaction['categoryId']) {
+          setState(() {
+            selectedCategoryIndex = i;
+          });
+          break;
         }
-      });
+      }
     } else {
-      _loadCategories();
+      // Nếu thêm mới, chỉ cần tải danh mục
+      await _loadCategories();
     }
   }
 
@@ -72,6 +86,7 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
       if (userDoc.docs.isNotEmpty) {
         userDocId = userDoc.docs.first.id;
         await _loadWalletIds(userDocId!);
+        setState(() {}); // Cập nhật UI sau khi có userDocId
       }
     }
   }
@@ -96,20 +111,33 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
     }
   }
 
-  // Tải tên ví từ ID ví (cho giao dịch có sẵn)
+  // Tải tên ví từ ID ví
   Future<void> _loadWalletName(String walletId) async {
     if (userDocId == null) return;
-    DocumentSnapshot walletDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userDocId)
-        .collection('vi_tien')
-        .doc(walletId)
-        .get();
+    try {
+      DocumentSnapshot walletDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userDocId)
+          .collection('vi_tien')
+          .doc(walletId)
+          .get();
 
-    if (walletDoc.exists) {
-      String walletName = walletDoc['ten_vi'] as String;
+      if (walletDoc.exists) {
+        String walletName = walletDoc['ten_vi'] as String;
+        setState(() {
+          _selectedWallet = walletName;
+        });
+      } else {
+        // Nếu không tìm thấy ví, đặt lại giá trị mặc định
+        setState(() {
+          _selectedWallet = 'Chọn ví tiền của bạn';
+        });
+        print('Wallet with ID $walletId not found.');
+      }
+    } catch (e) {
+      print('Error loading wallet name: $e');
       setState(() {
-        _selectedWallet = walletName;
+        _selectedWallet = 'Chọn ví tiền của bạn';
       });
     }
   }
@@ -608,7 +636,11 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                                   'assets/images/cate30.png',
                                                   width: 30.w,
                                                   height: 30.h),
-                                              title: Text("Tiền mặt", style: TextStyle(fontSize: 15.sp),),
+                                              title: Text(
+                                                "Tiền mặt",
+                                                style:
+                                                    TextStyle(fontSize: 15.sp),
+                                              ),
                                               trailing:
                                                   _selectedWallet == "Tiền mặt"
                                                       ? const Icon(Icons.check,
@@ -622,7 +654,11 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                                   'assets/images/cate29.png',
                                                   width: 30.w,
                                                   height: 30.h),
-                                              title: Text("Chuyển khoản", style: TextStyle(fontSize: 15.sp),),
+                                              title: Text(
+                                                "Chuyển khoản",
+                                                style:
+                                                    TextStyle(fontSize: 15.sp),
+                                              ),
                                               trailing: _selectedWallet ==
                                                       "Chuyển khoản"
                                                   ? const Icon(Icons.check,
