@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import '../../../widgets/input/email_input.dart';
-import 'resetpass_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../login/dangnhap_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class QuenMatKhau extends StatefulWidget {
   const QuenMatKhau({Key? key}) : super(key: key);
@@ -34,12 +35,14 @@ class _QuenMatKhauState extends State<QuenMatKhau> {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       // Hiển thị thông báo thành công
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đã gửi email khôi phục mật khẩu. Vui lòng kiểm tra hộp thư của bạn.')),
+        SnackBar(
+            content: Text(
+                'Đã gửi email khôi phục mật khẩu. Vui lòng kiểm tra hộp thư của bạn.')),
       );
       // Chuyển hướng đến màn hình ResetPassword với email đã nhập
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ResetPassword(email: email)),
+        MaterialPageRoute(builder: (context) => DangNhap()),
       );
     } catch (e) {
       // Hiển thị thông báo lỗi
@@ -60,22 +63,22 @@ class _QuenMatKhauState extends State<QuenMatKhau> {
               Padding(
                 padding:
                     // const EdgeInsets.only(left: 16.0, right: 16.0, top: 25.0),
-                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                    EdgeInsets.only(left: 16.0.w, right: 16.0.w, top: 16.0.h),
                 child: Row(
                   children: [
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.arrow_back,
-                          size: 26, color: Colors.black),
+                      child: Icon(Icons.arrow_back,
+                          size: 26.sp, color: Colors.black),
                     ),
                     Expanded(
                       child: Center(
                         child: Text(
                           'Quên mật khẩu',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 1.0,
+                            letterSpacing: 1.0.sp,
                             color: Colors.black,
                             fontFamily: 'Montserrat',
                           ),
@@ -87,23 +90,20 @@ class _QuenMatKhauState extends State<QuenMatKhau> {
               ),
               Padding(
                 // padding: const EdgeInsets.only(top: 30.0),
-                padding: const EdgeInsets.only(top: 20.0),
+                padding: EdgeInsets.only(top: 20.0.h),
                 child: Column(
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      // width: 70,
-                      // height: 70,
-                      width: 60,
-                      height: 60,
+                      width: 60.w,
+                      height: 60.h,
                     ),
-                    const Text(
+                    Text(
                       'MoneyMate',
                       style: TextStyle(
-                        // fontSize: 25,
-                        fontSize: 21,
+                        fontSize: 21.sp,
                         fontWeight: FontWeight.w800,
-                        letterSpacing: 2.52,
+                        letterSpacing: 2.52.sp,
                         color: Color(0xFF1E201E),
                         fontFamily: 'Montserrat',
                       ),
@@ -113,78 +113,77 @@ class _QuenMatKhauState extends State<QuenMatKhau> {
               ),
               Container(
                 width: double.infinity,
-                // margin: const EdgeInsets.only(top: 30.0),
-                margin: const EdgeInsets.only(top: 20.0),
-                // padding: const EdgeInsets.fromLTRB(16, 16, 16, 180),
-                // padding: const EdgeInsets.fromLTRB(16, 16, 16, 160),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 230),
-                decoration: const BoxDecoration(
+                margin: EdgeInsets.only(top: 20.0.h),
+                padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 230.h),
+                decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(40.r),
+                    topRight: Radius.circular(40.r),
                   ),
                 ),
                 child: Column(
                   children: [
                     Image.asset(
                       'assets/images/locked.png',
-                      width: 82,
-                      height: 82,
+                      width: 82.w,
+                      height: 82.h,
                       fit: BoxFit.contain,
                     ),
-                    const SizedBox(height: 14),
-                    const Text(
+                    SizedBox(height: 14.h),
+                    Text(
                       'Nhập email',
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
                         fontFamily: 'Montserrat',
                       ),
                     ),
-                    const SizedBox(height: 14),
-                    const Text(
+                    SizedBox(height: 14.h),
+                    Text(
                       'Vui lòng nhập chính xác email mà bạn đã đăng ký để được xác thực.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.w400,
                         color: Colors.black,
                         fontFamily: 'Montserrat',
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    EmailInput(controller: _emailController), // Truyền controller vào đây
-                    const SizedBox(height: 27),
+                    SizedBox(height: 30.h),
+                    EmailInput(
+                        controller:
+                            _emailController), // Truyền controller vào đây
+                    SizedBox(height: 27.h),
                     // button Gửi
                     ElevatedButton(
                       onPressed: _resetPassword,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(30, 32, 30, 1),
                         foregroundColor: Colors.white,
-                        minimumSize: const Size(150, 0),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 60, vertical: 12),
+                        minimumSize: Size(150.w, 0),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 60.w, vertical: 12.h),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
+                          borderRadius: BorderRadius.circular(50.r),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Gửi',
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
                           fontFamily: 'Montserrat',
                         ),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14.h),
                     RichText(
                       text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: TextStyle(
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w400,
                           color: Colors.black,
                           fontFamily: 'Montserrat',
@@ -199,7 +198,12 @@ class _QuenMatKhauState extends State<QuenMatKhau> {
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
-                                // TODO: Chuyển hướng sang màn hình khác nếu cần
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content:
+                                        Text('Tính năng này chưa được hỗ trợ'),
+                                  ),
+                                );
                               },
                           ),
                         ],

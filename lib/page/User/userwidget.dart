@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../User/doimatkhau.dart';
 
 class UserWidget extends StatefulWidget {
   const UserWidget({super.key});
@@ -14,10 +15,16 @@ class UserWidget extends StatefulWidget {
 
 class _UserWidgetState extends State<UserWidget> {
   bool _isObscured = true; // Biến kiểm soát hiển thị/ẩn mật khẩu
-  late TextEditingController _usernameController; // Controller cho tên đăng nhập
+  late TextEditingController
+      _usernameController; // Controller cho tên đăng nhập
   late TextEditingController _emailController; // Controller cho email
   late TextEditingController _phoneController; // Controller cho số điện thoại
   late TextEditingController _passwordController; // Controller cho mật khẩu
+
+  late String _initialUsername;
+  late String _initialEmail;
+  late String _initialPhone;
+
   String? _imageUrl; // Biến để lưu URL hoặc asset path của hình ảnh
 
   // Thêm biến để lưu trữ hình ảnh đã chọn
@@ -42,7 +49,8 @@ class _UserWidgetState extends State<UserWidget> {
 
   // Hàm load dữ liệu người dùng từ Firestore
   Future<void> _loadUserData() async {
-    User? user = FirebaseAuth.instance.currentUser; // Lấy thông tin user hiện tại từ Firebase Auth
+    User? user = FirebaseAuth
+        .instance.currentUser; // Lấy thông tin user hiện tại từ Firebase Auth
     if (user != null) {
       try {
         var userDoc = await FirebaseFirestore.instance
@@ -51,7 +59,8 @@ class _UserWidgetState extends State<UserWidget> {
             .get(); // Truy vấn document trong collection 'users' với email khớp
 
         if (userDoc.docs.isNotEmpty) {
-          var data = userDoc.docs.first.data(); // Lấy dữ liệu từ document đầu tiên
+          var data =
+              userDoc.docs.first.data(); // Lấy dữ liệu từ document đầu tiên
           setState(() {
             // Cập nhật giá trị cho các controller từ Firestore
             _usernameController.text = data['username'] ?? '';
@@ -60,6 +69,11 @@ class _UserWidgetState extends State<UserWidget> {
             _passwordController.text = data['password'] ?? '';
             _imageUrl = data['image']; // Lấy URL hoặc asset path của hình ảnh
             _selectedImage = null; // Đặt lại _selectedImage nếu không cần thiết
+
+            // Gán giá trị ban đầu
+            _initialUsername = _usernameController.text;
+            _initialEmail = _emailController.text;
+            _initialPhone = _phoneController.text;
           });
         } else {
           print('Không tìm thấy thông tin người dùng trong Firestore.');
@@ -80,195 +94,6 @@ class _UserWidgetState extends State<UserWidget> {
     return _passwordController.text; // Hiển thị mật khẩu thật
   }
 
-  // Hàm hiển thị dialog đổi mật khẩu
-  void showChangePasswordDialog() {
-    bool _isNewObscured = true; // Ẩn mật khẩu mới
-    bool _isConfirmObscured = true; // Ẩn xác nhận mật khẩu
-
-    TextEditingController _newPasswordController = TextEditingController();
-    TextEditingController _confirmPasswordController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: Colors.transparent,
-              content: Container(
-                width: 400.w,
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 8.r,
-                      spreadRadius: 2.r,
-                      offset: Offset(0, 4.h),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Đổi mật khẩu",
-                      style: TextStyle(
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    _buildPasswordField(
-                      "Mật khẩu mới",
-                      _newPasswordController,
-                      _isNewObscured,
-                      () {
-                        setState(() {
-                          _isNewObscured = !_isNewObscured;
-                        });
-                      },
-                    ),
-                    _buildPasswordField(
-                      "Xác nhận mật khẩu mới",
-                      _confirmPasswordController,
-                      _isConfirmObscured,
-                      () {
-                        setState(() {
-                          _isConfirmObscured = !_isConfirmObscured;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 16.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Nút Hủy
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
-                              side: BorderSide(
-                                color: Color(0xFFFE0000), // Màu viền nút Hủy
-                                width: 1.w,
-                              ),
-                            ),
-                          ),
-                          child: Text(
-                            'Hủy',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFFFE0000), // Màu chữ nút Hủy
-                            ),
-                          ),
-                        ),
-                        // Nút Xác nhận
-                        ElevatedButton(
-                          onPressed: () async {
-                            // Lấy giá trị nhập
-                            String newPassword = _newPasswordController.text.trim();
-                            String confirmPassword = _confirmPasswordController.text.trim();
-
-                            // Kiểm tra nếu ô nhập trống
-                            if (newPassword.isEmpty || confirmPassword.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Vui lòng nhập mật khẩu cần đổi')),
-                              );
-                              return;
-                            }
-
-                            // Kiểm tra mật khẩu mới và xác nhận
-                            if (newPassword == confirmPassword) {
-                              User? user = FirebaseAuth.instance.currentUser;
-                              if (user != null) {
-                                var userDoc = await FirebaseFirestore.instance
-                                    .collection('users')
-                                    .where('email', isEqualTo: user.email)
-                                    .get();
-                                if (userDoc.docs.isNotEmpty) {
-                                  await FirebaseFirestore.instance
-                                      .collection('users')
-                                      .doc(userDoc.docs.first.id)
-                                      .update({
-                                    'password': _newPasswordController.text, // Cập nhật mật khẩu mới
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Đã đổi mật khẩu thành công')),
-                                  );
-                                  Navigator.pop(context); // Đóng dialog
-                                }
-                              }
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Mật khẩu không khớp')),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
-                              side: BorderSide(
-                                color: const Color(0xFF4ABD57),
-                                width: 1.w,
-                              ),
-                            ),
-                          ),
-                          child: Text(
-                            'Xác nhận',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF4ABD57), // Màu chữ nút Hủy
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  // Hàm tạo TextField cho dialog đổi mật khẩu
-  Widget _buildPasswordField(
-    String label,
-    TextEditingController controller,
-    bool isObscured,
-    VoidCallback toggleVisibility,
-  ) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0.h),
-      child: TextField(
-        controller: controller,
-        obscureText: isObscured,
-        style: TextStyle(fontSize: 14.sp), // <-- Thêm dòng này
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(fontSize: 14.sp), // <-- Font size cho label
-          suffixIcon: IconButton(
-            icon: Icon(
-              isObscured ? Icons.visibility_off : Icons.visibility,
-              size: 22.sp, // 👈 Kích thước icon
-            ),
-            onPressed: toggleVisibility,
-          ),
-          border: const OutlineInputBorder(),
-        ),
-      ),
-    );
-  }
-
   // Hàm thay đổi hình ảnh avatar
   Future<void> _changeAvatar() async {
     final ImagePicker _picker = ImagePicker();
@@ -282,7 +107,7 @@ class _UserWidgetState extends State<UserWidget> {
       });
 
       // Cập nhật hình ảnh lên Firestore
-      User? user = FirebaseAuth.instance.currentUser ;
+      User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         var userDoc = await FirebaseFirestore.instance
             .collection('users')
@@ -304,7 +129,7 @@ class _UserWidgetState extends State<UserWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-         title: Text(
+        title: Text(
           "Tài khoản",
           style: TextStyle(
             fontSize: 17.sp,
@@ -319,18 +144,18 @@ class _UserWidgetState extends State<UserWidget> {
       ),
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
-        child: Center(
+        // child: Container(
           child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 400.w),
+            // child: ConstrainedBox(
+            //   constraints: BoxConstraints(maxWidth: 400.w),
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 30.0.h),
+                padding: EdgeInsets.symmetric(vertical: 30.0.h, horizontal: 16.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Phần hiển thị thông tin chính
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+                      padding: EdgeInsets.symmetric(horizontal: 5.0.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -340,24 +165,34 @@ class _UserWidgetState extends State<UserWidget> {
                               children: [
                                 CircleAvatar(
                                   radius: 65.r,
-                                  backgroundColor: _selectedImage == null && (_imageUrl == null || _imageUrl!.isEmpty)
-                                      ? Colors.white // Hình tròn trắng nếu không có hình
+                                  backgroundColor: _selectedImage == null &&
+                                          (_imageUrl == null ||
+                                              _imageUrl!.isEmpty)
+                                      ? Colors
+                                          .white // Hình tròn trắng nếu không có hình
                                       : null,
-                                  backgroundImage: _imageUrl != null && _imageUrl!.isNotEmpty
-                                      ? ( _imageUrl!.startsWith('assets/')
-                                          ? AssetImage(_imageUrl!) // Sử dụng AssetImage nếu là hình ảnh từ assets
-                                          : (_imageUrl!.startsWith('http') // Kiểm tra nếu hình ảnh là hình ảnh mạng
-                                              ? NetworkImage(_imageUrl!) // Sử dụng NetworkImage nếu là hình ảnh từ URL
-                                              : FileImage(File(_imageUrl!)))) // Sử dụng FileImage nếu là hình ảnh từ file
-                                      : (_selectedImage != null 
-                                          ? FileImage(_selectedImage!) // Sử dụng FileImage nếu có hình ảnh từ file
+                                  backgroundImage: _imageUrl != null &&
+                                          _imageUrl!.isNotEmpty
+                                      ? (_imageUrl!.startsWith('assets/')
+                                          ? AssetImage(
+                                              _imageUrl!) // Sử dụng AssetImage nếu là hình ảnh từ assets
+                                          : (_imageUrl!.startsWith(
+                                                  'http') // Kiểm tra nếu hình ảnh là hình ảnh mạng
+                                              ? NetworkImage(
+                                                  _imageUrl!) // Sử dụng NetworkImage nếu là hình ảnh từ URL
+                                              : FileImage(File(
+                                                  _imageUrl!)))) // Sử dụng FileImage nếu là hình ảnh từ file
+                                      : (_selectedImage != null
+                                          ? FileImage(
+                                              _selectedImage!) // Sử dụng FileImage nếu có hình ảnh từ file
                                           : null),
                                 ),
                                 Positioned(
                                   bottom: 5.h,
                                   right: 5.w,
                                   child: GestureDetector(
-                                    onTap: _changeAvatar, // Gọi hàm thay đổi hình ảnh
+                                    onTap:
+                                        _changeAvatar, // Gọi hàm thay đổi hình ảnh
                                     child: Container(
                                       width: 35.w,
                                       height: 35.h,
@@ -538,76 +373,84 @@ class _UserWidgetState extends State<UserWidget> {
                             ),
                           ),
                           // Phần mật khẩu
-                          SizedBox(height: 21.h),
-                          Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/password_icon.png',
-                                width: 27.w,
-                                height: 27.h,
-                                fit: BoxFit.contain,
-                              ),
-                              SizedBox(width: 2.w),
-                              Text(
-                                'Mật khẩu',
-                                style: TextStyle(
-                                  fontSize: 17.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 7.h),
-                          Container(
-                            height: 55.h,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15.r),
-                              border: Border.all(
-                                color: const Color(0xFF1E201E),
-                                width: 2.w,
-                              ),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.w,
-                              vertical: 2.h,
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: TextEditingController(text: displayText),
-                                    style: TextStyle(fontSize: 15.sp),
-                                    readOnly: true,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    _isObscured
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                    color: Colors.black,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _isObscured =
-                                          !_isObscured; // Đổi trạng thái hiển thị mật khẩu
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
+                          // SizedBox(height: 21.h),
+                          // Row(
+                          //   children: [
+                          //     Image.asset(
+                          //       'assets/images/password_icon.png',
+                          //       width: 27.w,
+                          //       height: 27.h,
+                          //       fit: BoxFit.contain,
+                          //     ),
+                          //     SizedBox(width: 2.w),
+                          //     Text(
+                          //       'Mật khẩu',
+                          //       style: TextStyle(
+                          //         fontSize: 17.sp,
+                          //         fontWeight: FontWeight.w500,
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
+                          // SizedBox(height: 7.h),
+                          // Container(
+                          //   height: 55.h,
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.white,
+                          //     borderRadius: BorderRadius.circular(15.r),
+                          //     border: Border.all(
+                          //       color: const Color(0xFF1E201E),
+                          //       width: 2.w,
+                          //     ),
+                          //   ),
+                          //   padding: EdgeInsets.symmetric(
+                          //     horizontal: 16.w,
+                          //     vertical: 2.h,
+                          //   ),
+                          //   child: Row(
+                          //     children: [
+                          //       Expanded(
+                          //         child: TextField(
+                          //           controller: TextEditingController(
+                          //               text: displayText),
+                          //           style: TextStyle(fontSize: 15.sp),
+                          //           readOnly: true,
+                          //           decoration: const InputDecoration(
+                          //             border: InputBorder.none,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //       IconButton(
+                          //         icon: Icon(
+                          //           _isObscured
+                          //               ? Icons.visibility_off
+                          //               : Icons.visibility,
+                          //           color: Colors.black,
+                          //         ),
+                          //         onPressed: () {
+                          //           setState(() {
+                          //             _isObscured =
+                          //                 !_isObscured; // Đổi trạng thái hiển thị mật khẩu
+                          //           });
+                          //         },
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                           // Link đổi mật khẩu
                           SizedBox(height: 10.h),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               GestureDetector(
-                                onTap: showChangePasswordDialog,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ChangePasswordPage()),
+                                  );
+                                },
                                 child: Text(
                                   'Đổi mật khẩu ',
                                   style: TextStyle(
@@ -717,9 +560,9 @@ class _UserWidgetState extends State<UserWidget> {
                   ],
                 ),
               ),
-            ),
+            // ),
           ),
-        ),
+        // ),
       ),
     );
   }
