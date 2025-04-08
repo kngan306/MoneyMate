@@ -544,7 +544,7 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                                   'assets/images/cate30.png',
                                                   width: 30,
                                                   height: 30),
-                                              title: const Text("Tiền mặt"),
+                                              title: Text("Tiền mặt", style: TextStyle(fontSize: 15.sp),),
                                               trailing:
                                                   _selectedWallet == "Tiền mặt"
                                                       ? const Icon(Icons.check,
@@ -558,7 +558,7 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                                   'assets/images/cate29.png',
                                                   width: 30,
                                                   height: 30),
-                                              title: const Text("Chuyển khoản"),
+                                              title: Text("Chuyển khoản", style: TextStyle(fontSize: 15.sp),),
                                               trailing: _selectedWallet ==
                                                       "Chuyển khoản"
                                                   ? const Icon(Icons.check,
