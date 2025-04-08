@@ -310,7 +310,7 @@ class _DanhMucThuState extends State<DanhMucThu> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(16.0.w, 10.0.h, 16.0.w, 0.0),
+                  padding: EdgeInsets.fromLTRB(16.0.w, 10.0.h, 16.0.w, 30.0),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,

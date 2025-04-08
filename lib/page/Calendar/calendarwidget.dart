@@ -436,7 +436,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
               // Danh sách giao dịch
               Padding(
-                padding: EdgeInsets.only(top: 14.0.h, bottom: 28.0.h),
+                padding: EdgeInsets.only(top: 14.0.h, bottom: 40.0.h),
                 child: _buildTransactionList(),
               ),
             ],
