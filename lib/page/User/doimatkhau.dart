@@ -22,57 +22,71 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   bool _isConfirmObscured = true;
 
   Future<void> _changePassword() async {
-    final currentPassword = _currentPasswordController.text.trim();
-    final newPassword = _newPasswordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
+  final currentPassword = _currentPasswordController.text.trim();
+  final newPassword = _newPasswordController.text.trim();
+  final confirmPassword = _confirmPasswordController.text.trim();
 
-    if (currentPassword.isEmpty ||
-        newPassword.isEmpty ||
-        confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin')),
-      );
-      return;
-    }
+  if (currentPassword.isEmpty ||
+      newPassword.isEmpty ||
+      confirmPassword.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin')),
+    );
+    return;
+  }
 
-    if (newPassword != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mật khẩu mới không khớp')),
-      );
-      return;
-    }
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: user.email)
+        .get();
 
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: user.email)
-          .get();
+    if (userDoc.docs.isNotEmpty) {
+      final storedPassword = userDoc.docs.first['password'];
 
-      if (userDoc.docs.isNotEmpty) {
-        final storedPassword = userDoc.docs.first['password'];
-
-        if (storedPassword != currentPassword) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mật khẩu hiện tại không đúng')),
-          );
-          return;
-        }
-
-        // Update password in Firestore
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userDoc.docs.first.id)
-            .update({'password': newPassword});
-
+      if (storedPassword != currentPassword) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đổi mật khẩu thành công')),
+          const SnackBar(content: Text('Mật khẩu hiện tại không đúng')),
         );
-
-        Navigator.pop(context); // Quay lại màn trước
+        return;
       }
+      final passwordRegex =
+          RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
+
+      if (!passwordRegex.hasMatch(newPassword)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ thường, chữ hoa và số',
+            ),
+          ),
+        );
+        return;
+      }
+
+      if (newPassword != confirmPassword) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Mật khẩu mới không khớp')),
+        );
+        return;
+      }
+
+      // ✅ Cập nhật mật khẩu trong Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userDoc.docs.first.id)
+          .update({'password': newPassword});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đổi mật khẩu thành công')),
+      );
+
+      Navigator.pop(context);
     }
   }
+}
+
 
   Widget _buildPasswordField(
     String label,
@@ -157,78 +171,85 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         ),
         showBackButton: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildPasswordField(
-              "Mật khẩu hiện tại",
-              _currentPasswordController,
-              _isCurrentObscured,
-              () => setState(() => _isCurrentObscured = !_isCurrentObscured),
-            ),
-            _buildPasswordField(
-              "Mật khẩu mới",
-              _newPasswordController,
-              _isNewObscured,
-              () => setState(() => _isNewObscured = !_isNewObscured),
-            ),
-            _buildPasswordField(
-              "Xác nhận mật khẩu mới",
-              _confirmPasswordController,
-              _isConfirmObscured,
-              () => setState(() => _isConfirmObscured = !_isConfirmObscured),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: EdgeInsets.only(top: 8.h),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const QuenMatKhau(),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildPasswordField(
+                  "Mật khẩu hiện tại",
+                  _currentPasswordController,
+                  _isCurrentObscured,
+                  () =>
+                      setState(() => _isCurrentObscured = !_isCurrentObscured),
+                ),
+                _buildPasswordField(
+                  "Mật khẩu mới",
+                  _newPasswordController,
+                  _isNewObscured,
+                  () => setState(() => _isNewObscured = !_isNewObscured),
+                ),
+                _buildPasswordField(
+                  "Xác nhận mật khẩu mới",
+                  _confirmPasswordController,
+                  _isConfirmObscured,
+                  () =>
+                      setState(() => _isConfirmObscured = !_isConfirmObscured),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 8.h),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const QuenMatKhau(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Quên mật khẩu?',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontFamily: 'Montserrat',
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
-                    );
-                  },
-                  child: Text(
-                    'Quên mật khẩu?',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontFamily: 'Montserrat',
-                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(height: 15.h),
-            Center(
-              child: SizedBox(
-                width: 200.w,
-                child: OutlinedButton(
-                  onPressed: _changePassword,
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 14.h),
-                    side: BorderSide(color: Colors.white, width: 2.w),
-                    backgroundColor: Color(0xFF4ABD57),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.r),
-                    ),
-                  ),
-                  child: Text(
-                    "Đổi mật khẩu",
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.white,
+                SizedBox(height: 15.h),
+                Center(
+                  child: SizedBox(
+                    width: 200.w,
+                    child: OutlinedButton(
+                      onPressed: _changePassword,
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        side: BorderSide(color: Colors.white, width: 2.w),
+                        backgroundColor: Color(0xFF4ABD57),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.r),
+                        ),
+                      ),
+                      child: Text(
+                        "Đổi mật khẩu",
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                SizedBox(height: 30.h), // thêm 1 chút khoảng trắng cuối
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
