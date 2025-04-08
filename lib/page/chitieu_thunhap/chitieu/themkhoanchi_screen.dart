@@ -9,6 +9,7 @@ import '../../mainpage.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:diacritic/diacritic.dart'; // Thêm thư viện để xử lý dấu tiếng Việt
 
 class ThemKhoanChi extends StatefulWidget {
   final Map<String, dynamic>? transaction;
@@ -28,10 +29,14 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   List<Map<String, dynamic>> _categories = [];
+  String? userDocId;
+  String? cashWalletId; // ID ví "Tiền mặt"
+  String? transferWalletId; // ID ví "Chuyển khoản"
 
   @override
   void initState() {
     super.initState();
+    _loadUserData(); // Tải dữ liệu người dùng và ví
     if (widget.transaction != null) {
       final transaction = widget.transaction!;
       selectedDate = DateTime.parse(transaction['date']);
@@ -39,9 +44,7 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
           NumberFormat.currency(locale: 'vi_VN', symbol: '')
               .format(transaction['amount']);
       _noteController.text = transaction['note'];
-      _selectedWallet = transaction['walletId'] == "QXf9f0y54ga0CH3VFym0"
-          ? "Tiền mặt"
-          : "Chuyển khoản";
+      _loadWalletName(transaction['walletId']); // Tải tên ví từ ID
       _loadCategories().then((_) {
         for (int i = 0; i < _categories.length; i++) {
           if (_categories[i]['id'] == transaction['categoryId']) {
@@ -54,6 +57,60 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
       });
     } else {
       _loadCategories();
+    }
+  }
+
+  // Tải dữ liệu người dùng và ví
+  Future<void> _loadUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        userDocId = userDoc.docs.first.id;
+        await _loadWalletIds(userDocId!);
+      }
+    }
+  }
+
+  // Tải ID ví từ Firestore
+  Future<void> _loadWalletIds(String userDocId) async {
+    QuerySnapshot walletSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('vi_tien')
+        .get();
+
+    for (var doc in walletSnapshot.docs) {
+      String walletName = doc['ten_vi'] as String;
+      String normalizedWalletName = removeDiacritics(walletName).toLowerCase();
+      if (normalizedWalletName == removeDiacritics('Tiền mặt').toLowerCase()) {
+        cashWalletId = doc.id;
+      } else if (normalizedWalletName ==
+          removeDiacritics('Chuyển khoản').toLowerCase()) {
+        transferWalletId = doc.id;
+      }
+    }
+  }
+
+  // Tải tên ví từ ID ví (cho giao dịch có sẵn)
+  Future<void> _loadWalletName(String walletId) async {
+    if (userDocId == null) return;
+    DocumentSnapshot walletDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('vi_tien')
+        .doc(walletId)
+        .get();
+
+    if (walletDoc.exists) {
+      String walletName = walletDoc['ten_vi'] as String;
+      setState(() {
+        _selectedWallet = walletName;
+      });
     }
   }
 
@@ -134,9 +191,15 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
       if (userDoc.docs.isNotEmpty) {
         String userDocId = userDoc.docs.first.id;
         String categoryId = _categories[selectedCategoryIndex]['id'];
-        String walletId = _selectedWallet == "Tiền mặt"
-            ? "QXf9f0y54ga0CH3VFym0"
-            : "X0dMqKhCQguVdmKRSOon";
+        String? walletId =
+            _selectedWallet == "Tiền mặt" ? cashWalletId : transferWalletId;
+
+        if (walletId == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Không tìm thấy ví tương ứng')),
+          );
+          return;
+        }
         String cleanedAmount =
             _amountController.text.replaceAll(RegExp(r'[.,]'), '');
         double amount = double.parse(cleanedAmount);
@@ -413,8 +476,9 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                             final result = await Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) =>
-                                                    Mainpage(selectedIndex: 10,),
+                                                builder: (context) => Mainpage(
+                                                  selectedIndex: 10,
+                                                ),
                                               ),
                                             );
                                             if (result == true) {
