@@ -35,54 +35,71 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     return;
   }
 
+  final passwordRegex =
+      RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
+
+  if (!passwordRegex.hasMatch(newPassword)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ thường, chữ hoa và số',
+        ),
+      ),
+    );
+    return;
+  }
+
+  if (newPassword != confirmPassword) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Mật khẩu mới không khớp')),
+    );
+    return;
+  }
+
   final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: user.email)
-        .get();
+  final email = user?.email;
 
-    if (userDoc.docs.isNotEmpty) {
-      final storedPassword = userDoc.docs.first['password'];
+  if (user != null && email != null) {
+    try {
+      // ✅ Reauthenticate với mật khẩu hiện tại
+      final cred = EmailAuthProvider.credential(
+        email: email,
+        password: currentPassword,
+      );
+      await user.reauthenticateWithCredential(cred);
 
-      if (storedPassword != currentPassword) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mật khẩu hiện tại không đúng')),
-        );
-        return;
-      }
-      final passwordRegex =
-          RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
+      // ✅ Đổi mật khẩu trong Firebase Authentication
+      await user.updatePassword(newPassword);
 
-      if (!passwordRegex.hasMatch(newPassword)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ thường, chữ hoa và số',
-            ),
-          ),
-        );
-        return;
-      }
-
-      if (newPassword != confirmPassword) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mật khẩu mới không khớp')),
-        );
-        return;
-      }
-
-      // ✅ Cập nhật mật khẩu trong Firestore
-      await FirebaseFirestore.instance
+      // ✅ (Tuỳ chọn) Cập nhật trong Firestore nếu bạn lưu mật khẩu ở đó
+      final userDoc = await FirebaseFirestore.instance
           .collection('users')
-          .doc(userDoc.docs.first.id)
-          .update({'password': newPassword});
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userDoc.docs.first.id)
+            .update({'password': newPassword});
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đổi mật khẩu thành công')),
       );
 
       Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      String errorMsg = 'Đã xảy ra lỗi';
+      if (e.code == 'wrong-password') {
+        errorMsg = 'Mật khẩu hiện tại không đúng';
+      } else if (e.code == 'weak-password') {
+        errorMsg = 'Mật khẩu mới quá yếu';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMsg)),
+      );
     }
   }
 }
