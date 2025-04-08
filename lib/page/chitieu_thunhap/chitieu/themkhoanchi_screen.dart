@@ -11,9 +11,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemKhoanChi extends StatefulWidget {
-  final Map<String, dynamic>? transaction; // Thêm tham số transaction
-  const ThemKhoanChi({Key? key, this.transaction}) : super(key: key);
+  final Map<String, dynamic>? transaction;
+  final Function? onTransactionSaved; // Callback để thông báo khi lưu giao dịch
 
+  const ThemKhoanChi({Key? key, this.transaction, this.onTransactionSaved}) : super(key: key);
   @override
   State<ThemKhoanChi> createState() => _ThemKhoanChiState();
 }
@@ -183,8 +184,10 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
           selectedCategoryIndex = -1;
         });
 
-        // Trả về true để báo hiệu rằng giao dịch đã được cập nhật
-        Navigator.pop(context, true);
+        // Gọi callback để thông báo rằng giao dịch đã được lưu
+        if (widget.onTransactionSaved != null) {
+          widget.onTransactionSaved!();
+        }
       }
     }
   }
@@ -410,11 +413,8 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                                   await Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      Mainpage(
-                                                    selectedIndex: 10,
-                                                  ),
-                                                ),
+                                                    builder: (context) =>
+                                                        const DanhMucChi()),
                                               );
                                               // Nếu có thay đổi (thêm/xóa/chỉnh sửa danh mục), tải lại danh sách
                                               if (result == true) {

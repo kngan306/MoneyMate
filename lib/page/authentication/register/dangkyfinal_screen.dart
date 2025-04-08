@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
 class DangKyFinal extends StatefulWidget {
   final String phoneNumber; // Thêm biến để lưu số điện thoại
   final String email; // Thêm biến để lưu email
@@ -28,11 +27,116 @@ class _DangKyFinalState extends State<DangKyFinal> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  // Thêm: Dữ liệu mặc định cho danh_muc_chi
+  final List<Map<String, dynamic>> defaultExpenseCategories = [
+    {'image': 'assets/images/wifi.png', 'ten_muc_chi': 'Cáp & Wifi'},
+    {'image': 'assets/images/quanao.png', 'ten_muc_chi': 'Quần áo'},
+    {'image': 'assets/images/cate50.png', 'ten_muc_chi': 'Xả stress'},
+    {'image': 'assets/images/yte.png', 'ten_muc_chi': 'Y tế'},
+    {'image': 'assets/images/mypham.png', 'ten_muc_chi': 'Mỹ phẩm'},
+    {'image': 'assets/images/xemay.png', 'ten_muc_chi': 'Đi lại'},
+    {'image': 'assets/images/food.png', 'ten_muc_chi': 'Ăn uống'},
+  ];
+
+  // Thêm: Dữ liệu mặc định cho danh_muc_thu
+  final List<Map<String, dynamic>> defaultIncomeCategories = [
+    {'image': 'assets/images/cate31.png', 'ten_muc_thu': 'Thu nhập phụ'},
+    {'image': 'assets/images/cate29.png', 'ten_muc_thu': 'Tiền lương'},
+    {'image': 'assets/images/cate32.png', 'ten_muc_thu': 'Tiền thưởng'},
+    {'image': 'assets/images/cate33.png', 'ten_muc_thu': 'Phụ cấp'},
+    {'image': 'assets/images/cate30.png', 'ten_muc_thu': 'Đầu tư'},
+  ];
+
+  // Thêm: Dữ liệu mặc định cho vi_tien
+  final List<Map<String, dynamic>> defaultWallets = [
+    {'ten_vi': 'Tiền mặt'},
+    {'ten_vi': 'Chuyển khoản'},
+  ];
+
+  // Thêm: Hàm thêm dữ liệu mặc định vào Firestore
+  Future<void> addDefaultDataToFirestore(String userDocId) async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Thêm danh mục chi tiêu mặc định
+    final expenseCategoriesRef =
+        firestore.collection('users').doc(userDocId).collection('danh_muc_chi');
+    for (var category in defaultExpenseCategories) {
+      final existingCategory = await expenseCategoriesRef
+          .where('ten_muc_chi', isEqualTo: category['ten_muc_chi'])
+          .get();
+      if (existingCategory.docs.isEmpty) {
+        await expenseCategoriesRef.add(category);
+      }
+    }
+
+    // Thêm danh mục thu nhập mặc định
+    final incomeCategoriesRef =
+        firestore.collection('users').doc(userDocId).collection('danh_muc_thu');
+    for (var category in defaultIncomeCategories) {
+      final existingCategory = await incomeCategoriesRef
+          .where('ten_muc_thu', isEqualTo: category['ten_muc_thu'])
+          .get();
+      if (existingCategory.docs.isEmpty) {
+        await incomeCategoriesRef.add(category);
+      }
+    }
+
+    // Thêm ví tiền mặc định
+    final walletsRef =
+        firestore.collection('users').doc(userDocId).collection('vi_tien');
+    for (var wallet in defaultWallets) {
+      final existingWallet =
+          await walletsRef.where('ten_vi', isEqualTo: wallet['ten_vi']).get();
+      if (existingWallet.docs.isEmpty) {
+        await walletsRef.add(wallet);
+      }
+    }
+
+    // Tạo các collection trống: thu_nhap và chi_tieu
+    await firestore
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .doc()
+        .set({});
+    await firestore
+        .collection('users')
+        .doc(userDocId)
+        .collection('chi_tieu')
+        .doc()
+        .set({});
+
+    // Xóa document rỗng ngay sau khi tạo để giữ collection trống
+    await firestore
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .get()
+        .then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+    await firestore
+        .collection('users')
+        .doc(userDocId)
+        .collection('chi_tieu')
+        .get()
+        .then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+
+    print('🔥 Đã thêm dữ liệu mặc định cho người dùng mới!');
+  }
+
   @override
   void initState() {
     super.initState();
     // Gán số điện thoại và email vào controller
-    _phoneController.text = widget.phoneNumber; // Sử dụng số điện thoại đã truyền vào
+    _phoneController.text =
+        widget.phoneNumber; // Sử dụng số điện thoại đã truyền vào
     _emailController.text = widget.email; // Sử dụng email đã truyền vào
   }
 
@@ -416,17 +520,21 @@ class _DangKyFinalState extends State<DangKyFinal> {
                                 password: password,
                               );
 
-                              // Lưu thông tin người dùng vào Firestore
+                              // Sửa: Lưu thông tin người dùng vào Firestore và lấy user ID
+                              String userId = userCredential.user!.uid;
                               await FirebaseFirestore.instance
                                   .collection('users')
-                                  .doc(userCredential.user?.uid)
+                                  .doc(userId)
                                   .set({
                                 'email': email,
                                 'username': username,
                                 'sdt': phoneNumber,
                                 'password': password,
-                                'image': '', // Trường này có thể cập nhật sau
+                                'image': '',
                               });
+
+                              // Thêm: Gọi hàm thêm dữ liệu mặc định sau khi tạo user
+                              await addDefaultDataToFirestore(userId);
 
                               // Hiển thị thông báo đăng ký thành công
                               ScaffoldMessenger.of(context).showSnackBar(

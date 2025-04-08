@@ -6,6 +6,9 @@ import '../../widgets/tab/thuchi_tab.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemKhoanThuChi extends StatefulWidget {
+  final Function(int)? onTransactionSaved; // Callback để thông báo khi lưu giao dịch
+
+  ThemKhoanThuChi({this.onTransactionSaved});
   @override
   _ThemKhoanThuChiState createState() => _ThemKhoanThuChiState();
 }
@@ -17,6 +20,13 @@ class _ThemKhoanThuChiState extends State<ThemKhoanThuChi> {
     setState(() {
       isChiTieuSelected = index == 0;
     });
+  }
+
+  void _onTransactionSaved() {
+    // Gọi callback để thông báo cho Mainpage rằng giao dịch đã được lưu
+    if (widget.onTransactionSaved != null) {
+      widget.onTransactionSaved!(0); // Quay lại Dashboard (index 0)
+    }
   }
 
   @override
@@ -67,7 +77,10 @@ class _ThemKhoanThuChiState extends State<ThemKhoanThuChi> {
           //   ],
           // ),
           Expanded(
-            child: isChiTieuSelected ? ThemKhoanChi() : ThemKhoanThu(),
+            //child: isChiTieuSelected ? ThemKhoanChi() : ThemKhoanThu(),
+            child: isChiTieuSelected
+                ? ThemKhoanChi(onTransactionSaved: _onTransactionSaved)
+                : ThemKhoanThu(onTransactionSaved: _onTransactionSaved),
           ),
         ],
       ),
