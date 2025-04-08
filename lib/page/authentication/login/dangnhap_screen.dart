@@ -190,57 +190,66 @@ class _DangNhapState extends State<DangNhap> {
     }
   }
 
-  // **Hàm đăng nhập bằng email và mật khẩu**
-  Future<void> _login() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      setState(() {
-        _errorMessage = 'Vui lòng nhập email và mật khẩu.';
-      });
-      return;
-    }
-
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        var userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .where('email', isEqualTo: user.email)
-            .get();
-
-        if (userDoc.docs.isNotEmpty) {
-          var data = userDoc.docs.first.data();
-          print('Đăng nhập thành công! Thông tin người dùng từ Firestore:');
-          print('ID: ${userDoc.docs.first.id}');
-          print('SĐT: ${data['sdt']}');
-          print('Email: ${data['email']}');
-          print('Username: ${data['username']}');
-          print('Password: ${data['password']}');
-          print('Image: ${data['image']}');
-        } else {
-          print('Không tìm thấy thông tin người dùng trong Firestore.');
-        }
-      }
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Mainpage()),
-      );
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        if (e.code == 'user-not-found' || e.code == 'wrong-password') {
-          _errorMessage = 'Email hoặc mật khẩu không đúng.';
-        } else {
-          _errorMessage = 'Đã xảy ra lỗi: ${e.message}';
-        }
-      });
-    }
+Future<void> _login() async {
+  if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    setState(() {
+      _errorMessage = 'Vui lòng nhập email và mật khẩu.';
+    });
+    return;
   }
+
+  try {
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+    );
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      var userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: user.email)
+          .get();
+
+      if (userDoc.docs.isNotEmpty) {
+        var data = userDoc.docs.first.data();
+        print('Đăng nhập thành công! Thông tin người dùng từ Firestore:');
+        print('ID: ${userDoc.docs.first.id}');
+        print('SĐT: ${data['sdt']}');
+        print('Email: ${data['email']}');
+        print('Username: ${data['username']}');
+        print('Password: ${data['password']}');
+        print('Image: ${data['image']}');
+      } else {
+        print('Không tìm thấy thông tin người dùng trong Firestore.');
+      }
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Mainpage()),
+    );
+  }on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found' ||
+        e.code == 'wrong-password' ||
+        e.code == 'invalid-email' ||
+        e.code == 'user-disabled' ||
+        e.code == 'invalid-credential') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email hoặc mật khẩu không đúng.')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi: ${e.message}')),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Đã xảy ra lỗi, vui lòng thử lại.')),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {

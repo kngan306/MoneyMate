@@ -166,13 +166,23 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => widget.isIncome
-            ? ThemKhoanThu(
-                transaction: transaction,
-              )
-            : ThemKhoanChi(
-                transaction: transaction,
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            backgroundColor: Color(0xFF1E201E),
+            title: Text(
+              widget.isIncome ? 'Chỉnh sửa khoản thu' : 'Chỉnh sửa khoản chi',
+              style: TextStyle(
+                fontSize: 20.sp,
+                color: Colors.white,
               ),
+            ),
+            iconTheme:
+                const IconThemeData(color: Colors.white), // màu icon back
+          ),
+          body: widget.isIncome
+              ? ThemKhoanThu(transaction: transaction)
+              : ThemKhoanChi(transaction: transaction),
+        ),
       ),
     );
 

@@ -571,21 +571,21 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                     return Dialog(
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(20)),
+                                              BorderRadius.circular(20.r)),
                                       backgroundColor: Colors.white,
                                       child: Container(
-                                        padding: const EdgeInsets.all(20),
-                                        width: 320,
-                                        height: 200,
+                                        padding: EdgeInsets.all(20.w),
+                                        width: 320.w,
+                                        height: 200.h,
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius:
-                                              BorderRadius.circular(20),
-                                          boxShadow: const [
+                                              BorderRadius.circular(20.r),
+                                          boxShadow: [
                                             BoxShadow(
                                                 color: Color(0x10000000),
-                                                blurRadius: 10,
-                                                spreadRadius: 5)
+                                                blurRadius: 10.r,
+                                                spreadRadius: 5.r)
                                           ],
                                         ),
                                         child: Column(
@@ -593,21 +593,21 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            const Center(
+                                            Center(
                                               child: Text(
                                                 "Chọn ví tiền",
                                                 style: TextStyle(
-                                                    fontSize: 20,
+                                                    fontSize: 20.sp,
                                                     fontWeight: FontWeight.bold,
                                                     color: Color(0xFF3E4A59)),
                                               ),
                                             ),
-                                            const SizedBox(height: 15),
+                                            SizedBox(height: 15.h),
                                             ListTile(
                                               leading: Image.asset(
                                                   'assets/images/cate30.png',
-                                                  width: 30,
-                                                  height: 30),
+                                                  width: 30.w,
+                                                  height: 30.h),
                                               title: const Text("Tiền mặt"),
                                               trailing:
                                                   _selectedWallet == "Tiền mặt"
@@ -620,8 +620,8 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                             ListTile(
                                               leading: Image.asset(
                                                   'assets/images/cate29.png',
-                                                  width: 30,
-                                                  height: 30),
+                                                  width: 30.w,
+                                                  height: 30.h),
                                               title: const Text("Chuyển khoản"),
                                               trailing: _selectedWallet ==
                                                       "Chuyển khoản"
