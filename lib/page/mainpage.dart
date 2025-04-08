@@ -71,24 +71,43 @@ class _MainpageState extends State<Mainpage> {
 
   static TextStyle optionStyle =
       TextStyle(fontSize: 30.sp, fontWeight: FontWeight.bold);
-  static List<Widget> _widgetOptions = <Widget>[
-    DashboardWidget(),
-    CalendarWidget(),
-    ThemKhoanThuChi(),
-    ReportWidget(),
-    UserWidget(),
-    ThongBao(), //5
-    ViTien(), //6
-    CaiDat(), //7
-    LichSuGhiChep(), //8
-    // Index 9 sẽ được xử lý riêng, không khởi tạo mặc định ở đây
-    const SizedBox(), // Placeholder cho index 9
-    DanhMucChi(), //10
-    DanhMucThu(), //11
-    ThemDanhMucChi(), //12
-    TimKiemBaoCaoThuChi(), //13
-    ThemDanhMucThu(), //14
-  ];
+  // Khởi tạo _widgetOptions mà không truyền callback trực tiếp
+  late List<Widget> _widgetOptions;
+
+  // Hàm để tạo widget ThemKhoanThuChi với callback
+  Widget _buildThemKhoanThuChi() {
+    return ThemKhoanThuChi(
+      onTransactionSaved: (index) {
+        setState(() {
+          _selectedIndex = index; // Quay lại Dashboard (index 0)
+        });
+      },
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Khởi tạo _widgetOptions trong didChangeDependencies
+    _widgetOptions = <Widget>[
+      DashboardWidget(),
+      CalendarWidget(),
+      _buildThemKhoanThuChi(), // Sử dụng hàm để tạo ThemKhoanThuChi
+      ReportWidget(),
+      UserWidget(),
+      ThongBao(),
+      ViTien(),
+      CaiDat(),
+      LichSuGhiChep(),
+      const SizedBox(),
+      DanhMucChi(),
+      DanhMucThu(),
+      ThemDanhMucChi(),
+      TimKiemBaoCaoThuChi(),
+      ThemDanhMucThu(),
+    ];
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;

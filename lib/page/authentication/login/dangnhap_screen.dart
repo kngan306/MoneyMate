@@ -22,6 +22,110 @@ class _DangNhapState extends State<DangNhap> {
   bool _obscurePassword = true;
   String? _errorMessage;
 
+  // **Dữ liệu mặc định cho danh_muc_chi**
+  final List<Map<String, dynamic>> defaultExpenseCategories = [
+    {'image': 'assets/images/wifi.png', 'ten_muc_chi': 'Cáp & Wifi'},
+    {'image': 'assets/images/quanao.png', 'ten_muc_chi': 'Quần áo'},
+    {'image': 'assets/images/cate50.png', 'ten_muc_chi': 'Xả stress'},
+    {'image': 'assets/images/yte.png', 'ten_muc_chi': 'Y tế'},
+    {'image': 'assets/images/mypham.png', 'ten_muc_chi': 'Mỹ phẩm'},
+    {'image': 'assets/images/xemay.png', 'ten_muc_chi': 'Đi lại'},
+    {'image': 'assets/images/food.png', 'ten_muc_chi': 'Ăn uống'},
+  ];
+
+  // **Dữ liệu mặc định cho danh_muc_thu**
+  final List<Map<String, dynamic>> defaultIncomeCategories = [
+    {'image': 'assets/images/cate31.png', 'ten_muc_thu': 'Thu nhập phụ'},
+    {'image': 'assets/images/cate29.png', 'ten_muc_thu': 'Tiền lương'},
+    {'image': 'assets/images/cate32.png', 'ten_muc_thu': 'Tiền thưởng'},
+    {'image': 'assets/images/cate33.png', 'ten_muc_thu': 'Phụ cấp'},
+    {'image': 'assets/images/cate30.png', 'ten_muc_thu': 'Đầu tư'},
+  ];
+
+  // **Dữ liệu mặc định cho vi_tien**
+  final List<Map<String, dynamic>> defaultWallets = [
+    {'ten_vi': 'Tiền mặt'},
+    {'ten_vi': 'Chuyển khoản'},
+  ];
+
+  // **Hàm thêm dữ liệu mặc định vào Firestore**
+  Future<void> addDefaultDataToFirestore(String userDocId) async {
+    final firestore = FirebaseFirestore.instance;
+
+    // Thêm danh mục chi tiêu mặc định
+    final expenseCategoriesRef =
+        firestore.collection('users').doc(userDocId).collection('danh_muc_chi');
+    for (var category in defaultExpenseCategories) {
+      final existingCategory = await expenseCategoriesRef
+          .where('ten_muc_chi', isEqualTo: category['ten_muc_chi'])
+          .get();
+      if (existingCategory.docs.isEmpty) {
+        await expenseCategoriesRef.add(category);
+      }
+    }
+
+    // Thêm danh mục thu nhập mặc định
+    final incomeCategoriesRef =
+        firestore.collection('users').doc(userDocId).collection('danh_muc_thu');
+    for (var category in defaultIncomeCategories) {
+      final existingCategory = await incomeCategoriesRef
+          .where('ten_muc_thu', isEqualTo: category['ten_muc_thu'])
+          .get();
+      if (existingCategory.docs.isEmpty) {
+        await incomeCategoriesRef.add(category);
+      }
+    }
+
+    // Thêm ví tiền mặc định
+    final walletsRef =
+        firestore.collection('users').doc(userDocId).collection('vi_tien');
+    for (var wallet in defaultWallets) {
+      final existingWallet =
+          await walletsRef.where('ten_vi', isEqualTo: wallet['ten_vi']).get();
+      if (existingWallet.docs.isEmpty) {
+        await walletsRef.add(wallet);
+      }
+    }
+
+    // Tạo các collection trống: thu_nhap và chi_tieu (không cần dữ liệu mặc định)
+    await firestore
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .doc()
+        .set({});
+    await firestore
+        .collection('users')
+        .doc(userDocId)
+        .collection('chi_tieu')
+        .doc()
+        .set({});
+    // Xóa document rỗng ngay sau khi tạo để giữ collection trống
+    await firestore
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .get()
+        .then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+    await firestore
+        .collection('users')
+        .doc(userDocId)
+        .collection('chi_tieu')
+        .get()
+        .then((snapshot) {
+      for (var doc in snapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+
+    print('🔥 Đã thêm dữ liệu mặc định cho người dùng mới!');
+  }
+
+  // **Hàm lưu thông tin người dùng Google vào Firestore**
   Future<void> saveGoogleUserToFirestore(User user) async {
     final userRef = FirebaseFirestore.instance.collection('users');
 
@@ -31,14 +135,16 @@ class _DangNhapState extends State<DangNhap> {
 
     if (existingUser.docs.isEmpty) {
       // Nếu chưa tồn tại -> thêm user mới
-      await userRef.add({
+      final newUserDoc = await userRef.add({
         'username': user.displayName ?? '',
         'email': user.email ?? '',
         'image': user.photoURL ?? '',
-        'sdt': '', // Bạn có thể cập nhật sau trong phần hồ sơ
+        'sdt': '', // Có thể cập nhật sau trong phần hồ sơ
         'password': '', // Để trống vì đăng nhập bằng Google
-        // 'createdAt': FieldValue.serverTimestamp(),
       });
+
+      // Thêm dữ liệu mặc định sau khi tạo user mới
+      await addDefaultDataToFirestore(newUserDoc.id);
 
       print('🔥 Thêm người dùng Google mới vào Firestore thành công!');
     } else {
@@ -46,11 +152,12 @@ class _DangNhapState extends State<DangNhap> {
     }
   }
 
-  login() async {
+  // **Hàm đăng nhập bằng Google**
+  Future<void> login() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
-        // Người dùng đã hủy đăng nhập, không làm gì cả
+        // Người dùng đã hủy đăng nhập
         return;
       }
 
@@ -67,13 +174,12 @@ class _DangNhapState extends State<DangNhap> {
       User? user = userCredential.user;
 
       if (user != null) {
-        await saveGoogleUserToFirestore(user); // Thêm dòng này
-        // Đăng nhập thành công, chuyển hướng đến Trang chủ
+        await saveGoogleUserToFirestore(user);
+        // Chuyển hướng đến trang chính
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  Mainpage(selectedIndex: 0)), // nếu bạn hỗ trợ initialIndex
+              builder: (context) => const Mainpage(selectedIndex: 0)),
         );
       }
     } catch (e) {
@@ -84,9 +190,8 @@ class _DangNhapState extends State<DangNhap> {
     }
   }
 
-  // Hàm đăng nhập với Firebase Authentication
+  // **Hàm đăng nhập bằng email và mật khẩu**
   Future<void> _login() async {
-    // Kiểm tra xem người dùng có nhập email và mật khẩu không
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       setState(() {
         _errorMessage = 'Vui lòng nhập email và mật khẩu.';
@@ -95,13 +200,12 @@ class _DangNhapState extends State<DangNhap> {
     }
 
     try {
-      // Đăng nhập với Firebase Authentication bằng email và mật khẩu
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // Lấy thông tin người dùng từ Firestore
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         var userDoc = await FirebaseFirestore.instance
@@ -110,7 +214,6 @@ class _DangNhapState extends State<DangNhap> {
             .get();
 
         if (userDoc.docs.isNotEmpty) {
-          // In thông tin người dùng ra terminal
           var data = userDoc.docs.first.data();
           print('Đăng nhập thành công! Thông tin người dùng từ Firestore:');
           print('ID: ${userDoc.docs.first.id}');
@@ -122,11 +225,8 @@ class _DangNhapState extends State<DangNhap> {
         } else {
           print('Không tìm thấy thông tin người dùng trong Firestore.');
         }
-      } else {
-        print('Không lấy được thông tin user từ Firebase Auth.');
       }
 
-      // Đăng nhập thành công, chuyển đến Mainpage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Mainpage()),
@@ -145,7 +245,7 @@ class _DangNhapState extends State<DangNhap> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFECDFCC),
+      backgroundColor: const Color(0xFFECDFCC),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -157,11 +257,8 @@ class _DangNhapState extends State<DangNhap> {
                   children: [
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: Icon(
-                        Icons.arrow_back,
-                        size: 26.sp,
-                        color: Colors.black,
-                      ),
+                      child: Icon(Icons.arrow_back,
+                          size: 26.sp, color: Colors.black),
                     ),
                     Expanded(
                       child: Center(
@@ -184,18 +281,15 @@ class _DangNhapState extends State<DangNhap> {
                 padding: EdgeInsets.only(top: 20.0.h),
                 child: Column(
                   children: [
-                    Image.asset(
-                      'assets/images/logo.png',
-                      width: 60.w,
-                      height: 60.h,
-                    ),
+                    Image.asset('assets/images/logo.png',
+                        width: 60.w, height: 60.h),
                     Text(
                       'MoneyMate',
                       style: TextStyle(
                         fontSize: 21.sp,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 2.52.sp,
-                        color: Color(0xFF1E201E),
+                        color: const Color(0xFF1E201E),
                         fontFamily: 'Montserrat',
                       ),
                     ),
@@ -206,34 +300,26 @@ class _DangNhapState extends State<DangNhap> {
                 margin: EdgeInsets.only(top: 20.0.h),
                 padding: EdgeInsets.fromLTRB(16.0.w, 30.0.h, 16.0.w, 88.0.h),
                 width: double.infinity,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40.r),
-                    topRight: Radius.circular(40.r),
+                    topLeft: Radius.circular(40),
+                    topRight: Radius.circular(40),
                   ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Username field
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/images/user_icon.png', // Replace with actual asset path
-                          width: 27.w,
-                          height: 27.h,
-                          fit: BoxFit.contain,
-                        ),
+                        Image.asset('assets/images/user_icon.png',
+                            width: 27.w, height: 27.h),
                         SizedBox(width: 2.w),
-                        Text(
-                          'Email',
-                          style: TextStyle(
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'Montserrat',
-                          ),
-                        ),
+                        Text('Email',
+                            style: TextStyle(
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Montserrat')),
                       ],
                     ),
                     SizedBox(height: 7.h),
@@ -241,51 +327,34 @@ class _DangNhapState extends State<DangNhap> {
                       controller: _emailController,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: 14.w,
-                          vertical: 14.h,
-                        ),
+                            horizontal: 14.w, vertical: 14.h),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.r),
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1.w,
-                          ),
+                          borderSide:
+                              const BorderSide(color: Colors.black, width: 1),
                         ),
                         hintText: 'Nhập email',
                         hintStyle: TextStyle(
-                          fontFamily:
-                              'Montserrat', // Áp dụng font cho hint text
-                          fontSize: 15.sp,
-                          color: Colors.grey,
-                        ),
+                            fontFamily: 'Montserrat',
+                            fontSize: 15.sp,
+                            color: Colors.grey),
                       ),
                       style: TextStyle(
-                        fontFamily:
-                            'Montserrat', // Áp dụng font cho nội dung nhập vào
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                      ),
+                          fontFamily: 'Montserrat',
+                          fontSize: 15.sp,
+                          color: Colors.black),
                     ),
-
-                    // Password field
                     SizedBox(height: 21.h),
                     Row(
                       children: [
-                        Image.asset(
-                          'assets/images/password_icon.png', // Replace with actual asset path
-                          width: 27.w,
-                          height: 27.h,
-                          fit: BoxFit.contain,
-                        ),
+                        Image.asset('assets/images/password_icon.png',
+                            width: 27.w, height: 27.h),
                         SizedBox(width: 2.w),
-                        Text(
-                          'Mật khẩu',
-                          style: TextStyle(
-                            fontSize: 17.sp,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'Montserrat',
-                          ),
-                        ),
+                        Text('Mật khẩu',
+                            style: TextStyle(
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Montserrat')),
                       ],
                     ),
                     SizedBox(height: 7.h),
@@ -294,97 +363,66 @@ class _DangNhapState extends State<DangNhap> {
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: 17.w,
-                          vertical: 12.h,
-                        ),
+                            horizontal: 17.w, vertical: 12.h),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.r),
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1.w,
-                          ),
+                          borderSide:
+                              const BorderSide(color: Colors.black, width: 1),
                         ),
                         hintText: 'Nhập mật khẩu',
                         hintStyle: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 15.sp,
-                          color: Colors.grey,
-                        ),
+                            fontFamily: 'Montserrat',
+                            fontSize: 15.sp,
+                            color: Colors.grey),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.black,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.black),
+                          onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
                         ),
                       ),
                       style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 15.sp,
-                        color: Colors.black,
-                      ),
+                          fontFamily: 'Montserrat',
+                          fontSize: 15.sp,
+                          color: Colors.black),
                     ),
-
-                    // Hiển thị lỗi (nếu có)
                     if (_errorMessage != null)
                       Padding(
                         padding: EdgeInsets.only(top: 8.0.h),
                         child: Text(
                           _errorMessage!,
                           style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 14.sp,
-                            fontFamily: 'Montserrat',
-                          ),
+                              color: Colors.red,
+                              fontSize: 14.sp,
+                              fontFamily: 'Montserrat'),
                         ),
                       ),
-
-                    // Forgot password
                     Align(
                       alignment: Alignment.centerRight,
                       child: Padding(
                         padding: EdgeInsets.only(top: 8.h),
                         child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const QuenMatKhau(),
-                              ),
-                            );
-                          },
+                                  builder: (context) => const QuenMatKhau())),
                           child: Text(
                             'Quên mật khẩu?',
                             style: TextStyle(
-                              fontSize: 14.sp,
-                              fontFamily: 'Montserrat',
-                              decoration: TextDecoration.underline,
-                            ),
+                                fontSize: 14.sp,
+                                fontFamily: 'Montserrat',
+                                decoration: TextDecoration.underline),
                           ),
                         ),
                       ),
                     ),
-
-                    // Login button
                     SizedBox(height: 21.h),
                     Center(
                       child: GestureDetector(
-                        onTap: _login, // Gọi hàm đăng nhập
-                        // onTap: () {
-                        //   // Navigator.pushNamed(context, '/dashboard');
-                        //   Navigator.pushReplacement(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => Mainpage(),
-                        //     ),
-                        //   );
-                        // },
+                        onTap: _login,
                         child: Container(
                           width: 200.w,
                           padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -396,84 +434,63 @@ class _DangNhapState extends State<DangNhap> {
                           child: Text(
                             'Đăng nhập',
                             style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 17.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white,
-                            ),
+                                fontFamily: 'Montserrat',
+                                fontSize: 17.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
                           ),
                         ),
                       ),
                     ),
-
-                    // Register link
                     SizedBox(height: 21.h),
                     Center(
                       child: RichText(
                         text: TextSpan(
                           style: TextStyle(
-                            fontSize: 14.sp,
-                            fontFamily: 'Montserrat',
-                            color: Colors.black,
-                          ),
+                              fontSize: 14.sp,
+                              fontFamily: 'Montserrat',
+                              color: Colors.black),
                           children: [
                             const TextSpan(text: 'Chưa có tài khoản? '),
                             TextSpan(
-                                text: 'Đăng ký',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () =>
-                                      // Navigator.pushNamed(ontext, AppRoutes.register)
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const DangKy(),
-                                        ),
-                                      )),
+                              text: 'Đăng ký',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w500),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const DangKy())),
+                            ),
                           ],
                         ),
                       ),
                     ),
-
-                    // Divider
                     SizedBox(height: 21.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: 133.w,
-                          height: 1.h,
-                          color: const Color(0x4D000000),
-                        ),
+                            width: 133.w,
+                            height: 1.h,
+                            color: const Color(0x4D000000)),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 2.w),
-                          child: Text(
-                            'hoặc',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w300,
-                              fontFamily: 'Montserrat',
-                              color: Colors.black,
-                            ),
-                          ),
+                          child: Text('hoặc',
+                              style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w300,
+                                  fontFamily: 'Montserrat')),
                         ),
                         Container(
-                          width: 133.w,
-                          height: 1.h,
-                          color: const Color(0x4D000000),
-                        ),
+                            width: 133.w,
+                            height: 1.h,
+                            color: const Color(0x4D000000)),
                       ],
                     ),
-
-                    // Google login button
                     SizedBox(height: 30.h),
                     GestureDetector(
-                      onTap: () {
-                        login();
-                      },
+                      onTap: login,
                       child: Container(
                         constraints: BoxConstraints(maxWidth: 300.w),
                         padding: EdgeInsets.fromLTRB(17.w, 10.h, 17.w, 10.h),
@@ -481,51 +498,34 @@ class _DangNhapState extends State<DangNhap> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(15.r),
                           border: Border.all(
-                            color: const Color(0xFF1E201E),
-                            width: 1.w,
-                          ),
+                              color: const Color(0xFF1E201E), width: 1),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               children: [
-                                Image.asset(
-                                  'assets/images/google_icon.png',
-                                  width: 30.w,
-                                  height: 30.h,
-                                  fit: BoxFit.contain,
-                                ),
+                                Image.asset('assets/images/google_icon.png',
+                                    width: 30.w, height: 30.h),
                                 SizedBox(width: 10.w),
-                                Text(
-                                  'Tiếp tục với Google',
-                                  style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontFamily: 'Montserrat',
-                                    color: Colors.black,
-                                  ),
-                                ),
+                                Text('Tiếp tục với Google',
+                                    style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontFamily: 'Montserrat')),
                               ],
                             ),
-                            Icon(
-                              Icons.arrow_forward,
-                              size: 26.sp,
-                              color: Colors.black,
-                            ),
+                            Icon(Icons.arrow_forward, size: 26.sp),
                           ],
                         ),
                       ),
                     ),
-
-                    // Facebook login button
                     SizedBox(height: 26.h),
                     GestureDetector(
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Tính năng này chưa được hỗ trợ'),
-                            duration: Duration(seconds: 2),
-                          ),
+                          const SnackBar(
+                              content: Text('Tính năng này chưa được hỗ trợ'),
+                              duration: Duration(seconds: 2)),
                         );
                       },
                       child: Container(
@@ -535,37 +535,23 @@ class _DangNhapState extends State<DangNhap> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(15.r),
                           border: Border.all(
-                            color: const Color(0xFF1E201E),
-                            width: 1.w,
-                          ),
+                              color: const Color(0xFF1E201E), width: 1),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               children: [
-                                Image.asset(
-                                  'assets/images/facebook_icon.png',
-                                  width: 35.w,
-                                  height: 35.h,
-                                  fit: BoxFit.contain,
-                                ),
+                                Image.asset('assets/images/facebook_icon.png',
+                                    width: 35.w, height: 35.h),
                                 SizedBox(width: 7.w),
-                                Text(
-                                  'Tiếp tục với Facebook',
-                                  style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontFamily: 'Montserrat',
-                                    color: Colors.black,
-                                  ),
-                                ),
+                                Text('Tiếp tục với Facebook',
+                                    style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontFamily: 'Montserrat')),
                               ],
                             ),
-                            Icon(
-                              Icons.arrow_forward,
-                              size: 26.sp,
-                              color: Colors.black,
-                            ),
+                            Icon(Icons.arrow_forward, size: 26.sp),
                           ],
                         ),
                       ),
