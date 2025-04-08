@@ -11,6 +11,7 @@ import '../mainpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_moneymate_01/page/dashboard/lichsutheodanhmuc_screen.dart';
 
 class ReportWidget extends StatefulWidget {
   const ReportWidget({super.key});
@@ -109,7 +110,7 @@ class _ReportWidgetState extends State<ReportWidget> {
     monthlyTotal = monthlyIncome - monthlyExpense;
   }
 
-  // Hàm tải chi tiết chi tiêu
+// Hàm tải chi tiết chi tiêu
   Future<void> _loadExpenseDetails(
       String userDocId, DateTime focusedDay) async {
     String monthStr = focusedDay.month.toString().padLeft(2, '0');
@@ -136,6 +137,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         'name': doc['ten_muc_chi'] as String,
         'image': doc['image'] as String,
         'total': 0.0,
+        'transactions': <Map<String, dynamic>>[], // Thêm danh sách giao dịch
       };
     }
 
@@ -148,11 +150,26 @@ class _ReportWidgetState extends State<ReportWidget> {
         .where('ngay', isLessThan: endDate)
         .get();
 
+    int transactionIndex = 0; // Thêm index để sử dụng cho Dismissible
     for (var doc in expenseSnapshot.docs) {
       String categoryId = doc['muc_chi_tieu'] as String;
       double amount = (doc['so_tien'] as num).toDouble();
+      String dateStr = doc['ngay'] as String;
+      DateTime date = DateTime.parse(dateStr);
+
       if (tempExpenseDetails.containsKey(categoryId)) {
         tempExpenseDetails[categoryId]!['total'] += amount;
+        tempExpenseDetails[categoryId]!['transactions'].add({
+          'id': doc.id,
+          'date': date,
+          'rawDate': dateStr,
+          'amount': -amount,
+          'rawAmount': amount,
+          'note': doc['ghi_chu'] as String,
+          'walletId': doc['loai_vi'] as String,
+          'categoryId': categoryId,
+          'index': transactionIndex++, // Thêm index cho giao dịch
+        });
       }
     }
 
@@ -161,7 +178,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         tempExpenseDetails.entries.where((entry) => entry.value['total'] > 0));
   }
 
-  // Hàm tải chi tiết thu nhập
+// Hàm tải chi tiết thu nhập
   Future<void> _loadIncomeDetails(String userDocId, DateTime focusedDay) async {
     String monthStr = focusedDay.month.toString().padLeft(2, '0');
     String yearStr = focusedDay.year.toString();
@@ -187,6 +204,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         'name': doc['ten_muc_thu'] as String,
         'image': doc['image'] as String,
         'total': 0.0,
+        'transactions': <Map<String, dynamic>>[], // Thêm danh sách giao dịch
       };
     }
 
@@ -199,11 +217,26 @@ class _ReportWidgetState extends State<ReportWidget> {
         .where('ngay', isLessThan: endDate)
         .get();
 
+    int transactionIndex = 0; // Thêm index để sử dụng cho Dismissible
     for (var doc in incomeSnapshot.docs) {
       String categoryId = doc['muc_thu_nhap'] as String;
       double amount = (doc['so_tien'] as num).toDouble();
+      String dateStr = doc['ngay'] as String;
+      DateTime date = DateTime.parse(dateStr);
+
       if (tempIncomeDetails.containsKey(categoryId)) {
         tempIncomeDetails[categoryId]!['total'] += amount;
+        tempIncomeDetails[categoryId]!['transactions'].add({
+          'id': doc.id,
+          'date': date,
+          'rawDate': dateStr,
+          'amount': amount,
+          'rawAmount': amount,
+          'note': doc['ghi_chu'] as String,
+          'walletId': doc['loai_vi'] as String,
+          'categoryId': categoryId,
+          'index': transactionIndex++, // Thêm index cho giao dịch
+        });
       }
     }
 
@@ -219,11 +252,34 @@ class _ReportWidgetState extends State<ReportWidget> {
     });
   }
 
+  // Điều hướng đến màn hình chi tiết danh mục
+  void _viewCategoryDetails(String categoryId, bool isIncome) async {
+    // Định dạng _focusedDay thành chuỗi "MM/yyyy"
+    String formattedMonth = DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay);
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LichSuTheoDanhMuc(
+          categoryId: categoryId,
+          isIncome: isIncome,
+          selectedMonth: formattedMonth, // Truyền chuỗi đã định dạng
+        ),
+      ),
+    );
+
+    // Nếu result là true, tức là có giao dịch được cập nhật hoặc xóa, làm mới dữ liệu
+    if (result == true) {
+      await _loadData();
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-         title: Text(
+        title: Text(
           "Báo cáo",
           style: TextStyle(
             fontSize: 20.sp,
@@ -355,7 +411,8 @@ class _ReportWidgetState extends State<ReportWidget> {
                                 ),
                               ),
                               Text(
-                                NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                                NumberFormat.currency(
+                                        locale: 'vi_VN', symbol: 'đ')
                                     .format(monthlyTotal),
                                 style: TextStyle(
                                   fontFamily: 'Montserrat',
@@ -536,73 +593,96 @@ class _ReportWidgetState extends State<ReportWidget> {
                                             : Column(
                                                 children: expenseDetails.entries
                                                     .map((entry) {
-                                                  return Column(
-                                                    children: [
-                                                      SizedBox(height: 8.h),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              Image.asset(
-                                                                entry.value[
-                                                                    'image'],
-                                                                width: 30.w,
-                                                                height: 30.h,
-                                                                fit: BoxFit
-                                                                    .contain,
-                                                              ),
-                                                              SizedBox(
-                                                                  width: 6.w),
-                                                              Text(
-                                                                entry.value[
-                                                                    'name'],
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      'Montserrat',
-                                                                  fontSize: 15.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
+                                                  return GestureDetector(
+                                                    onTap: () =>
+                                                        _viewCategoryDetails(
+                                                            entry.key,
+                                                            false), // Gọi hàm điều hướng
+                                                    child: Column(
+                                                      children: [
+                                                        SizedBox(height: 8.h),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                Image.asset(
+                                                                  entry.value[
+                                                                      'image'],
+                                                                  width: 30.w,
+                                                                  height: 30.h,
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                ),
+                                                                SizedBox(
+                                                                    width: 6.w),
+                                                                Text(
+                                                                  entry.value[
+                                                                      'name'],
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                Text(
+                                                                  NumberFormat.currency(
+                                                                          locale:
+                                                                              'vi_VN',
+                                                                          symbol:
+                                                                              'đ')
+                                                                      .format(-entry
+                                                                              .value[
+                                                                          'total']),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    color: Color(
+                                                                        0xFFFE0000),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                    width: 4.w),
+                                                                Icon(
+                                                                  Icons
+                                                                      .chevron_right,
                                                                   color: Colors
                                                                       .black,
+                                                                  size: 20.sp,
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Text(
-                                                            NumberFormat.currency(
-                                                                    locale:
-                                                                        'vi_VN',
-                                                                    symbol: 'đ')
-                                                                .format(-entry
-                                                                        .value[
-                                                                    'total']),
-                                                            style:
-                                                                TextStyle(
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontSize: 15.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: Color(
-                                                                  0xFFFE0000),
+                                                              ],
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Container(
-                                                        margin: EdgeInsets
-                                                            .only(top: 5.h),
-                                                        height: 0.5.h,
-                                                        color: const Color(
-                                                            0xFFD9D9D9),
-                                                      ),
-                                                    ],
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  top: 5.h),
+                                                          height: 0.5.h,
+                                                          color: const Color(
+                                                              0xFFD9D9D9),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   );
                                                 }).toList(),
                                               ),
@@ -628,8 +708,8 @@ class _ReportWidgetState extends State<ReportWidget> {
                               children: [
                                 // Chart section
                                 Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10.w),
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 10.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -661,10 +741,9 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                   ),
                                                 ],
                                               ),
-                                              padding:
-                                                  EdgeInsets.symmetric(
-                                                      horizontal: 12.h,
-                                                      vertical: 4.w),
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 12.h,
+                                                  vertical: 4.w),
                                               child: DropdownButton<String>(
                                                 value: selectedChartThuNhap,
                                                 items: ["Cột", "Tròn"]
@@ -761,73 +840,96 @@ class _ReportWidgetState extends State<ReportWidget> {
                                             : Column(
                                                 children: incomeDetails.entries
                                                     .map((entry) {
-                                                  return Column(
-                                                    children: [
-                                                      SizedBox(height: 8.h),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              Image.asset(
-                                                                entry.value[
-                                                                    'image'],
-                                                                width: 30.w,
-                                                                height: 30.w,
-                                                                fit: BoxFit
-                                                                    .contain,
-                                                              ),
-                                                              SizedBox(
-                                                                  width: 6.w),
-                                                              Text(
-                                                                entry.value[
-                                                                    'name'],
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      'Montserrat',
-                                                                  fontSize: 15.sp,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
+                                                  return GestureDetector(
+                                                    onTap: () =>
+                                                        _viewCategoryDetails(
+                                                            entry.key,
+                                                            true), // Gọi hàm điều hướng
+                                                    child: Column(
+                                                      children: [
+                                                        SizedBox(height: 8.h),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                Image.asset(
+                                                                  entry.value[
+                                                                      'image'],
+                                                                  width: 30.w,
+                                                                  height: 30.w,
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                ),
+                                                                SizedBox(
+                                                                    width: 6.w),
+                                                                Text(
+                                                                  entry.value[
+                                                                      'name'],
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                Text(
+                                                                  NumberFormat.currency(
+                                                                          locale:
+                                                                              'vi_VN',
+                                                                          symbol:
+                                                                              'đ')
+                                                                      .format(entry
+                                                                              .value[
+                                                                          'total']),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                    fontSize:
+                                                                        15.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    color: Color(
+                                                                        0xFF4ABD57),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                    width: 4.w),
+                                                                Icon(
+                                                                  Icons
+                                                                      .chevron_right,
                                                                   color: Colors
                                                                       .black,
+                                                                  size: 20.sp,
                                                                 ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Text(
-                                                            NumberFormat.currency(
-                                                                    locale:
-                                                                        'vi_VN',
-                                                                    symbol: 'đ')
-                                                                .format(entry
-                                                                        .value[
-                                                                    'total']),
-                                                            style:
-                                                                TextStyle(
-                                                              fontFamily:
-                                                                  'Montserrat',
-                                                              fontSize: 15.sp,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              color: Color(
-                                                                  0xFF4ABD57),
+                                                              ],
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Container(
-                                                        margin: EdgeInsets
-                                                            .only(top: 5.h),
-                                                        height: 0.5.h,
-                                                        color: const Color(
-                                                            0xFFD9D9D9),
-                                                      ),
-                                                    ],
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          margin:
+                                                              EdgeInsets.only(
+                                                                  top: 5.h),
+                                                          height: 0.5.h,
+                                                          color: const Color(
+                                                              0xFFD9D9D9),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   );
                                                 }).toList(),
                                               ),

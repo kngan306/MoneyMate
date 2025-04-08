@@ -33,8 +33,21 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
   @override
   void initState() {
     super.initState();
-    int monthIndex = int.parse(widget.selectedMonth.split(' ')[1]);
-    _focusedDay = DateTime(DateTime.now().year, monthIndex, 1);
+    try {
+      // Tách chuỗi "MM/yyyy" bằng ký tự '/'
+      List<String> parts = widget.selectedMonth.split('/');
+      if (parts.length != 2) {
+        throw FormatException(
+            'Invalid selectedMonth format: ${widget.selectedMonth}');
+      }
+      int monthIndex = int.parse(parts[0]); // Lấy phần "MM"
+      int year = int.parse(parts[1]); // Lấy phần "yyyy"
+      _focusedDay = DateTime(year, monthIndex, 1);
+    } catch (e) {
+      print('Error parsing selectedMonth: $e');
+      // Nếu có lỗi, sử dụng giá trị mặc định (ví dụ: tháng hiện tại)
+      _focusedDay = DateTime.now();
+    }
     _loadUserData();
   }
 
@@ -145,8 +158,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
     // Làm mới danh sách giao dịch
     await _loadTransactions();
     setState(() {});
-    // Trả về true để báo hiệu rằng dữ liệu đã thay đổi
-    Navigator.pop(context, true);
+    // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
   }
 
   // Điều hướng đến màn hình chỉnh sửa
@@ -168,8 +180,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
     if (result == true) {
       await _loadTransactions();
       setState(() {});
-      // Trả về true để báo hiệu rằng dữ liệu đã thay đổi
-      Navigator.pop(context, true);
+      // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
     }
   }
 

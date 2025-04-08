@@ -5,7 +5,16 @@ import '../../../widgets/cateitem/category3_item.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemDanhMucThu extends StatefulWidget {
-  const ThemDanhMucThu({Key? key}) : super(key: key);
+  final String? categoryId; // ID của danh mục (dùng khi chỉnh sửa)
+  final String? categoryName; // Tên danh mục (dùng khi chỉnh sửa)
+  final String? categoryImage; // Đường dẫn biểu tượng (dùng khi chỉnh sửa)
+
+  const ThemDanhMucThu({
+    Key? key,
+    this.categoryId,
+    this.categoryName,
+    this.categoryImage,
+  }) : super(key: key);
 
   @override
   State<ThemDanhMucThu> createState() => _ThemDanhMucThuState();
@@ -17,6 +26,18 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
 
   final List<String> _iconCate =
       List.generate(56, (index) => 'assets/images/cate${index + 1}.png');
+
+  @override
+  void initState() {
+    super.initState();
+    // Nếu ở chế độ chỉnh sửa, điền sẵn thông tin danh mục
+    if (widget.categoryName != null) {
+      _categoryNameController.text = widget.categoryName!;
+    }
+    if (widget.categoryImage != null) {
+      _selectedIconIndex = _iconCate.indexOf(widget.categoryImage!);
+    }
+  }
 
   @override
   void dispose() {
@@ -50,25 +71,43 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
         if (userDoc.docs.isNotEmpty) {
           String userDocId = userDoc.docs.first.id;
 
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userDocId)
-              .collection('danh_muc_thu')
-              .add({
-            'ten_muc_thu': _categoryNameController.text,
-            'image': _iconCate[_selectedIconIndex!],
-          });
+          if (widget.categoryId != null) {
+            // Chế độ chỉnh sửa: Cập nhật danh mục hiện có
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userDocId)
+                .collection('danh_muc_thu')
+                .doc(widget.categoryId)
+                .update({
+              'ten_muc_thu': _categoryNameController.text,
+              'image': _iconCate[_selectedIconIndex!],
+            });
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Đã lưu danh mục thành công')),
-          );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Đã cập nhật danh mục thành công')),
+            );
+          } else {
+            // Chế độ thêm mới: Thêm danh mục mới
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userDocId)
+                .collection('danh_muc_thu')
+                .add({
+              'ten_muc_thu': _categoryNameController.text,
+              'image': _iconCate[_selectedIconIndex!],
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Đã lưu danh mục thành công')),
+            );
+          }
 
           setState(() {
             _categoryNameController.clear();
             _selectedIconIndex = null;
           });
 
-          // Trả về true để thông báo rằng danh mục đã được thêm thành công
+          // Trả về true để thông báo rằng danh mục đã được thêm hoặc cập nhật thành công
           Navigator.pop(context, true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -94,7 +133,9 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E201E),
         title: Text(
-          'Danh mục thu nhập',
+          widget.categoryId != null
+              ? 'Chỉnh sửa danh mục'
+              : 'Danh mục thu nhập',
           style: TextStyle(
             fontFamily: 'Montserrat',
             fontSize: 20.sp,
@@ -104,7 +145,10 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            // Trả về true để thông báo rằng danh sách danh mục có thể đã thay đổi
+            Navigator.pop(context, true);
+          },
         ),
         centerTitle: true,
         elevation: 0,
@@ -220,7 +264,7 @@ class _ThemDanhMucThuState extends State<ThemDanhMucThu> {
                           ),
                         ),
                         child: Text(
-                          "Lưu",
+                          widget.categoryId != null ? "Cập nhật" : "Lưu",
                           style: TextStyle(
                             fontFamily: 'Montserrat',
                             fontSize: 17.sp,
