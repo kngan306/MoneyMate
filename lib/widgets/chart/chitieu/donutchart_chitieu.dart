@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DonutChart_ChiTieu extends StatefulWidget {
   final String userDocId; // ID của document người dùng
@@ -127,20 +128,20 @@ class _DonutChart_ChiTieuState extends State<DonutChart_ChiTieu> {
       children: [
         // Biểu đồ Donut Chart
         SizedBox(
-          height: 200,
+          height: 200.h,
           child: PieChart(
             PieChartData(
-              sectionsSpace: 2,
-              centerSpaceRadius: 50, // Tạo hiệu ứng Donut Chart
+              sectionsSpace: 2.w,
+              centerSpaceRadius: 50.w, // Tạo hiệu ứng Donut Chart
               sections: categories.map((data) {
                 double percentage = (data["value"] / total) * 100;
                 return PieChartSectionData(
                   value: data["value"].toDouble(),
                   color: data["color"],
-                  radius: 50,
+                  radius: 50.r,
                   title: "${percentage.toStringAsFixed(1)}%",
-                  titleStyle: const TextStyle(
-                    fontSize: 12,
+                  titleStyle: TextStyle(
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -149,29 +150,29 @@ class _DonutChart_ChiTieuState extends State<DonutChart_ChiTieu> {
             ),
           ),
         ),
-        const SizedBox(height: 16), // Khoảng cách giữa chart và legend
+        SizedBox(height: 16.h), // Khoảng cách giữa chart và legend
 
         // Hiển thị chú thích bên dưới
         Wrap(
           alignment: WrapAlignment.center,
-          spacing: 10,
-          runSpacing: 8,
+          spacing: 10.w,
+          runSpacing: 8.h,
           children: categories.map((data) {
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 12,
-                  height: 12,
+                  width: 12.w,
+                  height: 12.h,
                   decoration: BoxDecoration(
                     color: data["color"],
                     shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: 6.w),
                 Text(
                   data["title"],
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12.sp),
                 ),
               ],
             );

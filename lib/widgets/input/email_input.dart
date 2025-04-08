@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EmailInput extends StatefulWidget {
   final TextEditingController controller; // Thêm biến controller
@@ -13,23 +14,23 @@ class _EmailInputState extends State<EmailInput> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 18,
-        vertical: 4,
+      padding: EdgeInsets.symmetric(
+        horizontal: 18.w,
+        vertical: 4.h,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(50),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(50.r),
+        boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.07),
-            blurRadius: 4,
-            offset: Offset(0, 4),
+            blurRadius: 4.r,
+            offset: Offset(0, 4.r),
           ),
         ],
         border: Border.all(
           color: const Color(0xFF1E201E),
-          width: 1,
+          width: 1.w,
         ),
       ),
       child: Row(
@@ -38,34 +39,34 @@ class _EmailInputState extends State<EmailInput> {
             children: [
               Image.asset(
                 'assets/images/email_icon.png',
-                width: 32,
-                height: 32,
+                width: 32.w,
+                height: 32.h,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
               Container(
-                width: 1,
-                height: 35,
+                width: 1.w,
+                height: 35.h,
                 color: const Color.fromRGBO(30, 32, 30, 0.1),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14.w),
             ],
           ),
           Expanded(
             child: TextField(
               controller: widget.controller, // Sử dụng controller từ widget
               keyboardType: TextInputType.emailAddress,
-              style: const TextStyle(
-                fontSize: 15,
+              style: TextStyle(
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 fontFamily: 'Montserrat',
                 color: Colors.black,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'moneymate@gmail.com',
                 hintStyle: TextStyle(
                   color: Colors.grey,
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w400,
                   fontFamily: 'Montserrat',
                 ),
@@ -74,10 +75,10 @@ class _EmailInputState extends State<EmailInput> {
             ),
           ),
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.clear,
               color: Colors.black,
-              size: 22,
+              size: 22.r,
             ),
             onPressed: () {
               widget.controller.clear(); // Xóa nội dung của controller

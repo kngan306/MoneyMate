@@ -3,6 +3,7 @@ import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/themkhoanchi_s
 import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/themkhoanthu_screen.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/tab/thuchi_tab.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemKhoanThuChi extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _ThemKhoanThuChiState extends State<ThemKhoanThuChi> {
          title: Text(
           "Thêm khoản thu chi",
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 12.sp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),

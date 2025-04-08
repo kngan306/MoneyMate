@@ -132,7 +132,7 @@ class _UserWidgetState extends State<UserWidget> {
         title: Text(
           "Tài khoản",
           style: TextStyle(
-            fontSize: 17.sp,
+            fontSize: 20.sp,
             color: Colors.white,
           ),
         ),

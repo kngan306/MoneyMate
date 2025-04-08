@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CategoryItem extends StatelessWidget {
   final String imageUrl;
@@ -20,29 +21,29 @@ class CategoryItem extends StatelessWidget {
       // Sử dụng GestureDetector để xử lý nhấn
       onTap: onTap, // Gọi callback khi nhấn
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 13.h),
         // width: 90,
         // height: 90,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: isSelected ? Border.all(color: Colors.black, width: 1) : null,
+          borderRadius: BorderRadius.circular(15.r),
+          border: isSelected ? Border.all(color: Colors.black, width: 1.w) : null,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center, // Căn giữa nội dung
           children: [
             Image.asset(
               imageUrl,
-              width: 35,
-              height: 35,
+              width: 35.w,
+              height: 35.h,
               fit: BoxFit.contain,
             ),
-            const SizedBox(height: 5),
+            SizedBox(height: 5.h),
             // Cập nhật widget Text để giới hạn chiều dài
             Text(
               label,
-              style: const TextStyle(
-                fontSize: 15,
+              style: TextStyle(
+                fontSize: 15.sp,
                 fontWeight: FontWeight.w400,
                 fontFamily: 'Montserrat',
               ),

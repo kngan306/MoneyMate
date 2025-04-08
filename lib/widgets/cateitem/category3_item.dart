@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CategoryItem extends StatelessWidget {
   final String imageUrl;
@@ -18,11 +19,11 @@ class CategoryItem extends StatelessWidget {
       // Sử dụng GestureDetector để xử lý nhấn
       onTap: onTap, // Gọi callback khi nhấn
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 13.h),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: isSelected ? Border.all(color: Colors.black, width: 1) : null,
+          borderRadius: BorderRadius.circular(15.w),
+          border: isSelected ? Border.all(color: Colors.black, width: 1.w) : null,
         ),
         child: Column(
           mainAxisAlignment:
@@ -30,8 +31,8 @@ class CategoryItem extends StatelessWidget {
           children: [
             Image.asset(
               imageUrl,
-              width: 40,
-              height: 40,
+              width: 40.w,
+              height: 40.h,
               fit: BoxFit.contain,
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class WalletItem extends StatelessWidget {
   final String iconPath; // Đường dẫn đến biểu tượng
@@ -22,27 +23,27 @@ class WalletItem extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 4),
+            blurRadius: 4.r,
+            offset: Offset(0, 4.r),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding:  EdgeInsets.all(15.0.w),
         child: Row(
           children: [
             // Icon
             Image.asset(
               iconPath, // Sử dụng Image.asset để lấy biểu tượng từ assets
-              width: 40,
-              height: 40,
+              width: 40.w,
+              height: 40.h,
             ),
 
-            const SizedBox(width: 21),
+            SizedBox(width: 21.w),
 
             // Content
             Column(
@@ -51,25 +52,25 @@ class WalletItem extends StatelessWidget {
                 // Title
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 17,
+                  style: TextStyle(
+                    fontSize: 17.sp,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'Montserrat',
                   ),
                 ),
 
-                const SizedBox(height: 2),
+                SizedBox(height: 2.h),
 
                 // Amount
                 Text(
                   amount,
-                  style: const TextStyle(
-                    fontSize: 15,
+                  style: TextStyle(
+                    fontSize: 15.sp,
                     fontFamily: 'Montserrat',
                   ),
                 ),
 
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
 
                 // Action button (if needed)
                 if (showAction)
@@ -78,15 +79,15 @@ class WalletItem extends StatelessWidget {
                       // Thay thế Container bằng Image.asset
                       Image.asset(
                         'assets/images/add_icon.png', // Đường dẫn đến biểu tượng của bạn
-                        width: 20,
-                        height: 20,
+                        width: 20.w,
+                        height: 20.h,
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4.w),
                       Text(
                         actionText,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Color(0xFF4ABD57),
-                          fontSize: 15,
+                          fontSize: 15.sp,
                           fontFamily: 'Montserrat',
                         ),
                       ),

@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BarChart_ChiTieu extends StatefulWidget {
   final String userDocId; // ID của document người dùng
@@ -102,8 +103,8 @@ class _BarChart_ChiTieuState extends State<BarChart_ChiTieu> {
               BarChartRodData(
                 toY: totalAmount,
                 color: colors[index % colors.length], // Gán màu tự động không trùng
-                width: 18,
-                borderRadius: BorderRadius.circular(4),
+                width: 18.w,
+                borderRadius: BorderRadius.circular(4.r),
               ),
             ],
           ),
@@ -126,7 +127,7 @@ class _BarChart_ChiTieuState extends State<BarChart_ChiTieu> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 350,
+      height: 350.h,
       child: barGroups.isEmpty
           ? Center(child: Text('Không có dữ liệu chi tiêu trong tháng này'))
           : BarChart(
@@ -137,11 +138,11 @@ class _BarChart_ChiTieuState extends State<BarChart_ChiTieu> {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 40,
+                      reservedSize: 50.w,
                       getTitlesWidget: (value, meta) {
                         return Text(
                           "${(value ~/ 1000)}K",
-                          style: const TextStyle(fontSize: 10),
+                          style: TextStyle(fontSize: 10.sp),
                         );
                       },
                     ),
@@ -152,16 +153,16 @@ class _BarChart_ChiTieuState extends State<BarChart_ChiTieu> {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 50,
+                      reservedSize: 50.w,
                       getTitlesWidget: (value, meta) {
                         int index = value.toInt();
                         if (index >= 0 && index < labels.length) {
                           return Padding(
-                            padding: const EdgeInsets.only(top: 10),
+                            padding: EdgeInsets.only(top: 10.h),
                             child: Text(
                               labels[index],
                               textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 11),
+                              style: TextStyle(fontSize: 11.w),
                             ),
                           );
                         }

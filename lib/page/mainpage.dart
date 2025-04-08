@@ -19,6 +19,7 @@ import 'baoCao/timkiembaocao_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:io';
 
 class Mainpage extends StatefulWidget {
   //const Mainpage({Key? key}) : super(key: key);
@@ -143,139 +144,144 @@ class _MainpageState extends State<Mainpage> {
       );
     }
     return Scaffold(
-        key: _scaffoldKey, // Key để mở Drawer từ trang con
-        body: Center(
-          child: _widgetOptions[_selectedIndex],
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.all(0
-                .w), // Tất cả padding = 0 và sẽ responsive theo chiều rộng màn hình
-            children: [
-              // DrawerHeader với dữ liệu từ Firestore
-              FutureBuilder<Map<String, dynamic>?>(
-                future: _fetchUserData(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    // Hiển thị loading khi đang tải dữ liệu
-                    return DrawerHeader(
-                      decoration: BoxDecoration(color: Color(0xFF1E201E)),
-                      child: Center(
-                          child:
-                              CircularProgressIndicator(color: Colors.white)),
-                    );
-                  } else if (snapshot.hasError || !snapshot.hasData) {
-                    // Hiển thị mặc định nếu có lỗi hoặc không có dữ liệu
-                    return DrawerHeader(
+      key: _scaffoldKey, // Key để mở Drawer từ trang con
+      body: Center(
+        child: _widgetOptions[_selectedIndex],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.all(0
+              .w), // Tất cả padding = 0 và sẽ responsive theo chiều rộng màn hình
+          children: [
+            // DrawerHeader với dữ liệu từ Firestore
+            FutureBuilder<Map<String, dynamic>?>(
+              future: _fetchUserData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // Hiển thị loading khi đang tải dữ liệu
+                  return DrawerHeader(
+                    decoration: BoxDecoration(color: Color(0xFF1E201E)),
+                    child: Center(
+                        child: CircularProgressIndicator(color: Colors.white)),
+                  );
+                } else if (snapshot.hasError || !snapshot.hasData) {
+                  // Hiển thị mặc định nếu có lỗi hoặc không có dữ liệu
+                  return DrawerHeader(
+                    decoration: BoxDecoration(color: Color(0xFF1E201E)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 40.r,
+                          backgroundColor:
+                              Colors.white, // Hình tròn trắng nếu lỗi
+                        ),
+                        SizedBox(height: 8.h),
+                        Text(
+                          'Không xác định',
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 16.sp),
+                        ),
+                        Text(
+                          'Không có email',
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 16.sp),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  // Dữ liệu từ Firestore
+                  var userData = snapshot.data!;
+                  String image = userData['image'] ?? '';
+                  String username = userData['username'] ?? 'Không xác định';
+                  String email = userData['email'] ?? 'Không có email';
+
+                  return Container(
+                    height: 250.h, // Điều chỉnh chiều cao ở đây
+                    child: DrawerHeader(
                       decoration: BoxDecoration(color: Color(0xFF1E201E)),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CircleAvatar(
-                            radius: 40.r,
+                            radius: 50
+                                .r, // Tăng giá trị radius để hình tròn lớn hơn
                             backgroundColor:
-                                Colors.white, // Hình tròn trắng nếu lỗi
+                                image.isEmpty ? Colors.white : null,
+                            backgroundImage: image.isNotEmpty
+                                ? (image.startsWith('assets/')
+                                    ? AssetImage(
+                                        image) // For local asset images
+                                    : (image.startsWith(
+                                            'http') // Check if the image is a network image
+                                        ? NetworkImage(
+                                            image) // For network images
+                                        : FileImage(
+                                            File(image)))) // For file images
+                                : null,
                           ),
                           SizedBox(height: 8.h),
                           Text(
-                            'Không xác định',
+                            username,
                             style:
                                 TextStyle(color: Colors.white, fontSize: 16.sp),
                           ),
                           Text(
-                            'Không có email',
+                            email,
                             style:
                                 TextStyle(color: Colors.white, fontSize: 16.sp),
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
-                    );
-                  } else {
-                    // Dữ liệu từ Firestore
-                    var userData = snapshot.data!;
-                    String image = userData['image'] ?? '';
-                    String username = userData['username'] ?? 'Không xác định';
-                    String email = userData['email'] ?? 'Không có email';
-
-                    return Container(
-                      height: 250.h, // Điều chỉnh chiều cao ở đây
-                      child: DrawerHeader(
-                        decoration: BoxDecoration(color: Color(0xFF1E201E)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircleAvatar(
-                              radius: 50
-                                  .r, // Tăng giá trị radius để hình tròn lớn hơn
-                              backgroundColor:
-                                  image.isEmpty ? Colors.white : null,
-                              backgroundImage: image.isNotEmpty
-                                  ? (image.startsWith('assets/')
-                                      ? AssetImage(image)
-                                      : NetworkImage(image)) as ImageProvider
-                                  : null,
-                            ),
-                            SizedBox(height: 8.h),
-                            Text(
-                              username,
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 16.sp),
-                            ),
-                            Text(
-                              email,
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 16.sp),
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-              // Các mục menu trong Drawer
-              ListTile(
-                leading: const Icon(Icons.notifications_on_outlined),
-                title: const Text('Thông báo'),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _selectedIndex = 5;
-                  });
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.account_balance_wallet_outlined),
-                title: const Text('Ví của tôi'),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _selectedIndex = 6;
-                  });
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings_suggest_outlined),
-                title: const Text('Cài đặt'),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _selectedIndex = 7;
-                  });
-                },
-              ),
-              const Divider(color: Colors.black),
-              ListTile(
-                leading: const Icon(Icons.exit_to_app),
-                title: const Text('Đăng xuất'),
-                onTap: _logout, // Gọi hàm đăng xuất
-              ),
-            ],
-          ),
+                    ),
+                  );
+                }
+              },
+            ),
+            // Các mục menu trong Drawer
+            ListTile(
+              leading: const Icon(Icons.notifications_on_outlined),
+              title: const Text('Thông báo'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _selectedIndex = 5;
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance_wallet_outlined),
+              title: const Text('Ví của tôi'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _selectedIndex = 6;
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_suggest_outlined),
+              title: const Text('Cài đặt'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  _selectedIndex = 7;
+                });
+              },
+            ),
+            const Divider(color: Colors.black),
+            ListTile(
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Đăng xuất'),
+              onTap: _logout, // Gọi hàm đăng xuất
+            ),
+          ],
         ),
-              bottomNavigationBar: StyleProvider(
+      ),
+      bottomNavigationBar: StyleProvider(
         style: Style(),
         child: ConvexAppBar(
           backgroundColor: const Color(0xFF1E201E),
@@ -301,9 +307,10 @@ class _MainpageState extends State<Mainpage> {
           },
         ),
       ),
-      );
+    );
   }
 }
+
 class Style extends StyleHook {
   @override
   double get activeIconSize => 40;
@@ -318,10 +325,10 @@ class Style extends StyleHook {
   @override
   TextStyle textStyle(Color color, String? title) {
     return TextStyle(
-      fontSize: color == Colors.blue ? 16.sp : 12.sp, // Use the color parameter to decide the font size
+      fontSize: color == Colors.blue
+          ? 16.sp
+          : 12.sp, // Use the color parameter to decide the font size
       color: color, // Use the color parameter here
     );
   }
 }
-
-
