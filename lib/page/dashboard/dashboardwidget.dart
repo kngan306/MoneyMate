@@ -523,7 +523,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               ),
               SizedBox(height: 20.h),
               Padding(
-                padding: EdgeInsets.only(bottom: 30.h),
+                padding: EdgeInsets.only(bottom: 20.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

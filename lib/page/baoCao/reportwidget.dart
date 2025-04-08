@@ -673,7 +673,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                         Container(
                                                           margin:
                                                               EdgeInsets.only(
-                                                                  top: 5.h),
+                                                                  top: 10.h),
                                                           height: 0.5.h,
                                                           color: const Color(
                                                               0xFFD9D9D9),
@@ -919,7 +919,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                         Container(
                                                           margin:
                                                               EdgeInsets.only(
-                                                                  top: 5.h),
+                                                                  top: 8.h),
                                                           height: 0.5.h,
                                                           color: const Color(
                                                               0xFFD9D9D9),

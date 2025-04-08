@@ -14,7 +14,8 @@ class ThemKhoanChi extends StatefulWidget {
   final Map<String, dynamic>? transaction;
   final Function? onTransactionSaved; // Callback để thông báo khi lưu giao dịch
 
-  const ThemKhoanChi({Key? key, this.transaction, this.onTransactionSaved}) : super(key: key);
+  const ThemKhoanChi({Key? key, this.transaction, this.onTransactionSaved})
+      : super(key: key);
   @override
   State<ThemKhoanChi> createState() => _ThemKhoanChiState();
 }
@@ -374,87 +375,93 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                   fit: BoxFit.contain),
                             ],
                           ),
-                          Transform.translate(
-                            offset: const Offset(0, 0),
-                            child: Container(
-                              padding: EdgeInsets.only(top: 10.0),
-                              child: _categories.isEmpty
-                                  ? const Center(
-                                      child: Text('Không có danh mục chi'))
-                                  : GridView.builder(
-                                      shrinkWrap: true,
-                                      gridDelegate:
-                                          const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 3,
-                                        childAspectRatio: 1,
-                                        crossAxisSpacing: 5,
-                                        mainAxisSpacing: 5,
-                                      ),
-                                      itemCount: _categories.length + 1,
-                                      itemBuilder: (context, index) {
-                                        if (index < _categories.length) {
-                                          var category = _categories[index];
-                                          return CategoryItem(
-                                            imageUrl: category['image'],
-                                            label: category['name'],
-                                            isSelected:
-                                                selectedCategoryIndex == index,
-                                            onTap: () {
-                                              setState(() {
-                                                selectedCategoryIndex = index;
-                                              });
-                                            },
-                                          );
-                                        } else {
-                                          return GestureDetector(
-                                            onTap: () async {
-                                              // Chuyển đến màn hình DanhMucChi và chờ kết quả
-                                              final result =
-                                                  await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DanhMucChi()),
-                                              );
-                                              // Nếu có thay đổi (thêm/xóa/chỉnh sửa danh mục), tải lại danh sách
-                                              if (result == true) {
-                                                await _loadCategories();
-                                                // Đặt lại selectedCategoryIndex nếu danh mục đã chọn không còn tồn tại
-                                                if (selectedCategoryIndex >=
-                                                    _categories.length) {
-                                                  setState(() {
-                                                    selectedCategoryIndex = -1;
-                                                  });
-                                                }
-                                              }
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(15),
-                                              ),
-                                              child: const Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(Icons.edit, size: 30),
-                                                  SizedBox(height: 5),
-                                                  Text('Chỉnh sửa',
-                                                      style: TextStyle(
-                                                          fontSize: 15,
-                                                          fontFamily:
-                                                              'Montserrat')),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
+                          Container(
+                            height: 195, // Chiều cao cố định
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: _categories.isEmpty
+                                ? const Center(
+                                    child: Text('Không có danh mục chi'))
+                                : GridView.builder(
+                                    // shrinkWrap: false là mặc định, giữ nguyên hoặc bỏ cũng được
+                                    physics:
+                                        const BouncingScrollPhysics(), // Cho phép cuộn mềm mại
+                                    itemCount: _categories.length + 1,
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      mainAxisSpacing: 5,
+                                      crossAxisSpacing: 5,
+                                      mainAxisExtent: 90,
                                     ),
-                            ),
-                          ),
+                                    itemBuilder: (context, index) {
+                                      if (index < _categories.length) {
+                                        var category = _categories[index];
+                                        return CategoryItem(
+                                          imageUrl: category['image'],
+                                          label: category['name'],
+                                          isSelected:
+                                              selectedCategoryIndex == index,
+                                          onTap: () {
+                                            setState(() {
+                                              selectedCategoryIndex = index;
+                                            });
+                                          },
+                                        );
+                                      } else {
+                                        return GestureDetector(
+                                          onTap: () async {
+                                            final result = await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Mainpage(selectedIndex: 10,),
+                                              ),
+                                            );
+                                            if (result == true) {
+                                              await _loadCategories();
+                                              if (selectedCategoryIndex >=
+                                                  _categories.length) {
+                                                setState(() {
+                                                  selectedCategoryIndex = -1;
+                                                });
+                                              }
+                                            }
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.fromLTRB(
+                                                6.w, 30.h, 1.w, 30.h),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(15.r),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'Chỉnh sửa',
+                                                  style: TextStyle(
+                                                    fontSize: 15.sp,
+                                                    fontWeight: FontWeight.w400,
+                                                    fontFamily: 'Montserrat',
+                                                  ),
+                                                ),
+                                                SizedBox(width: 3.w),
+                                                Image.asset(
+                                                  'assets/images/arrow2_icon.png',
+                                                  width: 20.w,
+                                                  height: 20.h,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                          )
                         ],
                       ),
                     ),
