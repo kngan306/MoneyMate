@@ -217,38 +217,52 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
 
   // Điều hướng đến màn hình chỉnh sửa
   void _editTransaction(Map<String, dynamic> transaction) async {
+    final isIncome = transaction['isIncome'] == true;
+
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => transaction['isIncome']
-            ? ThemKhoanThu(
-                transaction: {
-                  'id': transaction['id'],
-                  'date': transaction['rawDate'],
-                  'amount': transaction['rawAmount'],
-                  'note': transaction['note'],
-                  'walletId': transaction['walletId'],
-                  'categoryId': transaction['categoryId'],
-                },
-              )
-            : ThemKhoanChi(
-                transaction: {
-                  'id': transaction['id'],
-                  'date': transaction['rawDate'],
-                  'amount': transaction['rawAmount'],
-                  'note': transaction['note'],
-                  'walletId': transaction['walletId'],
-                  'categoryId': transaction['categoryId'],
-                },
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF1E201E),
+            centerTitle: true,
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: Text(
+              isIncome ? 'Chỉnh sửa khoản thu' : 'Chỉnh sửa khoản chi',
+              style: TextStyle(
+                fontSize: 20.sp,
+                color: Colors.white,
               ),
+            ),
+          ),
+          body: isIncome
+              ? ThemKhoanThu(
+                  transaction: {
+                    'id': transaction['id'],
+                    'date': transaction['rawDate'],
+                    'amount': transaction['rawAmount'],
+                    'note': transaction['note'],
+                    'walletId': transaction['walletId'],
+                    'categoryId': transaction['categoryId'],
+                  },
+                )
+              : ThemKhoanChi(
+                  transaction: {
+                    'id': transaction['id'],
+                    'date': transaction['rawDate'],
+                    'amount': transaction['rawAmount'],
+                    'note': transaction['note'],
+                    'walletId': transaction['walletId'],
+                    'categoryId': transaction['categoryId'],
+                  },
+                ),
+        ),
       ),
     );
 
-    // Nếu result là true, tức là giao dịch đã được cập nhật, làm mới danh sách
     if (result == true) {
       await _loadTransactions();
       setState(() {});
-      // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
     }
   }
 

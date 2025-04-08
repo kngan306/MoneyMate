@@ -49,10 +49,15 @@ class _BarChart_ThuNhapState extends State<BarChart_ThuNhap> {
     String monthStr = widget.focusedDay.month.toString().padLeft(2, '0');
     String yearStr = widget.focusedDay.year.toString();
     String startDate = '$yearStr-$monthStr-01'; // Ngày đầu tháng
-    String nextMonthStr = ((widget.focusedDay.month + 1) % 12).toString().padLeft(2, '0');
-    String nextYearStr = (widget.focusedDay.month == 12 ? widget.focusedDay.year + 1 : widget.focusedDay.year).toString();
+    String nextMonthStr =
+        ((widget.focusedDay.month + 1) % 12).toString().padLeft(2, '0');
+    String nextYearStr = (widget.focusedDay.month == 12
+            ? widget.focusedDay.year + 1
+            : widget.focusedDay.year)
+        .toString();
     if (widget.focusedDay.month == 12) nextMonthStr = '01';
-    String endDate = '$nextYearStr-$nextMonthStr-01'; // Ngày đầu tháng tiếp theo
+    String endDate =
+        '$nextYearStr-$nextMonthStr-01'; // Ngày đầu tháng tiếp theo
 
     // Truy vấn danh mục thu nhập
     QuerySnapshot categorySnapshot = await FirebaseFirestore.instance
@@ -67,7 +72,8 @@ class _BarChart_ThuNhapState extends State<BarChart_ThuNhap> {
     // Lấy danh sách danh mục
     for (var doc in categorySnapshot.docs) {
       String categoryId = doc.id;
-      String categoryName = doc['ten_muc_thu'] as String; // Field tên danh mục thu nhập
+      String categoryName =
+          doc['ten_muc_thu'] as String; // Field tên danh mục thu nhập
       categoryMap[categoryId] = categoryName;
       incomeMap[categoryId] = 0.0; // Khởi tạo tổng tiền = 0
     }
@@ -83,7 +89,8 @@ class _BarChart_ThuNhapState extends State<BarChart_ThuNhap> {
 
     // Tính tổng tiền cho từng danh mục
     for (var doc in incomeSnapshot.docs) {
-      String categoryId = doc['muc_thu_nhap'] as String; // Field tham chiếu danh mục
+      String categoryId =
+          doc['muc_thu_nhap'] as String; // Field tham chiếu danh mục
       double amount = (doc['so_tien'] as num).toDouble();
       if (incomeMap.containsKey(categoryId)) {
         incomeMap[categoryId] = incomeMap[categoryId]! + amount;
@@ -95,7 +102,8 @@ class _BarChart_ThuNhapState extends State<BarChart_ThuNhap> {
     barGroups = [];
     int index = 0;
     incomeMap.forEach((categoryId, totalAmount) {
-      if (totalAmount > 0) { // Chỉ hiển thị danh mục có thu nhập
+      if (totalAmount > 0) {
+        // Chỉ hiển thị danh mục có thu nhập
         labels.add(categoryMap[categoryId]!);
         barGroups.add(
           BarChartGroupData(
@@ -130,7 +138,8 @@ class _BarChart_ThuNhapState extends State<BarChart_ThuNhap> {
     return SizedBox(
       height: 350.h,
       child: barGroups.isEmpty
-          ? const Center(child: Text('Không có dữ liệu thu nhập trong tháng này'))
+          ? const Center(
+              child: Text('Không có dữ liệu thu nhập trong tháng này'))
           : BarChart(
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
@@ -148,7 +157,8 @@ class _BarChart_ThuNhapState extends State<BarChart_ThuNhap> {
                       },
                     ),
                   ),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -156,20 +166,28 @@ class _BarChart_ThuNhapState extends State<BarChart_ThuNhap> {
                       getTitlesWidget: (value, meta) {
                         int index = value.toInt();
                         if (index >= 0 && index < labels.length) {
-                          return Padding(
-                            padding:EdgeInsets.only(top: 10.h),
-                            child: Text(
-                              labels[index],
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 11.sp),
+                          String label = labels[index];
+                          String shortenedLabel = label.length > 8
+                              ? '${label.substring(0, 6)}...'
+                              : label;
+
+                          return Transform.rotate(
+                            angle: -0.5, // Xoay khoảng -28 độ
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 10.h),
+                              child: Text(
+                                shortenedLabel,
+                                style: TextStyle(fontSize: 10.sp),
+                              ),
                             ),
                           );
                         }
-                        return const Text('');
+                        return const SizedBox.shrink();
                       },
                     ),
                   ),
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: barGroups,

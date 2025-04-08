@@ -140,6 +140,7 @@ class _DonutChart_ChiTieuState extends State<DonutChart_ChiTieu> {
                   color: data["color"],
                   radius: 50.r,
                   title: "${percentage.toStringAsFixed(1)}%",
+                  // title: percentage >= 5 ? "${percentage.toStringAsFixed(1)}%" : '',
                   titleStyle: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.bold,

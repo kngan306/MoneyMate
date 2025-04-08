@@ -169,6 +169,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
         builder: (context) => Scaffold(
           appBar: AppBar(
             backgroundColor: Color(0xFF1E201E),
+            centerTitle: true,
             title: Text(
               widget.isIncome ? 'Chỉnh sửa khoản thu' : 'Chỉnh sửa khoản chi',
               style: TextStyle(
