@@ -502,7 +502,19 @@ class _DangKyFinalState extends State<DangKyFinal> {
                               );
                               return;
                             }
+                            final passwordRegex = RegExp(
+                                r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$');
 
+                            if (!passwordRegex.hasMatch(password)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ thường, chữ hoa và số',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
                             // Kiểm tra mật khẩu
                             if (password != confirmPassword) {
                               ScaffoldMessenger.of(context).showSnackBar(
