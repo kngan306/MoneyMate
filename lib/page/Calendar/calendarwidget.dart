@@ -23,7 +23,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
   // Dữ liệu thu nhập/chi tiêu
   Map<DateTime, List<Map<String, dynamic>>> transactions = {};
-  Map<DateTime, List<String>> expenses = {}; // Để hiển thị chấm xanh/đỏ
+  Map<DateTime, List<String>> expenses = {};
   double monthlyIncome = 0.0;
   double monthlyExpense = 0.0;
   double monthlyTotal = 0.0;
@@ -33,7 +33,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     super.initState();
     _calendarFormat = CalendarFormat.month;
     _focusedDay = DateTime.now();
-    _selectedDay = null; // Ban đầu không chọn ngày
+    _selectedDay = null;
     _loadUserData();
   }
 
@@ -49,7 +49,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       if (userDoc.docs.isNotEmpty) {
         userDocId = userDoc.docs.first.id;
         await _loadTransactions();
-        setState(() {});
+        // Kiểm tra mounted trước khi gọi setState
+        if (mounted) {
+          setState(() {});
+        }
       }
     }
   }
@@ -61,9 +64,11 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     String monthStr = _focusedDay.month.toString().padLeft(2, '0');
     String yearStr = _focusedDay.year.toString();
     String startDate = '$yearStr-$monthStr-01';
-    String nextMonthStr = ((_focusedDay.month + 1) % 12).toString().padLeft(2, '0');
+    String nextMonthStr =
+        ((_focusedDay.month + 1) % 12).toString().padLeft(2, '0');
     String nextYearStr =
-        (_focusedDay.month == 12 ? _focusedDay.year + 1 : _focusedDay.year).toString();
+        (_focusedDay.month == 12 ? _focusedDay.year + 1 : _focusedDay.year)
+            .toString();
     if (_focusedDay.month == 12) nextMonthStr = '01';
     String endDate = '$nextYearStr-$nextMonthStr-01';
 
@@ -118,7 +123,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     Map<DateTime, List<String>> tempExpenses = {};
     monthlyIncome = 0.0;
     monthlyExpense = 0.0;
-    int transactionIndex = 0; // Thêm index để sử dụng cho Dismissible
+    int transactionIndex = 0;
 
     // Xử lý thu nhập
     for (var doc in incomeSnapshot.docs) {
@@ -144,7 +149,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         'note': doc['ghi_chu'] as String,
         'walletId': doc['loai_vi'] as String,
         'categoryId': categoryId,
-        'index': transactionIndex++, // Thêm index cho giao dịch
+        'index': transactionIndex++,
       });
 
       tempExpenses[normalizedDate]!.add('+$amount');
@@ -175,7 +180,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         'note': doc['ghi_chu'] as String,
         'walletId': doc['loai_vi'] as String,
         'categoryId': categoryId,
-        'index': transactionIndex++, // Thêm index cho giao dịch
+        'index': transactionIndex++,
       });
 
       tempExpenses[normalizedDate]!.add('-$amount');
@@ -184,10 +189,13 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
     monthlyTotal = monthlyIncome - monthlyExpense;
 
-    setState(() {
-      transactions = tempTransactions;
-      expenses = tempExpenses;
-    });
+    // Kiểm tra mounted trước khi gọi setState
+    if (mounted) {
+      setState(() {
+        transactions = tempTransactions;
+        expenses = tempExpenses;
+      });
+    }
   }
 
   // Điều hướng đến màn hình chỉnh sửa
@@ -200,7 +208,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 transaction: {
                   'id': transaction['id'],
                   'date': DateFormat('yyyy-MM-dd').format(transaction['date']),
-                  'amount': transaction['amount'].abs(), // Lấy giá trị tuyệt đối
+                  'amount': transaction['amount'].abs(),
                   'note': transaction['note'],
                   'walletId': transaction['walletId'],
                   'categoryId': transaction['categoryId'],
@@ -210,7 +218,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 transaction: {
                   'id': transaction['id'],
                   'date': DateFormat('yyyy-MM-dd').format(transaction['date']),
-                  'amount': transaction['amount'].abs(), // Lấy giá trị tuyệt đối
+                  'amount': transaction['amount'].abs(),
                   'note': transaction['note'],
                   'walletId': transaction['walletId'],
                   'categoryId': transaction['categoryId'],
@@ -219,11 +227,13 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       ),
     );
 
-    // Nếu result là true, tức là giao dịch đã được cập nhật, làm mới danh sách
+    // Nếu result là true, làm mới danh sách
     if (result == true) {
       await _loadTransactions();
-      setState(() {});
-      // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
+      // Kiểm tra mounted trước khi gọi setState
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -232,7 +242,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     if (userDocId == null) return;
 
     // Tìm giao dịch cần xóa
-    final transaction = transactions[normalizedDate]!.firstWhere((t) => t['index'] == index);
+    final transaction =
+        transactions[normalizedDate]!.firstWhere((t) => t['index'] == index);
     String transactionId = transaction['id'];
     bool isIncome = transaction['isIncome'];
 
@@ -246,13 +257,15 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
     // Làm mới danh sách giao dịch
     await _loadTransactions();
-    setState(() {});
-    // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
+    // Kiểm tra mounted trước khi gọi setState
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _changeMonth(int step) async {
     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
-    _selectedDay = null; // Reset ngày được chọn khi đổi tháng
+    _selectedDay = null;
     setState(() {});
     await _loadTransactions();
   }
@@ -291,7 +304,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     ),
                     Container(
                       width: 250.w,
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.black, width: 1.w),
                         borderRadius: BorderRadius.circular(8.r),
@@ -300,7 +314,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                       child: Center(
                         child: Text(
                           DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 18.sp, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -327,12 +342,11 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     _focusedDay = focusedDay;
                   });
                 },
-                onPageChanged: (focusedDay) {
-                  setState(() {
-                    _focusedDay = focusedDay;
-                    _selectedDay = null; // Reset ngày được chọn khi đổi tháng
-                    _loadTransactions();
-                  });
+                onPageChanged: (focusedDay) async {
+                  _focusedDay = focusedDay;
+                  _selectedDay = null;
+                  setState(() {});
+                  await _loadTransactions();
                 },
                 daysOfWeekHeight: 30.h,
                 rowHeight: 60.h,
@@ -346,7 +360,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 ),
                 calendarBuilders: CalendarBuilders(
                   defaultBuilder: (context, date, focusedDay) {
-                    DateTime normalizedDate = DateTime(date.year, date.month, date.day);
+                    DateTime normalizedDate =
+                        DateTime(date.year, date.month, date.day);
                     List<String>? dayExpenses = expenses[normalizedDate];
 
                     return Column(
@@ -377,7 +392,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                                 ),
                               if (dayExpenses.any((t) => t.startsWith('-')))
                                 Container(
-                                  margin: const EdgeInsets.only(top: 3, left: 2),
+                                  margin:
+                                      const EdgeInsets.only(top: 3, left: 2),
                                   width: 6.w,
                                   height: 6.h,
                                   decoration: const BoxDecoration(
@@ -401,15 +417,18 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   children: [
                     _buildSummaryColumn(
                         "Thu nhập",
-                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(monthlyIncome),
+                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                            .format(monthlyIncome),
                         Colors.green),
                     _buildSummaryColumn(
                         "Chi Tiêu",
-                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(monthlyExpense),
+                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                            .format(monthlyExpense),
                         Colors.red),
                     _buildSummaryColumn(
                         "Tổng",
-                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(monthlyTotal),
+                        NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                            .format(monthlyTotal),
                         Colors.black),
                   ],
                 ),
@@ -519,10 +538,11 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
                 child: GestureDetector(
-                  onTap: () => _editTransaction(transaction), // Gọi hàm chỉnh sửa
+                  onTap: () => _editTransaction(transaction),
                   child: Container(
                     color: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

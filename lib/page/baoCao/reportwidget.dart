@@ -33,10 +33,8 @@ class _ReportWidgetState extends State<ReportWidget> {
   double monthlyTotal = 0.0;
 
   // Dữ liệu động cho danh sách chi tiết
-  Map<String, Map<String, dynamic>> expenseDetails =
-      {}; // Chi tiết chi tiêu: {categoryId: {name, image, total}}
-  Map<String, Map<String, dynamic>> incomeDetails =
-      {}; // Chi tiết thu nhập: {categoryId: {name, image, total}}
+  Map<String, Map<String, dynamic>> expenseDetails = {};
+  Map<String, Map<String, dynamic>> incomeDetails = {};
 
   @override
   void initState() {
@@ -60,11 +58,12 @@ class _ReportWidgetState extends State<ReportWidget> {
         userDocId = userDoc.docs.first.id;
         print('User Document ID: $userDocId');
         await _calculateMonthlyData(userDocId!, _focusedDay);
-        await _loadExpenseDetails(
-            userDocId!, _focusedDay); // Tải chi tiết chi tiêu
-        await _loadIncomeDetails(
-            userDocId!, _focusedDay); // Tải chi tiết thu nhập
-        setState(() {});
+        await _loadExpenseDetails(userDocId!, _focusedDay);
+        await _loadIncomeDetails(userDocId!, _focusedDay);
+        // Kiểm tra mounted trước khi gọi setState
+        if (mounted) {
+          setState(() {});
+        }
       } else {
         print('Không tìm thấy thông tin người dùng trong Firestore.');
       }
@@ -110,7 +109,7 @@ class _ReportWidgetState extends State<ReportWidget> {
     monthlyTotal = monthlyIncome - monthlyExpense;
   }
 
-// Hàm tải chi tiết chi tiêu
+  // Hàm tải chi tiết chi tiêu
   Future<void> _loadExpenseDetails(
       String userDocId, DateTime focusedDay) async {
     String monthStr = focusedDay.month.toString().padLeft(2, '0');
@@ -137,7 +136,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         'name': doc['ten_muc_chi'] as String,
         'image': doc['image'] as String,
         'total': 0.0,
-        'transactions': <Map<String, dynamic>>[], // Thêm danh sách giao dịch
+        'transactions': <Map<String, dynamic>>[],
       };
     }
 
@@ -150,7 +149,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         .where('ngay', isLessThan: endDate)
         .get();
 
-    int transactionIndex = 0; // Thêm index để sử dụng cho Dismissible
+    int transactionIndex = 0;
     for (var doc in expenseSnapshot.docs) {
       String categoryId = doc['muc_chi_tieu'] as String;
       double amount = (doc['so_tien'] as num).toDouble();
@@ -168,7 +167,7 @@ class _ReportWidgetState extends State<ReportWidget> {
           'note': doc['ghi_chu'] as String,
           'walletId': doc['loai_vi'] as String,
           'categoryId': categoryId,
-          'index': transactionIndex++, // Thêm index cho giao dịch
+          'index': transactionIndex++,
         });
       }
     }
@@ -178,7 +177,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         tempExpenseDetails.entries.where((entry) => entry.value['total'] > 0));
   }
 
-// Hàm tải chi tiết thu nhập
+  // Hàm tải chi tiết thu nhập
   Future<void> _loadIncomeDetails(String userDocId, DateTime focusedDay) async {
     String monthStr = focusedDay.month.toString().padLeft(2, '0');
     String yearStr = focusedDay.year.toString();
@@ -204,7 +203,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         'name': doc['ten_muc_thu'] as String,
         'image': doc['image'] as String,
         'total': 0.0,
-        'transactions': <Map<String, dynamic>>[], // Thêm danh sách giao dịch
+        'transactions': <Map<String, dynamic>>[],
       };
     }
 
@@ -217,7 +216,7 @@ class _ReportWidgetState extends State<ReportWidget> {
         .where('ngay', isLessThan: endDate)
         .get();
 
-    int transactionIndex = 0; // Thêm index để sử dụng cho Dismissible
+    int transactionIndex = 0;
     for (var doc in incomeSnapshot.docs) {
       String categoryId = doc['muc_thu_nhap'] as String;
       double amount = (doc['so_tien'] as num).toDouble();
@@ -235,7 +234,7 @@ class _ReportWidgetState extends State<ReportWidget> {
           'note': doc['ghi_chu'] as String,
           'walletId': doc['loai_vi'] as String,
           'categoryId': categoryId,
-          'index': transactionIndex++, // Thêm index cho giao dịch
+          'index': transactionIndex++,
         });
       }
     }
@@ -254,7 +253,6 @@ class _ReportWidgetState extends State<ReportWidget> {
 
   // Điều hướng đến màn hình chi tiết danh mục
   void _viewCategoryDetails(String categoryId, bool isIncome) async {
-    // Định dạng _focusedDay thành chuỗi "MM/yyyy"
     String formattedMonth = DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay);
 
     final result = await Navigator.push(
@@ -263,15 +261,18 @@ class _ReportWidgetState extends State<ReportWidget> {
         builder: (context) => LichSuTheoDanhMuc(
           categoryId: categoryId,
           isIncome: isIncome,
-          selectedMonth: formattedMonth, // Truyền chuỗi đã định dạng
+          selectedMonth: formattedMonth,
         ),
       ),
     );
 
-    // Nếu result là true, tức là có giao dịch được cập nhật hoặc xóa, làm mới dữ liệu
+    // Nếu result là true, làm mới dữ liệu
     if (result == true) {
       await _loadData();
-      setState(() {});
+      // Kiểm tra mounted trước khi gọi setState
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
@@ -396,33 +397,30 @@ class _ReportWidgetState extends State<ReportWidget> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 14.h),
-                        child: Expanded(
-                          child: Row(
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Tổng: ',
-                                style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Tổng: ',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black,
                               ),
-                              Text(
-                                NumberFormat.currency(
-                                        locale: 'vi_VN', symbol: 'đ')
-                                    .format(monthlyTotal),
-                                style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
+                            ),
+                            Text(
+                              NumberFormat.currency(
+                                      locale: 'vi_VN', symbol: 'đ')
+                                  .format(monthlyTotal),
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -596,8 +594,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                   return GestureDetector(
                                                     onTap: () =>
                                                         _viewCategoryDetails(
-                                                            entry.key,
-                                                            false), // Gọi hàm điều hướng
+                                                            entry.key, false),
                                                     child: Column(
                                                       children: [
                                                         SizedBox(height: 8.h),
@@ -843,8 +840,7 @@ class _ReportWidgetState extends State<ReportWidget> {
                                                   return GestureDetector(
                                                     onTap: () =>
                                                         _viewCategoryDetails(
-                                                            entry.key,
-                                                            true), // Gọi hàm điều hướng
+                                                            entry.key, true),
                                                     child: Column(
                                                       children: [
                                                         SizedBox(height: 8.h),
