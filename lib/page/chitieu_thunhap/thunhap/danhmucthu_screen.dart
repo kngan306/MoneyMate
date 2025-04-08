@@ -85,6 +85,19 @@ class _DanhMucThuState extends State<DanhMucThu> {
     });
   }
 
+  // Kiểm tra xem danh mục có đang được sử dụng trong bảng thu_nhap không
+  Future<bool> _isCategoryInUse(String userDocId, String categoryId) async {
+    QuerySnapshot incomeSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection('thu_nhap')
+        .where('muc_thu_nhap', isEqualTo: categoryId)
+        .limit(1)
+        .get();
+
+    return incomeSnapshot.docs.isNotEmpty;
+  }
+
   Future<void> _deleteSelectedCategories() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -108,20 +121,48 @@ class _DanhMucThuState extends State<DanhMucThu> {
           return;
         }
 
+        int deletedCount = 0;
+        List<String> inUseCategories = [];
+
         for (String categoryId in selectedCategoryIds) {
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userDocId)
-              .collection('danh_muc_thu')
-              .doc(categoryId)
-              .delete();
+          bool isInUse = await _isCategoryInUse(userDocId, categoryId);
+          if (isInUse) {
+            // Nếu danh mục đang được sử dụng, thêm vào danh sách không xóa được
+            var category =
+                _allCategories.firstWhere((cat) => cat['id'] == categoryId);
+            inUseCategories.add(category['name']);
+          } else {
+            // Nếu không được sử dụng, tiến hành xóa
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userDocId)
+                .collection('danh_muc_thu')
+                .doc(categoryId)
+                .delete();
+            deletedCount++;
+          }
         }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Đã xóa ${selectedCategoryIds.length} danh mục')),
-        );
+        // Hiển thị thông báo kết quả
+        if (inUseCategories.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Không thể xóa danh mục "${inUseCategories.join(', ')}" vì đang được sử dụng trong giao dịch.',
+              ),
+            ),
+          );
+        }
 
+        if (deletedCount > 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Đã xóa $deletedCount danh mục.'),
+            ),
+          );
+        }
+
+        // Tải lại danh mục sau khi xóa
         await _loadCategories();
       }
     }
