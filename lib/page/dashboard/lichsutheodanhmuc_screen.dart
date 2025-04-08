@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../widgets/custom_app_bar.dart';
-
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/themkhoanchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/themkhoanthu_screen.dart';
 
 class LichSuTheoDanhMuc extends StatefulWidget {
   final String categoryId; // ID của danh mục
@@ -105,8 +106,13 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
     setState(() {
       transactions = transactionSnapshot.docs.map((doc) {
         return {
+          'id': doc.id, // ID của document để cập nhật sau này
           'date': doc['ngay'] as String,
           'amount': (doc['so_tien'] as num).toDouble(),
+          'note': doc['ghi_chu'] as String,
+          'walletId': doc['loai_vi'] as String,
+          'categoryId':
+              doc[widget.isIncome ? 'muc_thu_nhap' : 'muc_chi_tieu'] as String,
         };
       }).toList();
     });
@@ -121,11 +127,50 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
     await _loadTransactions();
   }
 
-  void _deleteTransaction(String date, int index) {
-    print("Deleted transaction at index $index on date $date");
-    setState(() {
-      transactions.removeAt(index);
-    });
+  // Xóa giao dịch trên Firestore và làm mới danh sách
+  void _deleteTransaction(String date, int index) async {
+    if (userDocId == null) return;
+
+    // Lấy ID của giao dịch từ transactions
+    String transactionId = transactions[index]['id'];
+
+    // Xóa giao dịch trên Firestore
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection(widget.isIncome ? 'thu_nhap' : 'chi_tieu')
+        .doc(transactionId)
+        .delete();
+
+    // Làm mới danh sách giao dịch
+    await _loadTransactions();
+    setState(() {});
+    // Trả về true để báo hiệu rằng dữ liệu đã thay đổi
+    Navigator.pop(context, true);
+  }
+
+  // Điều hướng đến màn hình chỉnh sửa
+  void _editTransaction(Map<String, dynamic> transaction) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => widget.isIncome
+            ? ThemKhoanThu(
+                transaction: transaction,
+              )
+            : ThemKhoanChi(
+                transaction: transaction,
+              ),
+      ),
+    );
+
+    // Nếu result là true, tức là giao dịch đã được cập nhật, làm mới danh sách
+    if (result == true) {
+      await _loadTransactions();
+      setState(() {});
+      // Trả về true để báo hiệu rằng dữ liệu đã thay đổi
+      Navigator.pop(context, true);
+    }
   }
 
   @override
@@ -214,6 +259,7 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
             SizedBox(height: 20.h),
 
             // Transaction list
+            // Transaction list
             Expanded(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0.0.w, 0.0.h, 0.0.w, 0.0.h),
@@ -245,13 +291,17 @@ class _LichSuTheoDanhMucState extends State<LichSuTheoDanhMuc> {
                                     locale: 'vi_VN', symbol: 'đ')
                                 .format(widget.isIncome ? amount : -amount);
 
-                            return Padding(
-                              padding:
-                                  EdgeInsets.symmetric(horizontal: 16.0.w),
-                              child: _buildTransactionItem(
-                                date: formattedDate,
-                                amount: formattedAmount,
-                                index: index,
+                            return GestureDetector(
+                              onTap: () => _editTransaction(
+                                  transaction), // Gọi hàm chỉnh sửa
+                              child: Padding(
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 16.0.w),
+                                child: _buildTransactionItem(
+                                  date: formattedDate,
+                                  amount: formattedAmount,
+                                  index: index,
+                                ),
                               ),
                             );
                           },

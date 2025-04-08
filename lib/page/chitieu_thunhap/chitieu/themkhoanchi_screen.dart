@@ -11,7 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemKhoanChi extends StatefulWidget {
-  const ThemKhoanChi({Key? key}) : super(key: key);
+  final Map<String, dynamic>? transaction; // Thêm tham số transaction
+  const ThemKhoanChi({Key? key, this.transaction}) : super(key: key);
 
   @override
   State<ThemKhoanChi> createState() => _ThemKhoanChiState();
@@ -29,7 +30,29 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
   @override
   void initState() {
     super.initState();
-    _loadCategories(); // Tải danh mục khi khởi tạo
+    if (widget.transaction != null) {
+      final transaction = widget.transaction!;
+      selectedDate = DateTime.parse(transaction['date']);
+      _amountController.text =
+          NumberFormat.currency(locale: 'vi_VN', symbol: '')
+              .format(transaction['amount']);
+      _noteController.text = transaction['note'];
+      _selectedWallet = transaction['walletId'] == "QXf9f0y54ga0CH3VFym0"
+          ? "Tiền mặt"
+          : "Chuyển khoản";
+      _loadCategories().then((_) {
+        for (int i = 0; i < _categories.length; i++) {
+          if (_categories[i]['id'] == transaction['categoryId']) {
+            setState(() {
+              selectedCategoryIndex = i;
+            });
+            break;
+          }
+        }
+      });
+    } else {
+      _loadCategories();
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -109,31 +132,49 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
       if (userDoc.docs.isNotEmpty) {
         String userDocId = userDoc.docs.first.id;
         String categoryId = _categories[selectedCategoryIndex]['id'];
-
         String walletId = _selectedWallet == "Tiền mặt"
             ? "QXf9f0y54ga0CH3VFym0"
             : "X0dMqKhCQguVdmKRSOon";
-
         String cleanedAmount =
             _amountController.text.replaceAll(RegExp(r'[.,]'), '');
         double amount = double.parse(cleanedAmount);
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userDocId)
-            .collection('chi_tieu')
-            .add({
-          'ghi_chu': _noteController.text,
-          'loai_vi': walletId,
-          'muc_chi_tieu': categoryId,
-          'ngay': DateFormat('yyyy-MM-dd').format(selectedDate!),
-          'so_tien': amount,
-        });
+        if (widget.transaction != null) {
+          // Cập nhật giao dịch
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userDocId)
+              .collection('chi_tieu')
+              .doc(widget.transaction!['id'])
+              .update({
+            'ghi_chu': _noteController.text,
+            'loai_vi': walletId,
+            'muc_chi_tieu': categoryId,
+            'ngay': DateFormat('yyyy-MM-dd').format(selectedDate!),
+            'so_tien': amount,
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đã cập nhật khoản chi')),
+          );
+        } else {
+          // Thêm mới giao dịch
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userDocId)
+              .collection('chi_tieu')
+              .add({
+            'ghi_chu': _noteController.text,
+            'loai_vi': walletId,
+            'muc_chi_tieu': categoryId,
+            'ngay': DateFormat('yyyy-MM-dd').format(selectedDate!),
+            'so_tien': amount,
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Đã lưu khoản chi')),
+          );
+        }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Đã lưu khoản chi')),
-        );
-
+        // Reset form sau khi lưu hoặc cập nhật
         setState(() {
           selectedDate = null;
           _amountController.clear();
@@ -141,6 +182,9 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
           _selectedWallet = 'Chọn ví tiền của bạn';
           selectedCategoryIndex = -1;
         });
+
+        // Trả về true để báo hiệu rằng giao dịch đã được cập nhật
+        Navigator.pop(context, true);
       }
     }
   }
@@ -159,11 +203,11 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                     Container(
                       padding: EdgeInsets.symmetric(
                           horizontal: 13.w, vertical: 15.h),
-                      decoration:  BoxDecoration(
+                      decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border(
-                            bottom:
-                                BorderSide(color: Color(0x1A000000), width: 1.w)),
+                            bottom: BorderSide(
+                                color: Color(0x1A000000), width: 1.w)),
                       ),
                       constraints: BoxConstraints(minHeight: 78.h),
                       child: GestureDetector(
@@ -211,8 +255,8 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border(
-                            bottom:
-                                BorderSide(color: Color(0x1A000000), width: 1.w)),
+                            bottom: BorderSide(
+                                color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         children: [
@@ -267,8 +311,8 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border(
-                            bottom:
-                                BorderSide(color: Color(0x1A000000), width: 1.w)),
+                            bottom: BorderSide(
+                                color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         children: [
@@ -322,7 +366,9 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                       fontFamily: 'Montserrat')),
                               SizedBox(width: 7.w),
                               Image.asset('assets/images/dropdown_icon.png',
-                                  width: 20.w, height: 20.h, fit: BoxFit.contain),
+                                  width: 20.w,
+                                  height: 20.h,
+                                  fit: BoxFit.contain),
                             ],
                           ),
                           Transform.translate(
@@ -365,7 +411,9 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      Mainpage(selectedIndex: 10,),
+                                                      Mainpage(
+                                                    selectedIndex: 10,
+                                                  ),
                                                 ),
                                               );
                                               // Nếu có thay đổi (thêm/xóa danh mục), tải lại danh sách
@@ -409,8 +457,8 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border(
-                            bottom:
-                                BorderSide(color: Color(0x1A000000), width: 1.w)),
+                            bottom: BorderSide(
+                                color: Color(0x1A000000), width: 1.w)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -418,7 +466,9 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                           Row(
                             children: [
                               Image.asset('assets/images/wallet_icon.png',
-                                  width: 30.w, height: 30.h, fit: BoxFit.contain),
+                                  width: 30.w,
+                                  height: 30.h,
+                                  fit: BoxFit.contain),
                               SizedBox(width: 10.w),
                               Text('Ví tiền',
                                   style: TextStyle(
@@ -517,8 +567,7 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                                 }
                               },
                               child: Container(
-                                padding:
-                                    EdgeInsets.symmetric(vertical: 8.h),
+                                padding: EdgeInsets.symmetric(vertical: 8.h),
                                 child: Text(
                                   _selectedWallet,
                                   style: TextStyle(
@@ -552,7 +601,9 @@ class _ThemKhoanChiState extends State<ThemKhoanChi> {
                           minimumSize: Size(220.w, 0),
                         ),
                         child: Text(
-                          'Lưu khoản chi',
+                          widget.transaction != null
+                              ? 'Cập nhật khoản chi'
+                              : 'Lưu khoản chi',
                           style: TextStyle(
                               fontSize: 17.sp,
                               fontWeight: FontWeight.w500,
