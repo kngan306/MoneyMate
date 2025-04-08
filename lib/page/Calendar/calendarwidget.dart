@@ -5,7 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../widgets/custom_app_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/themkhoanchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/themkhoanthu_screen.dart';
 
 class CalendarWidget extends StatefulWidget {
   const CalendarWidget({Key? key}) : super(key: key);
@@ -117,6 +118,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     Map<DateTime, List<String>> tempExpenses = {};
     monthlyIncome = 0.0;
     monthlyExpense = 0.0;
+    int transactionIndex = 0; // Thêm index để sử dụng cho Dismissible
 
     // Xử lý thu nhập
     for (var doc in incomeSnapshot.docs) {
@@ -132,11 +134,17 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       }
 
       tempTransactions[normalizedDate]!.add({
+        'id': doc.id,
         'date': date,
         'day': DateFormat('EEEE', 'vi_VN').format(date),
         'icon': incomeCategories[categoryId]?['image'] ?? '',
         'name': incomeCategories[categoryId]?['name'] ?? 'Không xác định',
         'amount': amount,
+        'isIncome': true,
+        'note': doc['ghi_chu'] as String,
+        'walletId': doc['loai_vi'] as String,
+        'categoryId': categoryId,
+        'index': transactionIndex++, // Thêm index cho giao dịch
       });
 
       tempExpenses[normalizedDate]!.add('+$amount');
@@ -157,11 +165,17 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       }
 
       tempTransactions[normalizedDate]!.add({
+        'id': doc.id,
         'date': date,
         'day': DateFormat('EEEE', 'vi_VN').format(date),
         'icon': expenseCategories[categoryId]?['image'] ?? '',
         'name': expenseCategories[categoryId]?['name'] ?? 'Không xác định',
         'amount': -amount,
+        'isIncome': false,
+        'note': doc['ghi_chu'] as String,
+        'walletId': doc['loai_vi'] as String,
+        'categoryId': categoryId,
+        'index': transactionIndex++, // Thêm index cho giao dịch
       });
 
       tempExpenses[normalizedDate]!.add('-$amount');
@@ -176,6 +190,66 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     });
   }
 
+  // Điều hướng đến màn hình chỉnh sửa
+  void _editTransaction(Map<String, dynamic> transaction) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => transaction['isIncome']
+            ? ThemKhoanThu(
+                transaction: {
+                  'id': transaction['id'],
+                  'date': DateFormat('yyyy-MM-dd').format(transaction['date']),
+                  'amount': transaction['amount'].abs(), // Lấy giá trị tuyệt đối
+                  'note': transaction['note'],
+                  'walletId': transaction['walletId'],
+                  'categoryId': transaction['categoryId'],
+                },
+              )
+            : ThemKhoanChi(
+                transaction: {
+                  'id': transaction['id'],
+                  'date': DateFormat('yyyy-MM-dd').format(transaction['date']),
+                  'amount': transaction['amount'].abs(), // Lấy giá trị tuyệt đối
+                  'note': transaction['note'],
+                  'walletId': transaction['walletId'],
+                  'categoryId': transaction['categoryId'],
+                },
+              ),
+      ),
+    );
+
+    // Nếu result là true, tức là giao dịch đã được cập nhật, làm mới danh sách
+    if (result == true) {
+      await _loadTransactions();
+      setState(() {});
+      // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
+    }
+  }
+
+  // Xóa giao dịch trên Firestore và làm mới danh sách
+  void _deleteTransaction(DateTime normalizedDate, int index) async {
+    if (userDocId == null) return;
+
+    // Tìm giao dịch cần xóa
+    final transaction = transactions[normalizedDate]!.firstWhere((t) => t['index'] == index);
+    String transactionId = transaction['id'];
+    bool isIncome = transaction['isIncome'];
+
+    // Xóa giao dịch trên Firestore
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection(isIncome ? 'thu_nhap' : 'chi_tieu')
+        .doc(transactionId)
+        .delete();
+
+    // Làm mới danh sách giao dịch
+    await _loadTransactions();
+    setState(() {});
+    // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
+  }
+
   void _changeMonth(int step) async {
     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + step, 1);
     _selectedDay = null; // Reset ngày được chọn khi đổi tháng
@@ -187,7 +261,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-         title: Text(
+        title: Text(
           "Lịch",
           style: TextStyle(
             fontSize: 20.sp,
@@ -413,6 +487,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       children: groupedTransactions.entries.map((entry) {
         String date = entry.key;
         List<Map<String, dynamic>> transactionList = entry.value;
+        DateTime normalizedDate = DateTime.parse(
+            DateFormat('dd/MM/yyyy', 'vi_VN').parse(date).toString());
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -430,43 +506,59 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               ),
             ),
             ...transactionList.map((transaction) {
-              return Container(
-                color: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+              return Dismissible(
+                key: Key(transaction['index'].toString()),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) {
+                  _deleteTransaction(normalizedDate, transaction['index']);
+                },
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: EdgeInsets.symmetric(horizontal: 20.0.w),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                child: GestureDetector(
+                  onTap: () => _editTransaction(transaction), // Gọi hàm chỉnh sửa
+                  child: Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Image.asset(
-                          transaction['icon'],
-                          width: 35.w,
-                          height: 35.w,
-                          fit: BoxFit.contain,
+                        Row(
+                          children: [
+                            Image.asset(
+                              transaction['icon'],
+                              width: 35.w,
+                              height: 35.w,
+                              fit: BoxFit.contain,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              transaction['name'],
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 4.w),
                         Text(
-                          transaction['name'],
+                          NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
+                              .format(transaction['amount']),
                           style: TextStyle(
                             fontFamily: 'Montserrat',
                             fontSize: 15.sp,
-                            color: Colors.black,
+                            color: transaction['amount'] >= 0
+                                ? const Color(0xFF4ABD57)
+                                : const Color(0xFFFE0000),
                           ),
                         ),
                       ],
                     ),
-                    Text(
-                      NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
-                          .format(transaction['amount']),
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 15.sp,
-                        color: transaction['amount'] >= 0
-                            ? const Color(0xFF4ABD57)
-                            : const Color(0xFFFE0000),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               );
             }).toList(),

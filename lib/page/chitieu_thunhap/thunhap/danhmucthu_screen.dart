@@ -144,7 +144,10 @@ class _DanhMucThuState extends State<DanhMucThu> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            // Trả về true để thông báo rằng danh sách danh mục có thể đã thay đổi
+            Navigator.pop(context, true);
+          },
         ),
         centerTitle: true,
         elevation: 0,
@@ -318,30 +321,51 @@ class _DanhMucThuState extends State<DanhMucThu> {
                       ),
                     ),
                     child: SizedBox(
-                      // height: 370,
-                      // child: SingleChildScrollView(
                       child: Column(
                         children:
                             _filteredCategories.asMap().entries.map((entry) {
                           int index = entry.key;
                           var category = entry.value;
-                          return CategoryItem(
-                            categoryKey: category['id'],
-                            title: category['name'],
-                            iconUrl: category['image'],
-                            arrowUrl: 'assets/images/arrow2_icon.png',
-                            isFirstItem: index == 0,
-                            isLastItem: index == _filteredCategories.length - 1,
-                            isChecked: categoryCheckStates[category['id']]!,
-                            onCheckboxChanged: (value) {
-                              setState(() {
-                                categoryCheckStates[category['id']] = value;
-                              });
+                          return GestureDetector(
+                            onTap: () async {
+                              // Điều hướng đến ThemDanhMucThu để chỉnh sửa danh mục
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ThemDanhMucThu(
+                                    categoryId:
+                                        category['id'], // Truyền ID danh mục
+                                    categoryName:
+                                        category['name'], // Truyền tên danh mục
+                                    categoryImage: category[
+                                        'image'], // Truyền đường dẫn biểu tượng
+                                  ),
+                                ),
+                              );
+
+                              // Nếu chỉnh sửa thành công, làm mới danh sách danh mục
+                              if (result == true) {
+                                await _loadCategories();
+                              }
                             },
+                            child: CategoryItem(
+                              categoryKey: category['id'],
+                              title: category['name'],
+                              iconUrl: category['image'],
+                              arrowUrl: 'assets/images/arrow2_icon.png',
+                              isFirstItem: index == 0,
+                              isLastItem:
+                                  index == _filteredCategories.length - 1,
+                              isChecked: categoryCheckStates[category['id']]!,
+                              onCheckboxChanged: (value) {
+                                setState(() {
+                                  categoryCheckStates[category['id']] = value;
+                                });
+                              },
+                            ),
                           );
                         }).toList(),
                       ),
-                      // ),
                     ),
                   ),
                 ),

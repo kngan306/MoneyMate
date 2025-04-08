@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../widgets/custom_app_bar.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/chitieu/themkhoanchi_screen.dart';
+import 'package:flutter_moneymate_01/page/chitieu_thunhap/thunhap/themkhoanthu_screen.dart';
 
 class LichSuGhiChep extends StatefulWidget {
   const LichSuGhiChep({Key? key}) : super(key: key);
@@ -49,9 +51,11 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
     String monthStr = _focusedDay.month.toString().padLeft(2, '0');
     String yearStr = _focusedDay.year.toString();
     String startDate = '$yearStr-$monthStr-01';
-    String nextMonthStr = ((_focusedDay.month + 1) % 12).toString().padLeft(2, '0');
+    String nextMonthStr =
+        ((_focusedDay.month + 1) % 12).toString().padLeft(2, '0');
     String nextYearStr =
-        (_focusedDay.month == 12 ? _focusedDay.year + 1 : _focusedDay.year).toString();
+        (_focusedDay.month == 12 ? _focusedDay.year + 1 : _focusedDay.year)
+            .toString();
     if (_focusedDay.month == 12) nextMonthStr = '01';
     String endDate = '$nextYearStr-$nextMonthStr-01';
 
@@ -107,9 +111,10 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
 
     // Xử lý thu nhập
     for (var doc in incomeSnapshot.docs) {
-      String date = doc['ngay'] as String;
-      DateTime parsedDate = DateTime.parse(date);
-      String formattedDate = DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').format(parsedDate);
+      String rawDate = doc['ngay'] as String;
+      DateTime parsedDate = DateTime.parse(rawDate);
+      String formattedDate =
+          DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').format(parsedDate);
       String categoryId = doc['muc_thu_nhap'] as String;
       double amount = (doc['so_tien'] as num).toDouble();
 
@@ -118,19 +123,27 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
       }
 
       tempTransactions[formattedDate]!.add({
+        'id': doc.id, // ID của document để cập nhật sau này
+        'rawDate': rawDate, // Ngày gốc để sử dụng khi chỉnh sửa
         'title': incomeCategories[categoryId]?['name'] ?? 'Không xác định',
-        'amount': NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(amount),
+        'amount':
+            NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(amount),
+        'rawAmount': amount, // Số tiền gốc để sử dụng khi chỉnh sửa
         'isIncome': true,
         'iconUrl': incomeCategories[categoryId]?['image'] ?? '',
         'index': transactionIndex++,
+        'note': doc['ghi_chu'] as String,
+        'walletId': doc['loai_vi'] as String,
+        'categoryId': categoryId,
       });
     }
 
     // Xử lý chi tiêu
     for (var doc in expenseSnapshot.docs) {
-      String date = doc['ngay'] as String;
-      DateTime parsedDate = DateTime.parse(date);
-      String formattedDate = DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').format(parsedDate);
+      String rawDate = doc['ngay'] as String;
+      DateTime parsedDate = DateTime.parse(rawDate);
+      String formattedDate =
+          DateFormat('dd/MM/yyyy (EEEE)', 'vi_VN').format(parsedDate);
       String categoryId = doc['muc_chi_tieu'] as String;
       double amount = (doc['so_tien'] as num).toDouble();
 
@@ -139,11 +152,18 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
       }
 
       tempTransactions[formattedDate]!.add({
+        'id': doc.id, // ID của document để cập nhật sau này
+        'rawDate': rawDate, // Ngày gốc để sử dụng khi chỉnh sửa
         'title': expenseCategories[categoryId]?['name'] ?? 'Không xác định',
-        'amount': NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(-amount),
+        'amount':
+            NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(-amount),
+        'rawAmount': amount, // Số tiền gốc để sử dụng khi chỉnh sửa
         'isIncome': false,
         'iconUrl': expenseCategories[categoryId]?['image'] ?? '',
         'index': transactionIndex++,
+        'note': doc['ghi_chu'] as String,
+        'walletId': doc['loai_vi'] as String,
+        'categoryId': categoryId,
       });
     }
 
@@ -171,14 +191,65 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
     await _loadTransactions();
   }
 
-  void _deleteTransaction(String date, int index) {
-    print("Deleted transaction at index $index on date $date");
-    setState(() {
-      transactions[date]?.removeWhere((transaction) => transaction['index'] == index);
-      if (transactions[date]?.isEmpty ?? true) {
-        transactions.remove(date);
-      }
-    });
+// Xóa giao dịch trên Firestore và làm mới danh sách
+  void _deleteTransaction(String date, int index) async {
+    if (userDocId == null) return;
+
+    // Tìm giao dịch cần xóa
+    final transaction =
+        transactions[date]!.firstWhere((t) => t['index'] == index);
+    String transactionId = transaction['id'];
+    bool isIncome = transaction['isIncome'];
+
+    // Xóa giao dịch trên Firestore
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userDocId)
+        .collection(isIncome ? 'thu_nhap' : 'chi_tieu')
+        .doc(transactionId)
+        .delete();
+
+    // Làm mới danh sách giao dịch
+    await _loadTransactions();
+    setState(() {});
+    // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
+  }
+
+  // Điều hướng đến màn hình chỉnh sửa
+  void _editTransaction(Map<String, dynamic> transaction) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => transaction['isIncome']
+            ? ThemKhoanThu(
+                transaction: {
+                  'id': transaction['id'],
+                  'date': transaction['rawDate'],
+                  'amount': transaction['rawAmount'],
+                  'note': transaction['note'],
+                  'walletId': transaction['walletId'],
+                  'categoryId': transaction['categoryId'],
+                },
+              )
+            : ThemKhoanChi(
+                transaction: {
+                  'id': transaction['id'],
+                  'date': transaction['rawDate'],
+                  'amount': transaction['rawAmount'],
+                  'note': transaction['note'],
+                  'walletId': transaction['walletId'],
+                  'categoryId': transaction['categoryId'],
+                },
+              ),
+      ),
+    );
+
+    // Nếu result là true, tức là giao dịch đã được cập nhật, làm mới danh sách
+    if (result == true) {
+      await _loadTransactions();
+      setState(() {});
+      // Không gọi Navigator.pop(context, true) để tránh quay lại DashboardWidget
+    }
   }
 
   @override
@@ -211,7 +282,8 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
                   ),
                   Container(
                     width: 250.w,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black, width: 1.w),
                       borderRadius: BorderRadius.circular(8.r),
@@ -220,7 +292,8 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
                     child: Center(
                       child: Text(
                         DateFormat("MM/yyyy", 'vi_VN').format(_focusedDay),
-                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -251,7 +324,8 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
                         children: [
                           ...transactions.entries.map((entry) {
                             String date = entry.key;
-                            List<Map<String, dynamic>> transactionList = entry.value;
+                            List<Map<String, dynamic>> transactionList =
+                                entry.value;
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -304,6 +378,9 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
     required int index,
     required String date,
   }) {
+    final transaction =
+        transactions[date]!.firstWhere((t) => t['index'] == index);
+
     return Dismissible(
       key: Key(index.toString()),
       direction: DismissDirection.endToStart,
@@ -316,42 +393,45 @@ class _LichSuGhiChepState extends State<LichSuGhiChep> {
         padding: EdgeInsets.symmetric(horizontal: 20.0.w),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
-      child: Container(
-        color: Colors.white,
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Image.asset(
-                  iconUrl,
-                  width: 35.w,
-                  height: 35.h,
-                  fit: BoxFit.contain,
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontSize: 15.sp,
-                    color: Colors.black,
+      child: GestureDetector(
+        onTap: () => _editTransaction(transaction), // Gọi hàm chỉnh sửa
+        child: Container(
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 13.h),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    iconUrl,
+                    width: 35.w,
+                    height: 35.h,
+                    fit: BoxFit.contain,
                   ),
-                ),
-              ],
-            ),
-            Text(
-              amount,
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-                fontSize: 15.sp,
-                color: isIncome
-                    ? const Color(0xFF4ABD57)
-                    : const Color(0xFFFE0000),
+                  SizedBox(width: 4.w),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontSize: 15.sp,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+              Text(
+                amount,
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  fontSize: 15.sp,
+                  color: isIncome
+                      ? const Color(0xFF4ABD57)
+                      : const Color(0xFFFE0000),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

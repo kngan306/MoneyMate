@@ -414,8 +414,16 @@ class _ThemKhoanThuState extends State<ThemKhoanThu> {
                                                           selectedIndex: 11,
                                                         )),
                                               );
+                                              // Nếu có thay đổi (thêm/xóa/chỉnh sửa danh mục), tải lại danh sách
                                               if (result == true) {
                                                 await _loadCategories();
+                                                // Đặt lại selectedCategoryIndex nếu danh mục đã chọn không còn tồn tại
+                                                if (selectedCategoryIndex >=
+                                                    _categories.length) {
+                                                  setState(() {
+                                                    selectedCategoryIndex = -1;
+                                                  });
+                                                }
                                               }
                                             },
                                             child: Container(

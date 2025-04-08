@@ -5,7 +5,16 @@ import '../../../widgets/cateitem/category3_item.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ThemDanhMucChi extends StatefulWidget {
-  const ThemDanhMucChi({Key? key}) : super(key: key);
+  final String? categoryId; // ID của danh mục (nếu chỉnh sửa)
+  final String? categoryName; // Tên danh mục hiện tại (nếu chỉnh sửa)
+  final String? categoryImage; // Đường dẫn biểu tượng hiện tại (nếu chỉnh sửa)
+
+  const ThemDanhMucChi({
+    Key? key,
+    this.categoryId,
+    this.categoryName,
+    this.categoryImage,
+  }) : super(key: key);
 
   @override
   State<ThemDanhMucChi> createState() => _ThemDanhMucChiState();
@@ -17,6 +26,20 @@ class _ThemDanhMucChiState extends State<ThemDanhMucChi> {
 
   final List<String> _iconCate =
       List.generate(56, (index) => 'assets/images/cate${index + 1}.png');
+
+  @override
+  void initState() {
+    super.initState();
+    // Điền sẵn dữ liệu nếu đang chỉnh sửa
+    if (widget.categoryName != null) {
+      _categoryNameController.text = widget.categoryName!;
+    }
+    if (widget.categoryImage != null) {
+      _selectedIconIndex = _iconCate.indexOf(widget.categoryImage!);
+      if (_selectedIconIndex == -1)
+        _selectedIconIndex = null; // Nếu không tìm thấy biểu tượng
+    }
+  }
 
   @override
   void dispose() {
@@ -50,25 +73,44 @@ class _ThemDanhMucChiState extends State<ThemDanhMucChi> {
         if (userDoc.docs.isNotEmpty) {
           String userDocId = userDoc.docs.first.id;
 
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userDocId)
-              .collection('danh_muc_chi')
-              .add({
+          // Dữ liệu danh mục
+          Map<String, dynamic> categoryData = {
             'ten_muc_chi': _categoryNameController.text,
             'image': _iconCate[_selectedIconIndex!],
-          });
+          };
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Đã lưu danh mục thành công')),
-          );
+          if (widget.categoryId != null) {
+            // Chế độ chỉnh sửa: Cập nhật danh mục hiện tại
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userDocId)
+                .collection('danh_muc_chi')
+                .doc(widget.categoryId)
+                .update(categoryData);
 
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Đã cập nhật danh mục thành công')),
+            );
+          } else {
+            // Chế độ thêm mới: Tạo danh mục mới
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(userDocId)
+                .collection('danh_muc_chi')
+                .add(categoryData);
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Đã thêm danh mục thành công')),
+            );
+          }
+
+          // Xóa dữ liệu trên form và quay lại
           setState(() {
             _categoryNameController.clear();
             _selectedIconIndex = null;
           });
 
-          // Trả về true để thông báo rằng danh mục đã được thêm thành công
+          // Trả về true để thông báo rằng danh mục đã được thêm/cập nhật thành công
           Navigator.pop(context, true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -94,7 +136,9 @@ class _ThemDanhMucChiState extends State<ThemDanhMucChi> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E201E),
         title: Text(
-          'Danh mục chi tiêu',
+          widget.categoryId != null
+              ? 'Chỉnh sửa danh mục chi tiêu'
+              : 'Thêm danh mục chi tiêu',
           style: TextStyle(
             fontFamily: 'Montserrat',
             fontSize: 20.sp,
@@ -220,7 +264,7 @@ class _ThemDanhMucChiState extends State<ThemDanhMucChi> {
                           ),
                         ),
                         child: Text(
-                          "Lưu",
+                          widget.categoryId != null ? "Cập nhật" : "Lưu",
                           style: TextStyle(
                             fontFamily: 'Montserrat',
                             fontSize: 17.sp,
