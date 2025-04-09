@@ -199,16 +199,32 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 
   // Điều hướng đến màn hình chỉnh sửa
-  void _editTransaction(Map<String, dynamic> transaction) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => transaction['isIncome']
+  // Điều hướng đến màn hình chỉnh sửa
+void _editTransaction(Map<String, dynamic> transaction) async {
+  final isIncome = transaction['isIncome'];
+
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF1E201E),
+          centerTitle: true,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: Text(
+            isIncome ? 'Chỉnh sửa khoản thu' : 'Chỉnh sửa khoản chi',
+            style: TextStyle(
+              fontSize: 20.sp,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        body: isIncome
             ? ThemKhoanThu(
                 transaction: {
                   'id': transaction['id'],
                   'date': DateFormat('yyyy-MM-dd').format(transaction['date']),
-                  'amount': transaction['amount'].abs(),
+                  'amount': transaction['amount'].abs(), // Đảm bảo amount là dương
                   'note': transaction['note'],
                   'walletId': transaction['walletId'],
                   'categoryId': transaction['categoryId'],
@@ -218,24 +234,24 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 transaction: {
                   'id': transaction['id'],
                   'date': DateFormat('yyyy-MM-dd').format(transaction['date']),
-                  'amount': transaction['amount'].abs(),
+                  'amount': transaction['amount'].abs(), // Đảm bảo amount là dương
                   'note': transaction['note'],
                   'walletId': transaction['walletId'],
                   'categoryId': transaction['categoryId'],
                 },
               ),
       ),
-    );
+    ),
+  );
 
-    // Nếu result là true, làm mới danh sách
-    if (result == true) {
-      await _loadTransactions();
-      // Kiểm tra mounted trước khi gọi setState
-      if (mounted) {
-        setState(() {});
-      }
+  // Nếu result là true, làm mới danh sách giao dịch
+  if (result == true) {
+    await _loadTransactions();
+    if (mounted) {
+      setState(() {});
     }
   }
+}
 
   // Xóa giao dịch trên Firestore và làm mới danh sách
   void _deleteTransaction(DateTime normalizedDate, int index) async {
