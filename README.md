@@ -50,14 +50,10 @@
 - Payment reminders
 - Multi-device data synchronization
 
----
-
 ## 👤 Target Users
 - Students, professionals, and homemakers who want better control of their finances
 - Users interested in understanding their spending habits and planning budgets
 - Tech-savvy individuals who prefer managing finances on their mobile devices
-
----
 
 ## 🛠️ Technologies Used
 
@@ -80,7 +76,7 @@ Below are some example screenshots showcasing the main features and interfaces o
 
 ---
 
-### 🔐 Authentication
+## 🔐 Authentication
 **Login Screen** – Authenticate via MoneyMate account or Google  
 ![Login](screenshots/login.png)  
 
@@ -97,9 +93,7 @@ Below are some example screenshots showcasing the main features and interfaces o
 **Forgot Password** – Reset password via email verification code  
 ![Forgot Password](screenshots/forgot-password.png)  
 
----
-
-### 🏠 Main Features
+## 🏠 Main Features
 **Home Screen** – Overview of balance, monthly income/expenses chart, and quick category list  
 ![Home](screenshots/home.png)  
 
@@ -127,9 +121,7 @@ Below are some example screenshots showcasing the main features and interfaces o
 **Add Income Category** – Create a new income category  
 ![Add Income Category](screenshots/add-income-category.png)  
 
----
-
-### 📅 Calendar & Reports
+## 📅 Calendar & Reports
 **Calendar** – Monthly view with marked transaction days  
 ![Calendar 1](screenshots/calendar1.png)  
 ![Calendar 2](screenshots/calendar2.png)  
@@ -142,9 +134,7 @@ Below are some example screenshots showcasing the main features and interfaces o
 ![Income Report 1](screenshots/report-income1.png)  
 ![Income Report 2](screenshots/report-income2.png)  
 
----
-
-### ⚙️ Account & Settings
+## ⚙️ Account & Settings
 **Account** – View and update user profile  
 ![Account](screenshots/account.png)  
 
@@ -163,11 +153,8 @@ Below are some example screenshots showcasing the main features and interfaces o
 **Settings** – Language, currency, theme, and data management  
 ![Settings](screenshots/settings.png)  
 
----
-
-### 🎥 Demo Video
-You can also watch a short demo video of the app:  
-[![Watch the video]](https://youtu.be/AHH3pqcdFY4)
+## 🎥 Demo Video
+You can also watch a short demo video of the app:  [![Watch the video]](https://youtu.be/AHH3pqcdFY4)
 
 ---
 
