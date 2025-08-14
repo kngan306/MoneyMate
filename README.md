@@ -2,6 +2,8 @@
 
 **MoneyMate** is a cross-platform mobile application built with **Flutter** and powered by **Firebase**. It helps users efficiently and intuitively manage their personal income and expenses, while ensuring data safety and ease of use.
 
+🗓 **Project Duration:** January 2025 – March 2025
+
 ---
 
 ## 🎯 Project Scope
