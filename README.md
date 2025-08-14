@@ -72,4 +72,103 @@
 
 ---
 
+## 📸 Demo Screenshots & Videos
+
+Below are some example screenshots showcasing the main features and interfaces of the MoneyMate app.
+
+> **Note:** All screenshots should be placed in the `screenshots/` folder inside the project directory.
+
+---
+
+### 🔐 Authentication
+**Login Screen** – Authenticate via MoneyMate account or Google  
+![Login](screenshots/login.png)  
+
+**Register – Phone Number Verification**  
+![Register Phone 1](screenshots/register-phone1.png)  
+![Register Phone 2](screenshots/register-phone2.png)  
+
+**Register – Email Verification**  
+![Register Email](screenshots/register-email.png)  
+
+**Final Registration Step**  
+![Register Final](screenshots/register-final.png)  
+
+**Forgot Password** – Reset password via email verification code  
+![Forgot Password](screenshots/forgot-password.png)  
+
+---
+
+### 🏠 Main Features
+**Home Screen** – Overview of balance, monthly income/expenses chart, and quick category list  
+![Home](screenshots/home.png)  
+
+**Transaction History** – View transactions by date  
+![History By Date](screenshots/history-date.png)  
+
+**History by Category** – View spending within a specific category  
+![History By Category](screenshots/history-category.png)  
+
+**Add Expense** – Add and save a new expense  
+![Add Expense](screenshots/add-expense.png)  
+
+**Expense Categories** – List of existing expense categories  
+![Expense Categories](screenshots/expense-categories.png)  
+
+**Add Expense Category** – Create a new category  
+![Add Expense Category](screenshots/add-expense-category.png)  
+
+**Add Income** – Add and save a new income entry  
+![Add Income](screenshots/add-income.png)  
+
+**Income Categories** – List of existing income categories  
+![Income Categories](screenshots/income-categories.png)  
+
+**Add Income Category** – Create a new income category  
+![Add Income Category](screenshots/add-income-category.png)  
+
+---
+
+### 📅 Calendar & Reports
+**Calendar** – Monthly view with marked transaction days  
+![Calendar 1](screenshots/calendar1.png)  
+![Calendar 2](screenshots/calendar2.png)  
+
+**Expense Report** – Column and pie charts with detailed list  
+![Expense Report 1](screenshots/report-expense1.png)  
+![Expense Report 2](screenshots/report-expense2.png)  
+
+**Income Report** – Column and pie charts with detailed list  
+![Income Report 1](screenshots/report-income1.png)  
+![Income Report 2](screenshots/report-income2.png)  
+
+---
+
+### ⚙️ Account & Settings
+**Account** – View and update user profile  
+![Account](screenshots/account.png)  
+
+**Change Password** – Update login password  
+![Change Password](screenshots/change-password.png)  
+
+**Drawer Menu** – Access notifications, wallets, settings, and logout  
+![Drawer](screenshots/drawer.png)  
+
+**Notifications** – View app activity updates  
+![Notifications](screenshots/notifications.png)  
+
+**My Wallet** – Overview of total cash and bank transfers  
+![My Wallet](screenshots/wallet.png)  
+
+**Settings** – Language, currency, theme, and data management  
+![Settings](screenshots/settings.png)  
+
+---
+
+### 🎥 Demo Video
+You can also watch a short demo video of the app:  
+[![Watch the video]](https://youtu.be/AHH3pqcdFY4)
+
+---
+
 **Note:** This version focuses on core features. Advanced tools like budgeting and reminders are planned for future releases.
