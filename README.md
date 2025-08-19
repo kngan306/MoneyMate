@@ -155,9 +155,6 @@ Below are some example screenshots showcasing the main features and interfaces o
 **Settings** – Language, currency, theme, and data management  
 ![Settings](screenshots/settings.png)  
 
-## 🎥 Demo Video
-You can also watch a short demo video of the app:  [![Watch the video]](https://youtu.be/AHH3pqcdFY4)
-
 ---
 
 **Note:** This version focuses on core features. Advanced tools like budgeting and reminders are planned for future releases.
